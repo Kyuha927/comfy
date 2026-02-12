@@ -1,0 +1,18 @@
+{
+    "base_character": {
+        "name": "lora_chibi",
+        "steps": 30,
+        "cfg": 7.5,
+        "sampler_name": "dpmpp_2m",
+        "scheduler": "karras",
+        "width": 1024,
+        "height": 1344,
+        "ckpt_name": "Illustrious-XL-v2.0.safetensors",
+        "lora_name": "SDXL Chibi Avatar Generator v1.0.safetensors",
+        "lora_weight": 0.6,
+        "base_prompt": "masterpiece, best quality, chibi anime character, cute style, single character, full body, standing pose, centered, white background, appearance: short black bob hair, straight style, large kawaii eyes, sparkle highlights, simple facial features, cute expression, outfit: red jacket with white stripes, blue pants, white sneakers with red details, art style: chibi proportions, 2 heads tall, cute anime style, clean outlines, bright vibrant colors, flat cel shading, high quality illustration, sharp focus, front view, symmetrical"
+    },
+    "base_image": "",
+    "parts": {},
+    "negative_prompt": "lowres, bad quality, blurry, realistic, photorealistic, 3d, extra limbs, bad anatomy, multiple characters, background elements, pixel art, mosaic, cropped, out of frame, sketch, rough lines"
+}

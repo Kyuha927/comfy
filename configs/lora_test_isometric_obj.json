@@ -1,0 +1,19 @@
+{
+    "base_character": {
+        "name": "obj_isometric_chair",
+        "steps": 35,
+        "cfg": 7.0,
+        "sampler_name": "dpmpp_2m",
+        "scheduler": "karras",
+        "width": 768,
+        "height": 768,
+        "ckpt_name": "Illustrious-XL-v2.0.safetensors",
+        "lora_name": "isometric_slider_sdxl.safetensors",
+        "lora_weight": 1.0,
+        "base_prompt": "masterpiece, best quality, game asset, single furniture object, office chair, isometric view, 3/4 angle, clean white background, centered, anime game asset style, clean illustration, flat cel shading, bold outlines, warm pastel colors, isolated object, no room, no floor, crisp edges, game ready asset",
+        "negative_prompt": "background, room, floor, wall, shadow, complex background, scenery, environment, characters, people, messy, cluttered, dark, realistic, photo"
+    },
+    "base_image": "",
+    "parts": {},
+    "negative_prompt": "background, room, floor, wall, shadow, complex background, scenery, environment, characters, people, messy, cluttered, dark, realistic, photo"
+}

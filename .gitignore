@@ -1,0 +1,16 @@
+__pycache__/
+*.pyc
+outputs/
+failed_workflow.json
+.vscode/
+.idea/
+*.log
+lora_list.txt
+server_state_dump.txt
+debug_history.py
+check_server_state.py
+restart_comfy.py
+list_ckpts.py
+test_run.py
+debug_output.log
+start_debug.bat

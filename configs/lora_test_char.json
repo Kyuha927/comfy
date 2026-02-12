@@ -1,0 +1,18 @@
+{
+    "base_character": {
+        "name": "lora_char",
+        "steps": 30,
+        "cfg": 7.0,
+        "sampler_name": "dpmpp_2m",
+        "scheduler": "karras",
+        "width": 1024,
+        "height": 1344,
+        "ckpt_name": "Illustrious-XL-v2.0.safetensors",
+        "lora_name": "Game Character Sprites v1.0.safetensors",
+        "lora_weight": 0.7,
+        "base_prompt": "masterpiece, best quality, anime game character concept art, single character, full body portrait, standing idle pose, centered composition, white background, character design: cute proportions, 2.5 heads tall, short body, clear anatomical structure, game character ready, appearance: short black bob cut hair, straight style, neat bangs, large expressive eyes with shine highlights, simple clean facial features, neutral calm expression, outfit details: red sporty zip-up jacket, white side stripes, blue jogger pants with elastic cuffs, white sneakers, red accent details, clean modern casual style, art style: clean anime illustration, sharp lineart, flat cel shading, vibrant colors, bold outlines, consistent line weight, professional game art quality, crisp sharp focus, high resolution, front view, full body visible, ready for sprite conversion"
+    },
+    "base_image": "",
+    "parts": {},
+    "negative_prompt": "lowres, worst quality, poor quality, bad quality, blurry, out of focus, jpeg artifacts, pixel art, pixelated, mosaic, realistic, photorealistic, 3d render, oil painting, watercolor, sketch, extra limbs, bad anatomy, deformed, asymmetrical, cropped, out of frame, dynamic pose, action, motion blur, background elements, scenery, multiple characters, character sheet, shadows, dramatic lighting"
+}

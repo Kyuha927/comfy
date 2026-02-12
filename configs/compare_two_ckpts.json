@@ -1,0 +1,24 @@
+{
+  "base_character": {
+    "name": "compare",
+    "seed": 42,
+    "steps": 28,
+    "cfg": 7.5,
+    "sampler_name": "dpmpp_2m",
+    "scheduler": "karras",
+    "ckpt_name": "anything-v5.safetensors",
+    "width": 1024,
+    "height": 1024,
+    "base_prompt": "masterpiece, best quality, anime game character concept art, single character only, full body, standing, idle pose, centered composition, symmetrical body, clear readable silhouette, cute but clean proportions (not super deformed, not realistic), large expressive eyes, simple facial features suitable for sprite conversion, short black hair, straight simple hairstyle, wearing a red jacket (clean design, minimal logos), blue pants, white sneakers, outfit designed for customization (clear layers, readable shapes), flat colors, clean shading, minimal gradients, clear lineart, consistent anatomy, neutral expression, plain light background"
+  },
+  "base_image": "",
+  "parts": {
+    "hair": "short_black",
+    "top": "red_jacket",
+    "bottom": "blue_pants",
+    "shoes": "white_sneakers",
+    "item": "empty",
+    "expression": "neutral"
+  },
+  "negative_prompt": "lowres, worst quality, blurry, jpeg artifacts, pixelated, mosaic, broken pixels, painterly, oil painting, realistic texture, heavy shadows, dramatic lighting, multiple characters, duplicate body, extra limbs, bad anatomy, deformed body, cropped, out of frame, dynamic pose, action pose"
+}

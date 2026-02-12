@@ -1,0 +1,17 @@
+{
+    "base_character": {
+        "name": "hires_bg",
+        "seed": 600,
+        "steps": 35,
+        "cfg": 7.0,
+        "sampler_name": "dpmpp_2m",
+        "scheduler": "karras",
+        "width": 1536,
+        "height": 1024,
+        "ckpt_name": "Illustrious-XL-v2.0.safetensors",
+        "base_prompt": "masterpiece, best quality, highly detailed, game background art, professional illustration, isometric room interior design, cozy bedroom, organized furniture layout, neat arrangement, environment details: single bed with colorful bedding, wooden desk with computer setup, ergonomic chair, bookshelf full of books, wall decorations, posters, photo frames, small plants, decorative items, warm lighting fixtures, organized cables and accessories, style: clean anime background art style, flat cel shading, soft gradients allowed, warm pastel color palette, cohesive color scheme (pink, mint, cream, peach), soft ambient lighting, natural feel, high detail, intricate objects, technical: isometric perspective or 3/4 view, clear depth, readable layout, empty room, no characters, game asset ready background, high resolution, sharp details, organized composition"
+    },
+    "base_image": "",
+    "parts": {},
+    "negative_prompt": "lowres, worst quality, poor quality, pixel art, pixelated, low resolution, realistic, photorealistic, photo, 3d render, ray tracing, unreal engine, messy, cluttered, disorganized, characters, people, humans, animals, dark, gloomy, dramatic shadows, modern flat UI, web design, icons, text, watermark, signature, blurry, out of focus, motion blur"
+}

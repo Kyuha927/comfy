@@ -1,0 +1,64 @@
+{
+  "1": {
+    "class_type": "LoadImage",
+    "inputs": {
+      "image": "__IMAGE_INPUT__"
+    }
+  },
+  "2": {
+    "class_type": "CheckpointLoaderSimple",
+    "inputs": {
+      "ckpt_name": "__CKPT_NAME__"
+    }
+  },
+  "3": {
+    "class_type": "VAEEncode",
+    "inputs": {
+      "pixels": ["1", 0],
+      "vae": ["2", 2]
+    }
+  },
+  "4": {
+    "class_type": "CLIPTextEncode",
+    "inputs": {
+      "clip": ["2", 1],
+      "text": "__PROMPT__"
+    }
+  },
+  "5": {
+    "class_type": "CLIPTextEncode",
+    "inputs": {
+      "clip": ["2", 1],
+      "text": "__NEGATIVE__"
+    }
+  },
+  "6": {
+    "class_type": "KSampler",
+    "inputs": {
+      "cfg": "__CFG__",
+      "denoise": "__DENOISE__",
+      "latent_image": ["3", 0],
+      "model": ["2", 0],
+      "negative": ["5", 0],
+      "positive": ["4", 0],
+      "sampler_name": "dpmpp_2m",
+      "scheduler": "karras",
+      "seed": "__SEED__",
+      "steps": 25
+    }
+  },
+  "7": {
+    "class_type": "VAEDecode",
+    "inputs": {
+      "samples": ["6", 0],
+      "vae": ["2", 2]
+    }
+  },
+  "8": {
+    "class_type": "SaveImage",
+    "inputs": {
+      "filename_prefix": "__FILENAME_PREFIX__",
+      "images": ["7", 0]
+    }
+  }
+}

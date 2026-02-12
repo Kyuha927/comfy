@@ -1,0 +1,19 @@
+{
+  "base_character": {
+    "name": "hero_01",
+    "seed": 42,
+    "ckpt_name": "pixelstyleckpt_strength07.safetensors",
+    "cfg_img2img": 6.75,
+    "base_prompt": "pixel game character sprite, flat colors, simple shading, clear outline, game asset, front view, standing pose"
+  },
+  "base_image": "",
+  "parts": {
+    "hair": "short black hair",
+    "top": "red jacket",
+    "bottom": "blue pants",
+    "shoes": "white sneakers",
+    "item": "empty",
+    "expression": "neutral"
+  },
+  "negative_prompt": "lowres, worst quality, blur, soft, gradient, smooth shading, anti-aliasing, realistic, photograph, 3d render, illustration style, gradient shading, soft edges, multiple characters, cropped, bad anatomy, extra limbs, deformed, jpeg artifacts"
+}

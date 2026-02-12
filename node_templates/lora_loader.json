@@ -1,0 +1,12 @@
+{
+    "1": {
+        "class_type": "LoraLoader",
+        "inputs": {
+            "lora_name": "__LORA_NAME__",
+            "strength_model": "__LORA_STRENGTH__",
+            "strength_clip": "__LORA_STRENGTH__",
+            "model": "__MODEL_INPUT__",
+            "clip": "__CLIP_INPUT__"
+        }
+    }
+}

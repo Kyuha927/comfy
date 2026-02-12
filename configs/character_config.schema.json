@@ -1,0 +1,23 @@
+{
+  "$schema": "캐릭터 파이프라인 설정 스키마 (참고용)",
+  "description": "게임용 픽셀 캐릭터 일관 생성 - 베이스 캐릭터 + 파츠 조합",
+  "base_character": {
+    "name": "캐릭터 식별자 (파일명·메타에 사용)",
+    "seed": "고정 시 일관된 얼굴/비율, 변경 시 다른 변형",
+    "ckpt_name": "ComfyUI models/checkpoints/ 내 체크포인트 파일명",
+    "base_prompt": "공통 묘사 (메이플스타일, 귀여운 비율, 큰 머리 등)"
+  },
+  "parts": {
+    "hair": "헤어스타일",
+    "top": "상의",
+    "bottom": "하의",
+    "shoes": "신발",
+    "item": "손에 든 아이템 (없으면 empty)",
+    "expression": "표정: neutral, happy, excited 등"
+  },
+  "pixel": {
+    "width": 96,
+    "height": 96,
+    "note": "64x64 또는 96x96 권장, 픽셀 보존 업스케일은 별도 템플릿"
+  }
+}

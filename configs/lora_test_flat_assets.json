@@ -1,0 +1,19 @@
+{
+    "base_character": {
+        "name": "obj_flat_desk",
+        "steps": 30,
+        "cfg": 7.0,
+        "sampler_name": "dpmpp_2m",
+        "scheduler": "karras",
+        "width": 512,
+        "height": 512,
+        "ckpt_name": "Illustrious-XL-v2.0.safetensors",
+        "lora_name": "flat_illustration_sdxl.safetensors",
+        "lora_weight": 0.8,
+        "base_prompt": "masterpiece, best quality, game asset, single object, wooden desk with drawers, flat 2d style cutout, centered composition, white background, anime game item style, flat cel shading, clean outlines, detailed furniture, warm brown wood, no characters, no room, isolated object",
+        "negative_prompt": "3d, room, floor, wall, shadow, complex background, scenery, environment, characters, people, messy, cluttered, dark, realistic, photo"
+    },
+    "base_image": "",
+    "parts": {},
+    "negative_prompt": "3d, room, floor, wall, shadow, complex background, scenery, environment, characters, people, messy, cluttered, dark, realistic, photo"
+}

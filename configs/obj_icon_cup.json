@@ -1,0 +1,17 @@
+{
+    "base_character": {
+        "name": "obj_icon_cup",
+        "steps": 25,
+        "cfg": 8.0,
+        "sampler_name": "dpmpp_2m",
+        "scheduler": "karras",
+        "width": 512,
+        "height": 512,
+        "ckpt_name": "Illustrious-XL-v2.0.safetensors",
+        "base_prompt": "masterpiece, best quality, game UI icon, ceramic coffee cup with handle, centered composition, white background, flat design, game icon style, bright colors, simple shapes, clean vector-like appearance, minimal details, readable at small size, square composition, icon ready, scalable design, high contrast",
+        "negative_prompt": "background, room, floor, wall, shadow, complex background, scenery, environment, characters, people, messy, cluttered, dark, realistic, photo, 3d render"
+    },
+    "base_image": "",
+    "parts": {},
+    "negative_prompt": "background, room, floor, wall, shadow, complex background, scenery, environment, characters, people, messy, cluttered, dark, realistic, photo, 3d render"
+}

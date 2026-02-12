@@ -1,0 +1,19 @@
+{
+    "base_character": {
+        "name": "bg_empty_base",
+        "steps": 32,
+        "cfg": 6.0,
+        "sampler_name": "dpmpp_2m",
+        "scheduler": "karras",
+        "width": 1024,
+        "height": 1024,
+        "ckpt_name": "Illustrious-XL-v2.0.safetensors",
+        "lora_name": "JJ's Isometric Room XL v1.0.safetensors",
+        "lora_weight": 0.45,
+        "base_prompt": "masterpiece, best quality, highly detailed, isometric cutaway room interior, empty room base, L-shaped room with solid walls and visible thickness, clean floor plane, simple wall surfaces, no large furniture, no bed, no desk, no chair, stable isometric perspective, accurate angles, soft ambient lighting, gentle shadows, warm low-saturation pastel palette (pink, peach, cream), clean illustration style, anime game background, cozy but minimal atmosphere, empty room, background only",
+        "negative_prompt": "furniture, bed, desk, chair, sofa, cabinet, cluttered room, objects touching each other, strong outlines, pixel art, photorealistic"
+    },
+    "base_image": "",
+    "parts": {},
+    "negative_prompt": "furniture, bed, desk, chair, sofa, cabinet, cluttered room, objects touching each other, strong outlines, pixel art, photorealistic"
+}

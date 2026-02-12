@@ -1,0 +1,18 @@
+{
+    "base_character": {
+        "name": "lora_bg_sharp",
+        "steps": 45,
+        "cfg": 6.0,
+        "sampler_name": "dpmpp_2m_sde",
+        "scheduler": "karras",
+        "width": 1024,
+        "height": 1024,
+        "ckpt_name": "Illustrious-XL-v2.0.safetensors",
+        "lora_name": "JJ's Isometric Room XL v1.0.safetensors",
+        "lora_weight": 0.35,
+        "base_prompt": "masterpiece, best quality, highly detailed, isometric bedroom interior, game background art, architecture: clean sharp edges, precise lines, architectural accuracy, clear room boundaries, well-defined furniture outlines, furniture: single bed with clean bedding, wooden desk with laptop, office chair, tall bookshelf with books, wall posters in frames, potted plants, desk lamp, small decorations, art style: anime game background illustration, vector-style clean linework, sharp precise edges, architectural drawing quality, warm pastel color palette (pink, mint, peach, cream), soft ambient lighting on surfaces, organized neat layout, technical: isometric perspective with accurate angles, empty room, no characters, high resolution, crisp sharp focus, game asset ready background, professional architectural illustration"
+    },
+    "base_image": "",
+    "parts": {},
+    "negative_prompt": "realistic, photorealistic, photo, 3d render, soft edges, blurry lines, unclear boundaries, melting, distorted, warped perspective, messy, cluttered, disorganized, characters, people, animals, dark lighting, heavy shadows, sketch, rough, unfinished, low quality, blurry, out of focus, pixel art, mosaic"
+}

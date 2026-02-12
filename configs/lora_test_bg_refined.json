@@ -1,0 +1,19 @@
+{
+    "base_character": {
+        "name": "lora_bg_refined",
+        "steps": 32,
+        "cfg": 6.5,
+        "sampler_name": "dpmpp_2m",
+        "scheduler": "karras",
+        "width": 1024,
+        "height": 1024,
+        "ckpt_name": "Illustrious-XL-v2.0.safetensors",
+        "lora_name": "JJ's Isometric Room XL v1.0.safetensors",
+        "lora_weight": 0.45,
+        "base_prompt": "masterpiece, best quality, highly detailed, isometric cutaway room interior, game background asset, stable isometric perspective, accurate angles, L-shaped room with solid walls and visible thickness, clearly separated furniture pieces, distinct object boundaries, subtle but visible outlines per object, slight contrast between adjacent objects, soft edge definition, readable silhouettes, furniture: bed, desk, chair, bookshelf, cabinets clearly distinguishable, warm low-saturation pastel palette (pink, peach, cream, mint), soft ambient lighting, gentle shadows, clean illustration style, anime game background, cozy atmosphere, organized layout, empty room, no characters",
+        "negative_prompt": "overly thick outlines, harsh black lineart, cell-shaded anime style, pixel art, blurry object boundaries, objects melting together, overexposed lighting, washed out contrast, noisy textures, hyper realism, photorealistic, messy cluttered layout"
+    },
+    "base_image": "",
+    "parts": {},
+    "negative_prompt": "overly thick outlines, harsh black lineart, cell-shaded anime style, pixel art, blurry object boundaries, objects melting together, overexposed lighting, washed out contrast, noisy textures, hyper realism, photorealistic, messy cluttered layout"
+}

@@ -1,0 +1,19 @@
+{
+    "base_character": {
+        "name": "obj_pixel_lamp",
+        "steps": 30,
+        "cfg": 7.5,
+        "sampler_name": "dpmpp_2m",
+        "scheduler": "karras",
+        "width": 512,
+        "height": 512,
+        "ckpt_name": "Illustrious-XL-v2.0.safetensors",
+        "lora_name": "PixelArtRedmond-Lite64.safetensors",
+        "lora_weight": 0.8,
+        "base_prompt": "pixel art, game item sprite, small cute desk lamp, 16-bit style, flat colors, no gradients, clean pixel edges, retro game aesthetic, white background, centered, detailed pixel art, high quality",
+        "negative_prompt": "3d, room, floor, wall, shadow, complex background, scenery, environment, characters, people, messy, cluttered, dark, realistic, photo, photography, smooth gradients"
+    },
+    "base_image": "",
+    "parts": {},
+    "negative_prompt": "3d, room, floor, wall, shadow, complex background, scenery, environment, characters, people, messy, cluttered, dark, realistic, photo, photography, smooth gradients"
+}

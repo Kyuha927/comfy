@@ -1,0 +1,19 @@
+{
+    "base_character": {
+        "name": "obj_desk_refined",
+        "steps": 32,
+        "cfg": 6.0,
+        "sampler_name": "dpmpp_2m",
+        "scheduler": "karras",
+        "width": 1024,
+        "height": 1024,
+        "ckpt_name": "Illustrious-XL-v2.0.safetensors",
+        "lora_name": "JJ's Isometric Room XL v1.0.safetensors",
+        "lora_weight": 0.45,
+        "base_prompt": "masterpiece, best quality, single furniture object, isometric view, game item asset, simple wooden desk, clear edges and readable shape, soft contact shadow, minimal props (one book or none), warm pastel tone, clean illustration style, centered, transparent background",
+        "negative_prompt": "room, background, multiple objects, messy details, strong black outlines, dramatic lighting, floor tiles, walls, environment"
+    },
+    "base_image": "",
+    "parts": {},
+    "negative_prompt": "room, background, multiple objects, messy details, strong black outlines, dramatic lighting, floor tiles, walls, environment"
+}

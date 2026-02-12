@@ -1,0 +1,20 @@
+{
+  "base_character": {
+    "name": "chibi_playable",
+    "seed": 42,
+    "steps": 28,
+    "cfg": 7.5,
+    "ckpt_name": "anything-v5.safetensors",
+    "base_prompt": "game character, playable character, cute chibi proportion, large expressive eyes, clear silhouette, thick outline, simple readable shapes, standing idle pose, front view, single character, anime style, flat shading, clean lineart"
+  },
+  "base_image": "",
+  "parts": {
+    "hair": "chibi",
+    "top": "playable",
+    "bottom": "standing",
+    "shoes": "idle",
+    "item": "empty",
+    "expression": "neutral"
+  },
+  "negative_prompt": "realistic, detailed background, illustration sheet, concept art, multiple characters, thin lines, washed colors, fashion illustration, model pose"
+}

@@ -1,0 +1,20 @@
+{
+  "base_character": {
+    "name": "cmp",
+    "seed": 42,
+    "steps": 28,
+    "cfg": 7.5,
+    "ckpt_name": "v1-5-pruned-emaonly.safetensors",
+    "base_prompt": "1girl, game character, anime style character, full body, standing pose, front facing, neutral expression, short black hair, simple outfit, clear facial features, balanced proportions, clean silhouette, readable shape, simple lighting, flat colors, minimal shading, plain background"
+  },
+  "base_image": "",
+  "parts": {
+    "hair": "short_black_hair",
+    "top": "simple_outfit",
+    "bottom": "full_body",
+    "shoes": "standing",
+    "item": "empty",
+    "expression": "neutral"
+  },
+  "negative_prompt": "masterpiece, best quality, illustration, artstation, photorealistic, realistic lighting, dramatic lighting, background scenery, complex background, gradient shading, soft shading, overdetailed, chibi, pixel art, lowres, blurry, multiple characters, cropped, out of frame, bad anatomy, extra limbs, deformed face"
+}

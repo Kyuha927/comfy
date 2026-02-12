@@ -1,0 +1,17 @@
+{
+    "base_character": {
+        "name": "hires_ui",
+        "seed": 700,
+        "steps": 30,
+        "cfg": 6.5,
+        "sampler_name": "dpmpp_2m",
+        "scheduler": "karras",
+        "width": 1024,
+        "height": 768,
+        "ckpt_name": "Illustrious-XL-v2.0.safetensors",
+        "base_prompt": "masterpiece, best quality, highly detailed, game UI interface design, clean modern layout, floating panel window, rounded corners, organized information display, UI elements: character portrait frame (circular or square), health/mana stat bars with gradients, inventory grid slots (6x4), skill button slots with icons, decorative borders, subtle patterns, navigation buttons, clear icons, text display areas, readable zones, style: anime game UI aesthetic, soft pastel color scheme, white/light panels with transparency, colorful accent buttons (pink, blue, green), subtle drop shadows, soft depth, gradient overlays (subtle), decorative frame elements, technical: vector-style clean graphics, scalable design elements, mobile-friendly layout, organized visual hierarchy, high resolution assets, game-ready interface"
+    },
+    "base_image": "",
+    "parts": {},
+    "negative_prompt": "lowres, worst quality, poor quality, realistic, corporate, business, web 2.0, bootstrap, material design, dashboard, admin panel, cluttered, messy, unorganized, heavy 3d effects, skeuomorphic, dark theme, gloomy colors, text content, lorem ipsum, blurry, low resolution"
+}

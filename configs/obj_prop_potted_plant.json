@@ -1,0 +1,19 @@
+{
+    "base_character": {
+        "name": "obj_prop_potted_plant",
+        "steps": 30,
+        "cfg": 7.0,
+        "sampler_name": "dpmpp_2m",
+        "scheduler": "karras",
+        "width": 512,
+        "height": 512,
+        "ckpt_name": "Illustrious-XL-v2.0.safetensors",
+        "lora_name": "JJ's Isometric Room XL v1.0.safetensors",
+        "lora_weight": 0.3,
+        "base_prompt": "masterpiece, best quality, game item, single object, small potted plant with green leaves, isometric view, white background, centered, cute game asset style, vibrant colors, clean design, flat shading, simple details, icon ready, isolated object, high quality",
+        "negative_prompt": "background, room, floor, wall, shadow, complex background, scenery, environment, characters, people, messy, cluttered, dark, realistic, photo"
+    },
+    "base_image": "",
+    "parts": {},
+    "negative_prompt": "background, room, floor, wall, shadow, complex background, scenery, environment, characters, people, messy, cluttered, dark, realistic, photo"
+}

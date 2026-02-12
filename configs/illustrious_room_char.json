@@ -1,0 +1,17 @@
+{
+    "base_character": {
+        "name": "hires_hero",
+        "seed": 500,
+        "steps": 35,
+        "cfg": 7.0,
+        "sampler_name": "dpmpp_2m",
+        "scheduler": "karras",
+        "width": 1024,
+        "height": 1344,
+        "ckpt_name": "Illustrious-XL-v2.0.safetensors",
+        "base_prompt": "masterpiece, best quality, highly detailed, anime game character concept art, professional illustration, single character, full body portrait, standing pose, centered composition, pure white background, character design: cute proportions, 2.5 heads tall, short body, NOT overly deformed, balanced cute style, clear anatomical structure, game character ready, appearance: short black bob cut hair, straight style, neat bangs, large expressive eyes with shine highlights, simple clean facial features, neutral calm expression, slight smile, outfit details: red sporty zip-up jacket, white side stripes, blue jogger pants with elastic cuffs, white sneakers, red accent details, clean modern casual style, clear layer separation for parts, art style: clean anime illustration, sharp lineart, flat cel shading with subtle gradients, vibrant colors, high saturation, bold outlines, consistent line weight, professional game art quality, crisp sharp focus, high resolution, technical: symmetrical standing pose, arms relaxed at sides, clear readable silhouette, front view, full body visible, ready for sprite conversion"
+    },
+    "base_image": "",
+    "parts": {},
+    "negative_prompt": "lowres, worst quality, poor quality, bad quality, blurry, out of focus, jpeg artifacts, compression, pixel art, pixelated, mosaic, low resolution, realistic, photorealistic, photo, photography, 3d render, cgi, unreal engine, oil painting, watercolor, sketch, rough, extra limbs, bad anatomy, deformed, mutated, asymmetrical, twisted body, broken proportions, cropped, cut off, out of frame, dynamic pose, action, motion blur, background elements, scenery, environment, multiple characters, character sheet, variations, shadows, dramatic lighting, rim lighting"
+}

@@ -1,0 +1,22 @@
+{
+  "base_character": {
+    "name": "chibi_redjacket",
+    "seed": 42,
+    "steps": 22,
+    "cfg": 6.8,
+    "sampler_name": "euler_ancestral",
+    "scheduler": "normal",
+    "ckpt_name": "anything-v5.safetensors",
+    "base_prompt": "masterpiece, best quality, anime game character, chibi style but well-proportioned, single character only, full body, standing, idle pose, centered composition, symmetrical body, clear silhouette, cute but detailed face, large expressive eyes, short black hair, simple straight hairstyle, wearing a red jacket, blue pants, white sneakers, clean outfit design suitable for customization, flat colors, clean shading, minimal gradients, clear lineart, consistent anatomy, neutral expression, plain light background"
+  },
+  "base_image": "",
+  "parts": {
+    "hair": "short_black",
+    "top": "red_jacket",
+    "bottom": "blue_pants",
+    "shoes": "white_sneakers",
+    "item": "empty",
+    "expression": "neutral"
+  },
+  "negative_prompt": "lowres, worst quality, blurry, jpeg artifacts, pixelated, mosaic, broken pixels, anti-aliasing, soft edges, painterly, multiple characters, duplicate body, extra limbs, bad anatomy, deformed body, big head tiny body, cropped, out of frame, dynamic pose, action pose, over-rendered, realistic texture, heavy shadows"
+}

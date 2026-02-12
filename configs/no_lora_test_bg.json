@@ -1,0 +1,16 @@
+{
+    "base_character": {
+        "name": "no_lora_bg",
+        "steps": 40,
+        "cfg": 7.0,
+        "sampler_name": "dpmpp_2m",
+        "scheduler": "karras",
+        "width": 1024,
+        "height": 1024,
+        "ckpt_name": "Illustrious-XL-v2.0.safetensors",
+        "base_prompt": "masterpiece, best quality, extremely detailed, isometric pixel art style bedroom, game background, architectural illustration, clean vector linework, sharp precise edges, well-defined boundaries, room layout: single bed, desk, chair, bookshelf, warm pastel colors (pink, mint, cream), soft lighting, organized layout, isometric game background art, empty room, high quality"
+    },
+    "base_image": "",
+    "parts": {},
+    "negative_prompt": "lowres, worst quality, poor quality, bad quality, blurry, realism, photorealistic, characters, people, animals, messy, cluttered"
+}

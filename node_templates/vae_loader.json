@@ -1,0 +1,8 @@
+{
+    "1": {
+        "class_type": "VAELoader",
+        "inputs": {
+            "vae_name": "__VAE_NAME__"
+        }
+    }
+}
