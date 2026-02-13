@@ -84,6 +84,18 @@ WORKFLOW_TEMPLATE = {
 if not os.path.exists(OUTPUT_DIR):
     os.makedirs(OUTPUT_DIR)
 
+def save_metadata(seed, pos, neg, width, height, steps, cfg):
+    filename = f"serverless_{seed}.txt"
+    filepath = os.path.join(OUTPUT_DIR, filename)
+    with open(filepath, "w", encoding="utf-8") as f:
+        f.write(f"Seed: {seed}\n")
+        f.write(f"Resolution: {width}x{height}\n")
+        f.write(f"Steps: {steps}\n")
+        f.write(f"CFG: {cfg}\n")
+        f.write(f"Positive Prompt:\n{pos}\n\n")
+        f.write(f"Negative Prompt:\n{neg}\n")
+    print(f"📝 Metadata saved: {filepath}")
+
 def generate_serverless_image(prompt_pos, prompt_neg, seed, steps=28, cfg=7.0, width=1024, height=1024):
     workflow = WORKFLOW_TEMPLATE.copy()
     
@@ -121,6 +133,10 @@ def generate_serverless_image(prompt_pos, prompt_neg, seed, steps=28, cfg=7.0, w
         result = response.json()
         job_id = result.get("id")
         print(f"✅ Job Started: {job_id}")
+        
+        # Save Metadata
+        save_metadata(seed, prompt_pos, prompt_neg, width, height, steps, cfg)
+        
         return job_id
     except Exception as e:
         print(f"❌ Failed to start job: {e}")
