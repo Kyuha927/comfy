@@ -22,6 +22,10 @@
       "clip_vision": [
         "5",
         0
+      ],
+      "attn_mask": [
+        "19",
+        0
       ]
     },
     "class_type": "IPAdapterAdvanced",
