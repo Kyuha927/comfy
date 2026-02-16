@@ -1,1 +1,12 @@
 image,dino_similarity,clip_similarity,final_score,prompt
+outputs\dataset_cyborg-tentacles-stable_20260217003215\data_05_45_degree_front_right_variant_05_00006_.png,0.9738409519195557,0.26195871353149414,0.7602762804031372,"pixel art, exactly 10 glowing purple tentacles"
+outputs\dataset_cyborg-tentacles-stable_20260217003215\data_11_attack_pose_2_variant_11_00008_.png,0.9706475734710693,0.2591990852355957,0.7572130270004271,"pixel art, exactly 10 glowing purple tentacles"
+outputs\dataset_cyborg-tentacles-stable_20260217003215\data_08_idle_animation_variant_08_00006_.png,0.9683972597122192,0.26052289962768554,0.7560349516868591,"pixel art, exactly 10 glowing purple tentacles"
+outputs\dataset_cyborg-tentacles-stable_20260217003215\data_03_back_view_variant_03_00006_.png,0.9606467485427856,0.26288055419921874,0.7513168902397156,"pixel art, exactly 10 glowing purple tentacles"
+outputs\dataset_cyborg-tentacles-stable_20260217003215\data_01_side_view_left_variant_01_00007_.png,0.9590375423431396,0.2585902214050293,0.7489033460617065,"pixel art, exactly 10 glowing purple tentacles"
+outputs\dataset_cyborg-tentacles-stable_20260217003215\data_09_walking_animation_variant_09_00006_.png,0.9526136517524719,0.2643268394470215,0.7461276080608368,"pixel art, exactly 10 glowing purple tentacles"
+outputs\dataset_cyborg-tentacles-stable_20260217003215\data_10_attack_pose_1_variant_10_00006_.png,0.949518620967865,0.2661545181274414,0.7445093901157378,"pixel art, exactly 10 glowing purple tentacles"
+outputs\dataset_cyborg-tentacles-stable_20260217003215\data_02_side_view_right_variant_02_00006_.png,0.9481697082519531,0.2642369842529297,0.7429898910522461,"pixel art, exactly 10 glowing purple tentacles"
+outputs\dataset_cyborg-tentacles-stable_20260217003215\data_06_45_degree_back_left_variant_06_00006_.png,0.9491634368896484,0.2604019546508789,0.7425349922180176,"pixel art, exactly 10 glowing purple tentacles"
+outputs\dataset_cyborg-tentacles-stable_20260217003215\data_04_45_degree_front_left_variant_04_00006_.png,0.9352352023124695,0.26385576248168946,0.7338213703632355,"pixel art, exactly 10 glowing purple tentacles"
+outputs\dataset_cyborg-tentacles-stable_20260217003215\data_07_45_degree_back_right_variant_07_00006_.png,0.898405909538269,0.2586928367614746,0.7064919877052307,"pixel art, exactly 10 glowing purple tentacles"
