@@ -1,0 +1,17 @@
+{
+  "lora_name": "cyborg-tentacles-color-fixed",
+  "username": "kyuhakim",
+  "ckpt_name": "AOM3A1.safetensors",
+  "mode": "pixel_controlnet_i2i",
+  "pose": "front view",
+  "seed": 100,
+  "denoise": 0.75,
+  "prompt": "pixel art, exactly 10 glowing purple tentacles, front view, standing on solid ground, white background, high quality",
+  "negative_prompt": "multiple characters, grid, split view, blurry, distorted, low quality, artifacts, text, watermark, messy background",
+  "controlnet": {
+    "enabled": true,
+    "controlnet_name": null,
+    "canny_low": null,
+    "canny_high": null
+  }
+}

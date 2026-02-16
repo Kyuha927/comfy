@@ -1,0 +1,86 @@
+[
+  {
+    "image": "outputs\\dataset_cyborg-tentacles-color-fixed_20260216192602\\data_06_45_degree_back_left_lineart_map_00001_.png",
+    "prompt": "pixel art, exactly 10 glowing purple tentacles, 45 degree back left, standing on solid ground, white background, high quality",
+    "dino_similarity": 1.0,
+    "clip_similarity": 0.24543467164039612,
+    "final_score": 0.7736304014921188
+  },
+  {
+    "image": "outputs\\dataset_cyborg-tentacles-color-fixed_20260216192602\\data_00_front_view_lineart_map_00001_.png",
+    "prompt": "pixel art, exactly 10 glowing purple tentacles, front view, standing on solid ground, white background, high quality",
+    "dino_similarity": 1.0,
+    "clip_similarity": 0.24511149525642395,
+    "final_score": 0.7735334485769272
+  },
+  {
+    "image": "outputs\\dataset_cyborg-tentacles-color-fixed_20260216192602\\data_05_45_degree_front_right_lineart_map_00001_.png",
+    "prompt": "pixel art, exactly 10 glowing purple tentacles, 45 degree front right, standing on solid ground, white background, high quality",
+    "dino_similarity": 1.0,
+    "clip_similarity": 0.24422818422317505,
+    "final_score": 0.7732684552669524
+  },
+  {
+    "image": "outputs\\dataset_cyborg-tentacles-color-fixed_20260216192602\\data_04_45_degree_front_left_lineart_map_00001_.png",
+    "prompt": "pixel art, exactly 10 glowing purple tentacles, 45 degree front left, standing on solid ground, white background, high quality",
+    "dino_similarity": 1.0,
+    "clip_similarity": 0.24375692009925842,
+    "final_score": 0.7731270760297775
+  },
+  {
+    "image": "outputs\\dataset_cyborg-tentacles-color-fixed_20260216192602\\data_03_back_view_lineart_map_00001_.png",
+    "prompt": "pixel art, exactly 10 glowing purple tentacles, back view, standing on solid ground, white background, high quality",
+    "dino_similarity": 1.0,
+    "clip_similarity": 0.24356117844581604,
+    "final_score": 0.7730683535337448
+  },
+  {
+    "image": "outputs\\dataset_cyborg-tentacles-color-fixed_20260216192602\\data_07_45_degree_back_right_lineart_map_00001_.png",
+    "prompt": "pixel art, exactly 10 glowing purple tentacles, 45 degree back right, standing on solid ground, white background, high quality",
+    "dino_similarity": 1.0,
+    "clip_similarity": 0.24314145743846893,
+    "final_score": 0.7729424372315407
+  },
+  {
+    "image": "outputs\\dataset_cyborg-tentacles-color-fixed_20260216192602\\data_01_side_view_left_lineart_map_00001_.png",
+    "prompt": "pixel art, exactly 10 glowing purple tentacles, side view left, standing on solid ground, white background, high quality",
+    "dino_similarity": 1.0,
+    "clip_similarity": 0.24095769226551056,
+    "final_score": 0.7722873076796531
+  },
+  {
+    "image": "outputs\\dataset_cyborg-tentacles-color-fixed_20260216192602\\data_09_walking_animation_lineart_map_00001_.png",
+    "prompt": "pixel art, exactly 10 glowing purple tentacles, walking animation, standing on solid ground, white background, high quality",
+    "dino_similarity": 1.0,
+    "clip_similarity": 0.24002023041248322,
+    "final_score": 0.7720060691237449
+  },
+  {
+    "image": "outputs\\dataset_cyborg-tentacles-color-fixed_20260216192602\\data_02_side_view_right_lineart_map_00001_.png",
+    "prompt": "pixel art, exactly 10 glowing purple tentacles, side view right, standing on solid ground, white background, high quality",
+    "dino_similarity": 1.0,
+    "clip_similarity": 0.23970668017864227,
+    "final_score": 0.7719120040535926
+  },
+  {
+    "image": "outputs\\dataset_cyborg-tentacles-color-fixed_20260216192602\\data_08_idle_animation_lineart_map_00001_.png",
+    "prompt": "pixel art, exactly 10 glowing purple tentacles, idle animation, standing on solid ground, white background, high quality",
+    "dino_similarity": 1.0,
+    "clip_similarity": 0.23664559423923492,
+    "final_score": 0.7709936782717705
+  },
+  {
+    "image": "outputs\\dataset_cyborg-tentacles-color-fixed_20260216192602\\data_10_attack_pose_1_lineart_map_00001_.png",
+    "prompt": "pixel art, exactly 10 glowing purple tentacles, attack pose 1, standing on solid ground, white background, high quality",
+    "dino_similarity": 1.0,
+    "clip_similarity": 0.2273847460746765,
+    "final_score": 0.7682154238224029
+  },
+  {
+    "image": "outputs\\dataset_cyborg-tentacles-color-fixed_20260216192602\\data_11_attack_pose_2_lineart_map_00001_.png",
+    "prompt": "pixel art, exactly 10 glowing purple tentacles, attack pose 2, standing on solid ground, white background, high quality",
+    "dino_similarity": 1.0,
+    "clip_similarity": 0.2262367606163025,
+    "final_score": 0.7678710281848907
+  }
+]
