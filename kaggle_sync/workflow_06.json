@@ -2,7 +2,7 @@
   "1": {
     "inputs": {
       "model": [
-        "12",
+        "2",
         0
       ],
       "ipadapter": [
@@ -74,7 +74,7 @@
     "inputs": {
       "text": "pixel art, exactly 10 glowing purple tentacles, 45 degree back left, standing on solid ground, white background, high quality",
       "clip": [
-        "12",
+        "2",
         1
       ]
     },
@@ -87,7 +87,7 @@
     "inputs": {
       "text": "multiple characters, grid, split view, blurry, distorted, low quality, artifacts, text, watermark, messy background",
       "clip": [
-        "12",
+        "2",
         1
       ]
     },
