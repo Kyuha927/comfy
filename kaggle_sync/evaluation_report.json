@@ -1,0 +1,79 @@
+[
+  {
+    "name": "data_07_45_degree_back_right_variant_07_00005_.png",
+    "path": "outputs\\dataset_cyborg-tentacles-final_20260216185508\\data_07_45_degree_back_right_variant_07_00005_.png",
+    "dino_score": 0.9493086934089661,
+    "clip_score": 0.2873902702331543,
+    "final_score": 0.7507331664562225
+  },
+  {
+    "name": "data_05_45_degree_front_right_variant_05_00005_.png",
+    "path": "outputs\\dataset_cyborg-tentacles-final_20260216185508\\data_05_45_degree_front_right_variant_05_00005_.png",
+    "dino_score": 0.9440808296203613,
+    "clip_score": 0.2837662696838379,
+    "final_score": 0.7459864616394043
+  },
+  {
+    "name": "data_10_attack_pose_1_variant_10_00005_.png",
+    "path": "outputs\\dataset_cyborg-tentacles-final_20260216185508\\data_10_attack_pose_1_variant_10_00005_.png",
+    "dino_score": 0.9354434013366699,
+    "clip_score": 0.2864235305786133,
+    "final_score": 0.7407374401092529
+  },
+  {
+    "name": "data_02_side_view_right_variant_02_00005_.png",
+    "path": "outputs\\dataset_cyborg-tentacles-final_20260216185508\\data_02_side_view_right_variant_02_00005_.png",
+    "dino_score": 0.9366223812103271,
+    "clip_score": 0.2816314125061035,
+    "final_score": 0.74012509059906
+  },
+  {
+    "name": "data_11_attack_pose_2_variant_11_00007_.png",
+    "path": "outputs\\dataset_cyborg-tentacles-final_20260216185508\\data_11_attack_pose_2_variant_11_00007_.png",
+    "dino_score": 0.9359803199768066,
+    "clip_score": 0.28110006332397464,
+    "final_score": 0.739516242980957
+  },
+  {
+    "name": "data_09_walking_animation_variant_09_00005_.png",
+    "path": "outputs\\dataset_cyborg-tentacles-final_20260216185508\\data_09_walking_animation_variant_09_00005_.png",
+    "dino_score": 0.9298869371414185,
+    "clip_score": 0.285682315826416,
+    "final_score": 0.7366255507469177
+  },
+  {
+    "name": "data_01_side_view_left_variant_01_00006_.png",
+    "path": "outputs\\dataset_cyborg-tentacles-final_20260216185508\\data_01_side_view_left_variant_01_00006_.png",
+    "dino_score": 0.914179265499115,
+    "clip_score": 0.2869481086730957,
+    "final_score": 0.7260099184513091
+  },
+  {
+    "name": "data_06_45_degree_back_left_variant_06_00005_.png",
+    "path": "outputs\\dataset_cyborg-tentacles-final_20260216185508\\data_06_45_degree_back_left_variant_06_00005_.png",
+    "dino_score": 0.9122984409332275,
+    "clip_score": 0.2896297073364258,
+    "final_score": 0.725497820854187
+  },
+  {
+    "name": "data_08_idle_animation_variant_08_00005_.png",
+    "path": "outputs\\dataset_cyborg-tentacles-final_20260216185508\\data_08_idle_animation_variant_08_00005_.png",
+    "dino_score": 0.914472222328186,
+    "clip_score": 0.2814498519897461,
+    "final_score": 0.724565511226654
+  },
+  {
+    "name": "data_03_back_view_variant_03_00005_.png",
+    "path": "outputs\\dataset_cyborg-tentacles-final_20260216185508\\data_03_back_view_variant_03_00005_.png",
+    "dino_score": 0.903974175453186,
+    "clip_score": 0.28492748260498046,
+    "final_score": 0.7182601675987244
+  },
+  {
+    "name": "data_04_45_degree_front_left_variant_04_00005_.png",
+    "path": "outputs\\dataset_cyborg-tentacles-final_20260216185508\\data_04_45_degree_front_left_variant_04_00005_.png",
+    "dino_score": 0.8797491788864136,
+    "clip_score": 0.2911711311340332,
+    "final_score": 0.7031757645606994
+  }
+]
