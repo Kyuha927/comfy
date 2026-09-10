@@ -1,0 +1,2 @@
+-keep class com.lifeagent.unified.** { *; }
+-dontwarn javax.annotation.**
