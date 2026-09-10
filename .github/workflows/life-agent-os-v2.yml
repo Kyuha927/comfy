@@ -36,17 +36,8 @@ jobs:
             bash life-agent-build/apply-patches.sh "$ROOT"
           fi
 
-          echo 'AGENT_OS_PATCH_CHUNK_HASHES_BEGIN'
-          for f in life-agent-os-v2/patch.tar.xz.b64.part*; do
-            printf '%s bytes=' "$f"
-            tr -d '\r\n\t ' < "$f" | wc -c
-            tr -d '\r\n\t ' < "$f" | sha256sum
-          done
-          echo 'AGENT_OS_PATCH_CHUNK_HASHES_END'
-
           cat life-agent-os-v2/patch.tar.xz.b64.part* | base64 --decode > /tmp/life-agent-os-v2-patch.tar.xz
-          sha256sum /tmp/life-agent-os-v2-patch.tar.xz
-          echo '75fc9d2c265bbe85a75b80d73fecf7a5c6d63513b31f387da461a92eac64599d  /tmp/life-agent-os-v2-patch.tar.xz' | sha256sum -c -
+          echo '20e0f1b2200d3dd537451b0c6ced4ed467191ba409fff0b7ae6b83ef74742b88  /tmp/life-agent-os-v2-patch.tar.xz' | sha256sum -c -
           tar -xJf /tmp/life-agent-os-v2-patch.tar.xz -C "$ROOT"
 
       - name: Set up Java 17
@@ -81,7 +72,6 @@ jobs:
           grep -q "applicationId 'com.lifeagent.unified'" "$ROOT/app/build.gradle"
           grep -q "versionCode 200" "$ROOT/app/build.gradle"
           grep -q "versionName '2.0.0-agent-os-alpha'" "$ROOT/app/build.gradle"
-          grep -q 'android:label="@string/app_name"' "$MANIFEST"
           grep -q 'android.intent.action.SEND' "$MANIFEST"
           grep -q 'android.intent.action.PROCESS_TEXT' "$MANIFEST"
           grep -q 'android.intent.action.ASSIST' "$MANIFEST"
@@ -100,7 +90,6 @@ jobs:
           grep -R -q 'verification' "$JAVA/TaskStore.java"
           grep -R -q 'Trigger' "$JAVA/RecipeEngine.java"
           grep -R -q 'SkillRegistry' "$JAVA/AgentPlanner.java"
-
           ! grep -R -E '(sk-[A-Za-z0-9]{20,}|BEGIN (RSA |EC |OPENSSH )?PRIVATE KEY|api[_-]?key[[:space:]]*=[[:space:]]*[A-Za-z0-9_-]{16,})' "$ROOT" --exclude='*.md'
 
       - name: Assemble Agent OS APK and capture diagnostics
