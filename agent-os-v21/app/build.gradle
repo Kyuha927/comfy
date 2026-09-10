@@ -1,0 +1,49 @@
+plugins {
+    id "com.android.application"
+}
+
+android {
+    namespace "com.lifeagent.unified"
+    compileSdk 35
+
+    defaultConfig {
+        applicationId "com.lifeagent.unified"
+        minSdk 30
+        targetSdk 35
+        versionCode 210
+        versionName "2.1.0-agent-os-beta"
+        testInstrumentationRunner "android.test.InstrumentationTestRunner"
+    }
+
+    buildTypes {
+        debug {
+            debuggable true
+            minifyEnabled false
+        }
+        release {
+            minifyEnabled true
+            shrinkResources true
+            proguardFiles getDefaultProguardFile("proguard-android-optimize.txt"), "proguard-rules.pro"
+        }
+    }
+
+    compileOptions {
+        sourceCompatibility JavaVersion.VERSION_17
+        targetCompatibility JavaVersion.VERSION_17
+    }
+
+    testOptions {
+        unitTests.returnDefaultValues = true
+    }
+
+    lint {
+        abortOnError true
+        checkReleaseBuilds true
+        warningsAsErrors false
+        disable "ExpiredTargetSdkVersion"
+    }
+}
+
+dependencies {
+    testImplementation "junit:junit:4.13.2"
+}
