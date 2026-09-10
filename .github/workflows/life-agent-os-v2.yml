@@ -40,6 +40,10 @@ jobs:
           echo '20e0f1b2200d3dd537451b0c6ced4ed467191ba409fff0b7ae6b83ef74742b88  /tmp/life-agent-os-v2-patch.tar.xz' | sha256sum -c -
           tar -xJf /tmp/life-agent-os-v2-patch.tar.xz -C "$ROOT"
 
+          if [ -f life-agent-os-v2/apply-build-fixes.sh ]; then
+            bash life-agent-os-v2/apply-build-fixes.sh "$ROOT"
+          fi
+
       - name: Set up Java 17
         uses: actions/setup-java@v4
         with:
@@ -86,6 +90,7 @@ jobs:
           grep -R -q 'MODEL_FREE' "$JAVA"
           grep -R -q 'HUMAN_GATE' "$JAVA"
           grep -R -q 'AndroidKeyStore' "$JAVA"
+          grep -q '^import android.graphics.Color;' "$JAVA/FeatureActivity.java"
           grep -q 'int score' "$JAVA/SkillManifest.java"
           grep -q 'supports(String capability)' "$JAVA/SkillManifest.java"
           grep -q 'verifiedEvidence' "$JAVA/TaskStore.java"
