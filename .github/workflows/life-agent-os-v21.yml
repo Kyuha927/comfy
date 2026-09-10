@@ -1,0 +1,265 @@
+name: Build and verify Life Agent OS v2.1
+
+on:
+  push:
+    branches:
+      - life-agent-os-v21-20260910
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  build-test-runtime:
+    runs-on: ubuntu-latest
+    timeout-minutes: 55
+
+    steps:
+      - name: Checkout isolated Agent OS branch
+        uses: actions/checkout@v4
+        with:
+          ref: life-agent-os-v21-20260910
+
+      - name: Set up Java 17
+        uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: '17'
+
+      - name: Set up Android SDK
+        uses: android-actions/setup-android@v3
+
+      - name: Install Android SDK components
+        shell: bash
+        run: |
+          set -euo pipefail
+          yes | sdkmanager --licenses >/dev/null || true
+          sdkmanager 'platforms;android-35' 'build-tools;35.0.0' 'platform-tools' 'emulator'
+
+      - name: Set up Gradle 8.9
+        uses: gradle/actions/setup-gradle@v4
+        with:
+          gradle-version: '8.9'
+
+      - name: Apply deterministic integration patches
+        shell: bash
+        run: |
+          set -euo pipefail
+          bash agent-os-v21/apply-build-patches.sh "$GITHUB_WORKSPACE/agent-os-v21"
+
+      - name: Audit architecture, permissions and secrets
+        shell: bash
+        run: |
+          set -euo pipefail
+          ROOT=agent-os-v21
+          MANIFEST="$ROOT/app/src/main/AndroidManifest.xml"
+          JAVA="$ROOT/app/src/main/java"
+          grep -q 'applicationId "com.lifeagent.unified"' "$ROOT/app/build.gradle"
+          grep -q 'versionName "2.1.0-agent-os-beta"' "$ROOT/app/build.gradle"
+          grep -q 'targetSdk 35' "$ROOT/app/build.gradle"
+          grep -q 'usesCleartextTraffic="false"' "$MANIFEST"
+          grep -q 'networkSecurityConfig="@xml/network_security_config"' "$MANIFEST"
+          grep -q 'UnifiedNotificationListener' "$MANIFEST"
+          grep -q 'LifeAgentAutofillService' "$MANIFEST"
+          grep -q 'LocationContextService' "$MANIFEST"
+          grep -q 'AgentTileService' "$MANIFEST"
+          grep -q 'DocumentIntakeActivity' "$MANIFEST"
+          grep -R -q 'class SkillRegistry' "$JAVA"
+          grep -R -q 'class PolicyKernel' "$JAVA"
+          grep -R -q 'class ExecutorRouter' "$JAVA"
+          grep -R -q 'class OpportunityEngine' "$JAVA"
+          grep -R -q 'class CommerceFirewall' "$JAVA"
+          grep -R -q 'class TaskGraph' "$JAVA"
+          grep -R -q 'AndroidKeyStore' "$JAVA"
+          grep -R -q 'MODEL_FREE' "$JAVA"
+          grep -R -q 'MANUAL_AUTH' "$JAVA"
+          grep -R -q 'completionEvidence' "$JAVA"
+          ! grep -q 'android.permission.READ_SMS' "$MANIFEST"
+          ! grep -q 'android.permission.RECEIVE_SMS' "$MANIFEST"
+          ! grep -q 'android.permission.READ_CALL_LOG' "$MANIFEST"
+          ! grep -q 'android.permission.QUERY_ALL_PACKAGES' "$MANIFEST"
+          ! grep -q 'android.permission.SYSTEM_ALERT_WINDOW' "$MANIFEST"
+          ! grep -q 'android.permission.REQUEST_INSTALL_PACKAGES' "$MANIFEST"
+          ! grep -R -E '(sk-[A-Za-z0-9]{20,}|BEGIN (RSA |EC |OPENSSH )?PRIVATE KEY|api[_-]?key[[:space:]]*[:=][[:space:]]*[A-Za-z0-9_-]{16,})' "$ROOT" --exclude='*.md'
+
+      - name: Unit tests, lint and APK assembly
+        working-directory: agent-os-v21
+        shell: bash
+        run: |
+          set -euo pipefail
+          gradle --no-daemon --stacktrace \
+            :app:testDebugUnitTest \
+            :app:lintDebug \
+            :app:assembleDebug \
+            :app:assembleDebugAndroidTest
+
+      - name: Verify APK metadata, signature, alignment and archive
+        shell: bash
+        run: |
+          set -euo pipefail
+          APK=agent-os-v21/app/build/outputs/apk/debug/app-debug.apk
+          TEST_APK=agent-os-v21/app/build/outputs/apk/androidTest/debug/app-debug-androidTest.apk
+          test -s "$APK"
+          test -s "$TEST_APK"
+          mkdir -p dist/runtime
+          cp "$APK" dist/Life-Agent-OS-v2.1-beta.apk
+          cp "$TEST_APK" dist/Life-Agent-OS-v2.1-beta-androidTest.apk
+          "$ANDROID_HOME/build-tools/35.0.0/zipalign" -c -v 4 dist/Life-Agent-OS-v2.1-beta.apk | tee dist/zipalign.txt
+          "$ANDROID_HOME/build-tools/35.0.0/apksigner" verify --verbose --print-certs dist/Life-Agent-OS-v2.1-beta.apk | tee dist/apksigner.txt
+          "$ANDROID_HOME/build-tools/35.0.0/aapt" dump badging dist/Life-Agent-OS-v2.1-beta.apk | tee dist/apk-badging.txt
+          grep -q "package: name='com.lifeagent.unified'" dist/apk-badging.txt
+          grep -q "versionCode='210'" dist/apk-badging.txt
+          grep -q "versionName='2.1.0-agent-os-beta'" dist/apk-badging.txt
+          grep -q "targetSdkVersion:'35'" dist/apk-badging.txt
+          unzip -t dist/Life-Agent-OS-v2.1-beta.apk | tee dist/unzip-test.txt
+          sha256sum dist/Life-Agent-OS-v2.1-beta.apk > dist/Life-Agent-OS-v2.1-beta.apk.sha256
+
+      - name: Android 15 install, launch, UI and instrumentation smoke
+        uses: reactivecircus/android-emulator-runner@v2
+        with:
+          api-level: 35
+          target: google_apis
+          arch: x86_64
+          profile: pixel_6
+          disable-animations: true
+          emulator-options: -no-window -gpu swiftshader_indirect -noaudio -no-boot-anim -camera-back none -accel on
+          script: |
+            set -euo pipefail
+            APK="$GITHUB_WORKSPACE/dist/Life-Agent-OS-v2.1-beta.apk"
+            TEST_APK="$GITHUB_WORKSPACE/dist/Life-Agent-OS-v2.1-beta-androidTest.apk"
+            OUT="$GITHUB_WORKSPACE/dist/runtime"
+            adb logcat -c
+            adb install -r "$APK"
+            adb shell pm clear com.lifeagent.unified
+            adb shell am start -W -n com.lifeagent.unified/.MainActivity | tee "$OUT/home-launch.txt"
+            sleep 3
+            adb shell pidof com.lifeagent.unified | tee "$OUT/pid.txt"
+            test -s "$OUT/pid.txt"
+            adb shell uiautomator dump /sdcard/home.xml >/dev/null
+            adb pull /sdcard/home.xml "$OUT/home.xml" >/dev/null
+            grep -q 'Life Agent OS' "$OUT/home.xml"
+            grep -q '무엇을 맡길까요' "$OUT/home.xml"
+            grep -q '현재 문맥' "$OUT/home.xml"
+            grep -q '지금 발견한 기회' "$OUT/home.xml"
+            adb exec-out screencap -p > "$OUT/home.png"
+
+            adb shell am start -W -n com.lifeagent.unified/.MainActivity --es life_agent_open_page tasks | tee "$OUT/tasks-launch.txt"
+            sleep 2
+            adb shell uiautomator dump /sdcard/tasks.xml >/dev/null
+            adb pull /sdcard/tasks.xml "$OUT/tasks.xml" >/dev/null
+            grep -q '작업함' "$OUT/tasks.xml"
+            adb exec-out screencap -p > "$OUT/tasks.png"
+
+            adb shell am start -W -n com.lifeagent.unified/.MainActivity --es life_agent_open_page automations | tee "$OUT/automations-launch.txt"
+            sleep 2
+            adb shell uiautomator dump /sdcard/automations.xml >/dev/null
+            adb pull /sdcard/automations.xml "$OUT/automations.xml" >/dev/null
+            grep -q '스킬과 자동화' "$OUT/automations.xml"
+            grep -q '내 자동화' "$OUT/automations.xml"
+            grep -q '설치된 스킬' "$OUT/automations.xml"
+            adb exec-out screencap -p > "$OUT/automations.png"
+
+            adb shell am start -W -n com.lifeagent.unified/.MainActivity --es life_agent_open_page me | tee "$OUT/me-launch.txt"
+            sleep 2
+            adb shell uiautomator dump /sdcard/me.xml >/dev/null
+            adb pull /sdcard/me.xml "$OUT/me.xml" >/dev/null
+            grep -q '내 정보와 권한' "$OUT/me.xml"
+            grep -q '개인정보 금고' "$OUT/me.xml"
+            grep -q '상시 문맥' "$OUT/me.xml"
+            grep -q '투명성 및 삭제' "$OUT/me.xml"
+            adb exec-out screencap -p > "$OUT/me.png"
+
+            adb shell am start -W \
+              -a android.intent.action.SEND \
+              -t text/plain \
+              --es android.intent.extra.TEXT '최근 비타민 상담 내용을 처리해줘' \
+              -n com.lifeagent.unified/.ShareReceiverActivity | tee "$OUT/share-launch.txt"
+            sleep 3
+            adb shell uiautomator dump /sdcard/share.xml >/dev/null
+            adb pull /sdcard/share.xml "$OUT/share.xml" >/dev/null
+            grep -q '이 내용을 처리해줘' "$OUT/share.xml"
+            adb exec-out screencap -p > "$OUT/share.png"
+
+            adb install -r "$TEST_APK"
+            adb shell am instrument -w com.lifeagent.unified.test/android.test.InstrumentationTestRunner \
+              | tee "$OUT/instrumentation.txt"
+            grep -q 'OK (1 test)' "$OUT/instrumentation.txt"
+
+            adb shell dumpsys package com.lifeagent.unified > "$OUT/package.txt"
+            grep -q 'UnifiedNotificationListener' "$OUT/package.txt"
+            grep -q 'LifeAgentAutofillService' "$OUT/package.txt"
+            grep -q 'LocationContextService' "$OUT/package.txt"
+            grep -q 'AgentTileService' "$OUT/package.txt"
+
+            adb logcat -d > "$OUT/logcat.txt"
+            if grep -A20 -B5 'FATAL EXCEPTION' "$OUT/logcat.txt" | grep -q 'com.lifeagent.unified'; then
+              echo 'Package crash detected' >&2
+              exit 1
+            fi
+            {
+              echo 'ANDROID_15_RUNTIME_SMOKE=PASS'
+              echo 'INSTALL=PASS'
+              echo 'HOME_UI=PASS'
+              echo 'TASKS_UI=PASS'
+              echo 'AUTOMATIONS_UI=PASS'
+              echo 'ME_UI=PASS'
+              echo 'SHARE_ENTRY=PASS'
+              echo 'INSTRUMENTATION=PASS'
+              echo 'CRASH_SCAN=PASS'
+            } > "$OUT/RUNTIME_SMOKE_REPORT.txt"
+
+      - name: Build final evidence bundle
+        if: success()
+        shell: bash
+        run: |
+          set -euo pipefail
+          mkdir -p dist/reports
+          cp agent-os-v21/app/build/reports/lint-results-debug.html dist/reports/ || true
+          cp -R agent-os-v21/app/build/test-results/testDebugUnitTest dist/reports/unit-test-results
+          cp -R agent-os-v21/app/build/reports/tests/testDebugUnitTest dist/reports/unit-test-report
+          tar -C "$GITHUB_WORKSPACE" -czf dist/life-agent-os-v2.1-source.tar.gz agent-os-v21
+          {
+            echo 'LIFE AGENT OS v2.1 FINAL VERIFICATION'
+            echo '===================================='
+            echo 'status=BUILD_STATIC_UNIT_LINT_ANDROID15_RUNTIME_PASS'
+            echo 'package=com.lifeagent.unified'
+            echo 'version=2.1.0-agent-os-beta'
+            echo 'versionCode=210'
+            echo 'minSdk=30'
+            echo 'targetSdk=35'
+            echo 'artifact=Life-Agent-OS-v2.1-beta.apk'
+            echo
+            echo 'Verified gates:'
+            echo '- Gradle Java 17 compile'
+            echo '- JUnit policy/routing/privacy/task graph tests'
+            echo '- Android lintDebug'
+            echo '- APK zip alignment'
+            echo '- APK Signature Scheme verification'
+            echo '- APK archive integrity'
+            echo '- Android 15 emulator install and cold launch'
+            echo '- Home, Tasks, Automations, Me UI assertions'
+            echo '- Share/selected-text entry path'
+            echo '- On-device instrumentation test'
+            echo '- Runtime fatal-crash scan'
+            echo '- Manifest component and dangerous-permission audit'
+            echo '- Hard-coded secret scan'
+            echo
+            echo 'Provider-dependent gates not represented as completed:'
+            echo '- Real bank transfer requires bank/open-banking provider and user authentication'
+            echo '- Real monimo submission requires installed app, user authentication and receipt number'
+            echo '- AI phone booking requires an official subscription client or telephony provider through Companion'
+            echo '- Live benefit catalogue and submission require an official data/provider connector'
+            echo '- Complex mobile computer use requires a selected CU provider'
+            echo
+            cat dist/runtime/RUNTIME_SMOKE_REPORT.txt
+          } > dist/FINAL_VERIFICATION_REPORT.txt
+          find dist -maxdepth 3 -type f -printf '%P\n' | sort > dist/ARTIFACT_MANIFEST.txt
+
+      - name: Upload verified Life Agent OS bundle
+        if: success()
+        uses: actions/upload-artifact@v4
+        with:
+          name: life-agent-os-v2.1-verified
+          path: dist/**
+          if-no-files-found: error
+          retention-days: 14
