@@ -91,7 +91,7 @@ jobs:
           grep -q 'verifiedEvidence' "$JAVA/TaskStore.java"
           grep -q 'recordEvidence' "$JAVA/TaskStore.java"
           grep -q 'triggerType' "$JAVA/RecipeEngine.java"
-          grep -q 'verificationType' "$JAVA/RecipeEngine.java"
+          grep -q 'recordResult' "$JAVA/RecipeEngine.java"
           grep -q 'SkillRegistry' "$JAVA/AgentPlanner.java"
           ! grep -R -E '(sk-[A-Za-z0-9]{20,}|BEGIN (RSA |EC |OPENSSH )?PRIVATE KEY|api[_-]?key[[:space:]]*=[[:space:]]*[A-Za-z0-9_-]{16,})' "$ROOT" --exclude='*.md'
 
