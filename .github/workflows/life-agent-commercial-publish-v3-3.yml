@@ -1,0 +1,105 @@
+name: Publish Audited Life Agent Commercial APK v3.3
+
+on:
+  workflow_run:
+    workflows:
+      - Build and Audit Life Agent Commercial Hardening v3.3
+    types:
+      - completed
+
+permissions:
+  actions: read
+  contents: write
+
+jobs:
+  publish-success:
+    if: >-
+      github.event.workflow_run.conclusion == 'success' &&
+      github.event.workflow_run.head_branch == 'life-agent-commercial-hardening-v3-2-20260911'
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+
+    steps:
+      - name: Checkout audited branch
+        uses: actions/checkout@v4
+        with:
+          ref: life-agent-commercial-hardening-v3-2-20260911
+          fetch-depth: 1
+
+      - name: Download artifact from exact triggering run
+        uses: actions/download-artifact@v4
+        with:
+          name: life-agent-os-v3.3-hardening-beta
+          path: /tmp/audited-v33
+          run-id: ${{ github.event.workflow_run.id }}
+          github-token: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Verify audit seal and artifact hashes
+        shell: bash
+        run: |
+          set -euo pipefail
+          test -s /tmp/audited-v33/Life-Agent-OS-v3.3-hardening-beta.apk
+          test -s /tmp/audited-v33/Life-Agent-OS-v3.3-hardening-beta.apk.sha256
+          test -s /tmp/audited-v33/COMMERCIALIZATION_AUDIT_V3.3.md
+          (cd /tmp/audited-v33 && sha256sum -c Life-Agent-OS-v3.3-hardening-beta.apk.sha256)
+          grep -q 'Installable core hardening beta: PASS' /tmp/audited-v33/COMMERCIALIZATION_AUDIT_V3.3.md
+          grep -q 'Every live external feature error-free and commercially launchable: NO' \
+            /tmp/audited-v33/COMMERCIALIZATION_AUDIT_V3.3.md
+
+      - name: Publish audited candidate to isolated branch directory
+        shell: bash
+        run: |
+          set -euo pipefail
+          rm -rf commercial-release-assets-v3.3
+          mkdir -p commercial-release-assets-v3.3
+          cp /tmp/audited-v33/Life-Agent-OS-v3.3-hardening-beta.apk commercial-release-assets-v3.3/
+          cp /tmp/audited-v33/Life-Agent-OS-v3.3-hardening-beta.apk.sha256 commercial-release-assets-v3.3/
+          cp /tmp/audited-v33/Life-Agent-OS-v3.3-release-unsigned.apk commercial-release-assets-v3.3/
+          cp /tmp/audited-v33/Life-Agent-OS-v3.3-release-unsigned.apk.sha256 commercial-release-assets-v3.3/
+          cp /tmp/audited-v33/COMMERCIALIZATION_AUDIT_V3.3.md commercial-release-assets-v3.3/
+          cp /tmp/audited-v33/INSTALL_AND_TEST_V3.3.md commercial-release-assets-v3.3/
+          cp /tmp/audited-v33/life-agent-commercial-v3.3-source.tar.gz commercial-release-assets-v3.3/
+          cp /tmp/audited-v33/life-agent-commercial-v3.3-source.tar.gz.sha256 commercial-release-assets-v3.3/
+          cp /tmp/audited-v33/runtime-evidence-v3.3.tar.gz commercial-release-assets-v3.3/
+          cp /tmp/audited-v33/runtime-evidence-v3.3.tar.gz.sha256 commercial-release-assets-v3.3/
+          cp /tmp/audited-v33/apk-badging.txt commercial-release-assets-v3.3/
+          cp /tmp/audited-v33/apksigner.txt commercial-release-assets-v3.3/
+          cp /tmp/audited-v33/lint-results-debug.xml commercial-release-assets-v3.3/
+          git config user.name 'github-actions[bot]'
+          git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
+          git add -f commercial-release-assets-v3.3
+          git commit -m 'release: publish audited Life Agent v3.3 hardening beta [skip ci]'
+          git push origin HEAD:life-agent-commercial-hardening-v3-2-20260911
+
+  publish-failure:
+    if: >-
+      github.event.workflow_run.conclusion != 'success' &&
+      github.event.workflow_run.head_branch == 'life-agent-commercial-hardening-v3-2-20260911'
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+
+    steps:
+      - name: Checkout audited branch
+        uses: actions/checkout@v4
+        with:
+          ref: life-agent-commercial-hardening-v3-2-20260911
+          fetch-depth: 1
+
+      - name: Write visible failed-gate receipt
+        shell: bash
+        run: |
+          set -euo pipefail
+          mkdir -p commercial-release-assets-v3.3
+          cat > commercial-release-assets-v3.3/BUILD_BLOCKED.md <<EOF
+          # Life Agent OS v3.3 build blocked
+
+          - Workflow run: ${{ github.event.workflow_run.id }}
+          - Head SHA: ${{ github.event.workflow_run.head_sha }}
+          - Conclusion: ${{ github.event.workflow_run.conclusion }}
+          - Publication: BLOCKED
+          EOF
+          git config user.name 'github-actions[bot]'
+          git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
+          git add -f commercial-release-assets-v3.3/BUILD_BLOCKED.md
+          git commit -m 'ci: record blocked v3.3 commercial gate [skip ci]' || true
+          git push origin HEAD:life-agent-commercial-hardening-v3-2-20260911
