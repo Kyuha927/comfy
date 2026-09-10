@@ -1,0 +1,180 @@
+name: Build and Publish Life Agent OS v2
+
+on:
+  push:
+    branches:
+      - life-agent-os-v2-20260910
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+jobs:
+  build-publish:
+    runs-on: ubuntu-latest
+    timeout-minutes: 45
+
+    steps:
+      - name: Checkout Agent OS branch
+        uses: actions/checkout@v4
+        with:
+          ref: life-agent-os-v2-20260910
+          fetch-depth: 1
+
+      - name: Restore integrated source and apply Agent OS overlay
+        shell: bash
+        run: |
+          set -euo pipefail
+          cat life-agent-build/source.tar.xz.b64.part* | base64 --decode > /tmp/life-agent-source.tar.xz
+          echo '29919c8d8f0f4b535d1c1a05370e22d464ef7bdc1725730da21add0d1ac5f06b  /tmp/life-agent-source.tar.xz' | sha256sum -c -
+          rm -rf /tmp/life-agent-src
+          mkdir -p /tmp/life-agent-src
+          tar -xJf /tmp/life-agent-source.tar.xz -C /tmp/life-agent-src
+          ROOT=/tmp/life-agent-src/life-agent-unified-v2
+          test -f "$ROOT/app/build.gradle"
+          if [ -f life-agent-build/apply-patches.sh ]; then bash life-agent-build/apply-patches.sh "$ROOT"; fi
+          cp -R life-agent-build/patches/. "$ROOT/"
+          bash life-agent-build/apply-agent-os-v2.sh "$ROOT"
+
+      - name: Set up Java 17
+        uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: '17'
+
+      - name: Set up Android SDK
+        uses: android-actions/setup-android@v3
+
+      - name: Install Android 35 build components
+        shell: bash
+        run: |
+          set -euo pipefail
+          yes | sdkmanager --licenses >/dev/null || true
+          sdkmanager 'platforms;android-35' 'build-tools;35.0.0'
+
+      - name: Set up Gradle 8.9
+        uses: gradle/actions/setup-gradle@v4
+        with:
+          gradle-version: '8.9'
+
+      - name: Validate Agent OS source contracts
+        shell: bash
+        run: |
+          set -euo pipefail
+          ROOT=/tmp/life-agent-src/life-agent-unified-v2
+          JAVA="$ROOT/app/src/main/java/com/lifeagent/unified"
+          MANIFEST="$ROOT/app/src/main/AndroidManifest.xml"
+          grep -q "applicationId 'com.lifeagent.unified'" "$ROOT/app/build.gradle"
+          grep -q "versionCode 200" "$ROOT/app/build.gradle"
+          grep -q "versionName '2.0.0-agent-os-alpha'" "$ROOT/app/build.gradle"
+          grep -q 'class ContextEngine' "$JAVA/AgentOsCore.java"
+          grep -q 'class Registry' "$JAVA/AgentOsCore.java"
+          grep -q 'class PolicyKernel' "$JAVA/AgentOsCore.java"
+          grep -q 'class ExecutorRouter' "$JAVA/AgentOsCore.java"
+          grep -q 'class TaskGraph' "$JAVA/AgentOsCore.java"
+          grep -q 'MODEL_FREE' "$JAVA/AgentOsCore.java"
+          grep -q 'AndroidKeyStore' "$JAVA/SecureStore.java"
+          grep -q 'AgentEntryActivity' "$MANIFEST"
+          grep -q 'LifeAgentTileService' "$MANIFEST"
+          grep -q 'android.intent.action.SEND' "$MANIFEST"
+          grep -q 'android.intent.action.PROCESS_TEXT' "$MANIFEST"
+          grep -q 'android.service.quicksettings.action.QS_TILE' "$MANIFEST"
+          grep -q 'AgentOsCore.Events.captureNotification' "$JAVA/UnifiedNotificationListener.java"
+          grep -q 'usesCleartextTraffic="false"' "$MANIFEST"
+
+      - name: Assemble Agent OS APK
+        id: assemble
+        shell: bash
+        working-directory: /tmp/life-agent-src/life-agent-unified-v2
+        run: |
+          set +e
+          set -o pipefail
+          gradle --no-daemon --stacktrace :app:assembleDebug 2>&1 | tee /tmp/life-agent-os-gradle.log
+          status=${PIPESTATUS[0]}
+          echo "status=$status" >> "$GITHUB_OUTPUT"
+          exit 0
+
+      - name: Publish compile failure receipt
+        if: steps.assemble.outputs.status != '0'
+        shell: bash
+        run: |
+          set -euo pipefail
+          mkdir -p release-assets
+          {
+            echo 'LIFE_AGENT_OS_V2_BUILD_FAILURE'
+            echo "run_id=$GITHUB_RUN_ID"
+            echo "commit=$GITHUB_SHA"
+            echo
+            grep -n -E '(^|[[:space:]])(error:|FAILURE:|What went wrong|Execution failed|Caused by:|cannot find symbol|incompatible types|package .* does not exist)' /tmp/life-agent-os-gradle.log || true
+            echo
+            echo '--- FINAL 320 LINES ---'
+            tail -n 320 /tmp/life-agent-os-gradle.log
+          } > release-assets/LIFE_AGENT_OS_V2_BUILD_FAILURE.log
+          git config user.name 'github-actions[bot]'
+          git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
+          git add release-assets/LIFE_AGENT_OS_V2_BUILD_FAILURE.log
+          git commit -m 'ci: publish Agent OS build failure receipt [skip ci]' || true
+          git push origin HEAD:life-agent-os-v2-20260910 || true
+
+      - name: Stop after captured compile failure
+        if: steps.assemble.outputs.status != '0'
+        run: exit 1
+
+      - name: Verify and package Agent OS build
+        shell: bash
+        run: |
+          set -euo pipefail
+          ROOT=/tmp/life-agent-src/life-agent-unified-v2
+          APK="$ROOT/app/build/outputs/apk/debug/app-debug.apk"
+          test -s "$APK"
+          rm -rf release-assets
+          mkdir -p release-assets
+          cp "$APK" release-assets/Life-Agent-OS-v2.0-alpha.apk
+          "$ANDROID_HOME/build-tools/35.0.0/zipalign" -c -v 4 release-assets/Life-Agent-OS-v2.0-alpha.apk > release-assets/zipalign.txt
+          "$ANDROID_HOME/build-tools/35.0.0/apksigner" verify --verbose --print-certs release-assets/Life-Agent-OS-v2.0-alpha.apk | tee release-assets/apksigner.txt
+          "$ANDROID_HOME/build-tools/35.0.0/aapt" dump badging release-assets/Life-Agent-OS-v2.0-alpha.apk | tee release-assets/apk-badging.txt
+          grep -q "package: name='com.lifeagent.unified'" release-assets/apk-badging.txt
+          grep -q "versionCode='200'" release-assets/apk-badging.txt
+          grep -q "versionName='2.0.0-agent-os-alpha'" release-assets/apk-badging.txt
+          "$ANDROID_HOME/build-tools/35.0.0/aapt" dump xmltree release-assets/Life-Agent-OS-v2.0-alpha.apk AndroidManifest.xml > release-assets/manifest-tree.txt
+          grep -q 'AgentEntryActivity' release-assets/manifest-tree.txt
+          grep -q 'LifeAgentTileService' release-assets/manifest-tree.txt
+          unzip -t release-assets/Life-Agent-OS-v2.0-alpha.apk | tee release-assets/unzip-test.txt
+          sha256sum release-assets/Life-Agent-OS-v2.0-alpha.apk > release-assets/Life-Agent-OS-v2.0-alpha.apk.sha256
+          tar -C /tmp/life-agent-src -czf release-assets/life-agent-os-v2-source.tar.gz life-agent-unified-v2
+          {
+            echo 'Life Agent OS v2 Android build'
+            echo 'package=com.lifeagent.unified'
+            echo 'version=2.0.0-agent-os-alpha'
+            echo 'versionCode=200'
+            echo 'minSdk=30'
+            echo 'targetSdk=35'
+            echo 'architecture=ContextEngine->SkillRegistry->PolicyKernel->ExecutorRouter->PersistentTaskGraph'
+            echo 'entry_points=app,share,selected_text,deep_link,quick_settings,home_shortcut,notification_context'
+            echo 'skills=reservation,insurance,transfer,signup,streaming,software_update,vault,connections,general'
+            echo 'status=BUILD_AND_VERIFICATION_PASS'
+          } > release-assets/AGENT_OS_BUILD_REPORT.txt
+
+      - name: Commit verified APK to isolated branch
+        shell: bash
+        run: |
+          set -euo pipefail
+          git config user.name 'github-actions[bot]'
+          git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
+          git add -f release-assets/Life-Agent-OS-v2.0-alpha.apk \
+                     release-assets/Life-Agent-OS-v2.0-alpha.apk.sha256 \
+                     release-assets/AGENT_OS_BUILD_REPORT.txt \
+                     release-assets/apk-badging.txt \
+                     release-assets/apksigner.txt \
+                     release-assets/manifest-tree.txt \
+                     release-assets/life-agent-os-v2-source.tar.gz
+          git commit -m 'build: publish verified Life Agent OS v2 APK [skip ci]'
+          git push origin HEAD:life-agent-os-v2-20260910
+
+      - name: Upload verified Agent OS artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: life-agent-os-v2-alpha
+          path: release-assets/*
+          if-no-files-found: error
+          retention-days: 7
