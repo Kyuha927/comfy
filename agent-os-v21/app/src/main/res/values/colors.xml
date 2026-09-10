@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <color name="canvas">#F7F4EE</color>
+    <color name="surface">#FFFCF7</color>
+    <color name="ink">#1D2722</color>
+    <color name="muted">#667068</color>
+    <color name="sage">#708879</color>
+    <color name="sage_soft">#E4ECE5</color>
+    <color name="terracotta">#B56F55</color>
+    <color name="terracotta_soft">#F2E2D9</color>
+    <color name="amber_soft">#F5EBCF</color>
+    <color name="red_soft">#F6DDDA</color>
+    <color name="divider">#DED8CE</color>
+</resources>
