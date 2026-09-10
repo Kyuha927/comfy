@@ -1,0 +1,423 @@
+name: Build and Audit Life Agent Commercial Hardening v3.3
+
+on:
+  push:
+    branches:
+      - life-agent-commercial-hardening-v3-2-20260911
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  build-audit-v33:
+    runs-on: ubuntu-latest
+    timeout-minutes: 45
+
+    steps:
+      - name: Checkout hardening branch
+        uses: actions/checkout@v4
+        with:
+          ref: life-agent-commercial-hardening-v3-2-20260911
+          fetch-depth: 1
+
+      - name: Restore source and apply all commercial patches
+        shell: bash
+        run: |
+          set -euo pipefail
+          rm -rf /tmp/life-agent-v33
+          mkdir -p /tmp/life-agent-v33
+          tar -xzf release-assets/life-agent-os-v2-source.tar.gz -C /tmp/life-agent-v33
+          PROJECT_ROOT="$(find /tmp/life-agent-v33 -maxdepth 4 -type f -name settings.gradle -printf '%h\n' | head -n 1)"
+          test -n "$PROJECT_ROOT"
+          bash commercial-hardening/apply-commercial-hardening.sh "$PROJECT_ROOT"
+          bash commercial-hardening/apply-commercial-followup.sh "$PROJECT_ROOT"
+          bash commercial-hardening/apply-commercial-hardening-v2.sh "$PROJECT_ROOT"
+          echo "PROJECT_ROOT=$PROJECT_ROOT" >> "$GITHUB_ENV"
+
+      - name: Set up Java 17
+        uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: '17'
+
+      - name: Set up Android SDK
+        uses: android-actions/setup-android@v3
+
+      - name: Install Android build and emulator components
+        shell: bash
+        run: |
+          set -euo pipefail
+          yes | sdkmanager --licenses >/dev/null || true
+          sdkmanager 'platform-tools' 'platforms;android-35' 'build-tools;35.0.0' \
+            'emulator' 'system-images;android-35;google_apis;x86_64'
+
+      - name: Set up Gradle 8.9
+        uses: gradle/actions/setup-gradle@v4
+        with:
+          gradle-version: '8.9'
+
+      - name: Static release-gate audit
+        shell: bash
+        run: |
+          set -euo pipefail
+          MANIFEST="$PROJECT_ROOT/app/src/main/AndroidManifest.xml"
+          CORE="$PROJECT_ROOT/app/src/main/java/com/lifeagent/unified/CommercialCore.java"
+          python3 - "$MANIFEST" <<'PY'
+          import sys, xml.etree.ElementTree as ET
+          ET.parse(sys.argv[1])
+          PY
+          grep -q "versionCode 330" "$PROJECT_ROOT/app/build.gradle"
+          grep -q "versionName '3.3.0-hardening-beta'" "$PROJECT_ROOT/app/build.gradle"
+          grep -q 'PROVIDER_EVIDENCE_REQUIRED' "$CORE"
+          grep -q 'completeTaskFromProvider' "$CORE"
+          grep -q '지원·혜택 후보 알림 1건' "$CORE"
+          grep -q '보험 또는 추가서류 관련 알림 1건' "$CORE"
+          grep -q 'Math.round(location.getLatitude() \* 100d)' "$CORE"
+          grep -q 'net.ib.android.smcard' "$CORE"
+          grep -q 'ACTION_REQUEST_SET_AUTOFILL_SERVICE' \
+            "$PROJECT_ROOT/app/src/main/java/com/lifeagent/unified/CommercialMainActivity.java"
+          for forbidden in ACCESS_BACKGROUND_LOCATION READ_SMS RECEIVE_SMS READ_CONTACTS \
+            READ_CALL_LOG CALL_PHONE QUERY_ALL_PACKAGES SYSTEM_ALERT_WINDOW MANAGE_EXTERNAL_STORAGE; do
+            ! grep -q "android.permission.${forbidden}" "$MANIFEST"
+          done
+          ! grep -R -E '(sk-[A-Za-z0-9]{20,}|BEGIN (RSA |EC |OPENSSH )?PRIVATE KEY|api[_-]?key[[:space:]]*=[[:space:]]*[A-Za-z0-9_-]{16,})' \
+            "$PROJECT_ROOT/app/src" --exclude='*.md'
+
+      - name: Compile, lint, unit test and assemble both build types
+        id: gradle
+        shell: bash
+        run: |
+          set +e
+          set -o pipefail
+          cd "$PROJECT_ROOT"
+          gradle --no-daemon --stacktrace :app:clean :app:testDebugUnitTest :app:lintDebug \
+            :app:assembleDebug :app:assembleRelease 2>&1 | tee /tmp/v33-gradle.log
+          status=${PIPESTATUS[0]}
+          echo "status=$status" >> "$GITHUB_OUTPUT"
+          exit 0
+
+      - name: Prepare build failure evidence
+        if: steps.gradle.outputs.status != '0'
+        shell: bash
+        run: |
+          mkdir -p failure-v33
+          {
+            echo 'LIFE_AGENT_V3_3_BUILD_FAILURE'
+            grep -n -E '(error:|FAILURE:|What went wrong|Execution failed|cannot find symbol|Lint found)' \
+              /tmp/v33-gradle.log || true
+            tail -n 360 /tmp/v33-gradle.log
+          } > failure-v33/BUILD_FAILURE.log
+
+      - name: Upload build failure evidence
+        if: steps.gradle.outputs.status != '0'
+        uses: actions/upload-artifact@v4
+        with:
+          name: life-agent-v3.3-build-failure
+          path: failure-v33/BUILD_FAILURE.log
+          retention-days: 7
+
+      - name: Block failed build
+        if: steps.gradle.outputs.status != '0'
+        run: exit 1
+
+      - name: Boot Android 15 emulator
+        shell: bash
+        run: |
+          set -euo pipefail
+          echo no | avdmanager create avd --force --name life-agent-v33 \
+            --package 'system-images;android-35;google_apis;x86_64' --device 'pixel_6'
+          sudo chmod 666 /dev/kvm || true
+          nohup emulator -avd life-agent-v33 -no-window -no-audio -no-boot-anim \
+            -gpu swiftshader_indirect -no-snapshot -camera-back none -camera-front none \
+            > /tmp/v33-emulator.log 2>&1 &
+          adb wait-for-device
+          for i in $(seq 1 120); do
+            [ "$(adb shell getprop sys.boot_completed 2>/dev/null | tr -d '\r')" = '1' ] && break
+            sleep 3
+          done
+          test "$(adb shell getprop sys.boot_completed | tr -d '\r')" = '1'
+          adb shell settings put global window_animation_scale 0
+          adb shell settings put global transition_animation_scale 0
+          adb shell settings put global animator_duration_scale 0
+
+      - name: Install and run encrypted-state contract suites
+        shell: bash
+        run: |
+          set -euo pipefail
+          mkdir -p dist-v33 evidence-v33
+          APK="$PROJECT_ROOT/app/build/outputs/apk/debug/app-debug.apk"
+          adb install -r "$APK"
+          adb logcat -c
+          adb shell am start -W -n com.lifeagent.unified/.CommercialSelfTestActivity \
+            > evidence-v33/self-test-start.txt
+          sleep 2
+          adb exec-out run-as com.lifeagent.unified cat files/commercial-self-test.json \
+            > evidence-v33/commercial-self-test.json
+          grep -Eq '"final"[[:space:]]*:[[:space:]]*"PASS"' evidence-v33/commercial-self-test.json
+          adb shell am start -W -n com.lifeagent.unified/.CommercialStateSelfTestActivity \
+            > evidence-v33/state-test-start.txt
+          sleep 2
+          adb exec-out run-as com.lifeagent.unified cat files/commercial-state-self-test.json \
+            > evidence-v33/commercial-state-self-test.json
+          grep -Eq '"final"[[:space:]]*:[[:space:]]*"PASS"' evidence-v33/commercial-state-self-test.json
+          grep -q 'manual_high_risk_evidence_rejected' evidence-v33/commercial-state-self-test.json
+          grep -q 'signed_provider_evidence_accepted' evidence-v33/commercial-state-self-test.json
+
+      - name: Goal-first UI and persistence smoke
+        shell: bash
+        run: |
+          set -euo pipefail
+          dump_ui() {
+            local name="$1"
+            for attempt in 1 2 3; do
+              adb shell uiautomator dump "/sdcard/${name}.xml" >/dev/null 2>&1 && break
+              sleep 1
+            done
+            adb pull "/sdcard/${name}.xml" "evidence-v33/${name}.xml" >/dev/null
+          }
+          tap_contains() {
+            python3 - "$1" "$2" <<'PY'
+          import re, subprocess, sys, xml.etree.ElementTree as ET
+          root=ET.parse(sys.argv[1]).getroot(); needle=sys.argv[2]; hits=[]
+          for node in root.iter('node'):
+              label=(node.attrib.get('text','')+' '+node.attrib.get('content-desc','')).strip()
+              if needle in label:
+                  m=re.match(r'\[(\d+),(\d+)\]\[(\d+),(\d+)\]',node.attrib.get('bounds',''))
+                  if m:
+                      x1,y1,x2,y2=map(int,m.groups()); hits.append(((x2-x1)*(y2-y1),(x1+x2)//2,(y1+y2)//2))
+          if not hits: raise SystemExit('missing UI: '+needle)
+          _,x,y=sorted(hits)[0]
+          subprocess.check_call(['adb','shell','input','tap',str(x),str(y)])
+          PY
+          }
+
+          adb shell am force-stop com.lifeagent.unified
+          adb shell am start -W -n com.lifeagent.unified/.CommercialMainActivity >/dev/null
+          sleep 2
+          dump_ui home
+          grep -q '원하는 결과만 말하세요' evidence-v33/home.xml
+          grep -q '상용화 준비 상태' evidence-v33/home.xml
+          adb exec-out screencap -p > evidence-v33/home.png
+
+          adb shell am start -W -n com.lifeagent.unified/.CommercialMainActivity \
+            --es lifeagent.os.command '병원 진료비 서류로 보험 청구해줘' >/dev/null
+          sleep 2
+          dump_ui command
+          tap_contains evidence-v33/command.xml '처리 계획 보기'
+          sleep 1
+          dump_ui insurance-plan
+          grep -q '보험금 청구' evidence-v33/insurance-plan.xml
+          grep -q '접수번호' evidence-v33/insurance-plan.xml
+          adb exec-out screencap -p > evidence-v33/insurance-plan.png
+          adb shell input keyevent 4
+
+          adb shell am start -W -n com.lifeagent.unified/.CommercialMainActivity \
+            --es lifeagent.os.command 'OTP 123456으로 로그인해줘' >/dev/null
+          sleep 1
+          dump_ui sensitive-command
+          tap_contains evidence-v33/sensitive-command.xml '처리 계획 보기'
+          sleep 1
+          dump_ui blocked-plan
+          grep -q '실행 금지' evidence-v33/blocked-plan.xml
+          grep -q '민감정보' evidence-v33/blocked-plan.xml
+          adb shell input keyevent 4
+
+          adb shell am start -W -a android.intent.action.SEND -t text/plain \
+            --es android.intent.extra.TEXT '내가 받을 수 있는 지원금과 혜택을 확인해줘' \
+            -n com.lifeagent.unified/.CommercialMainActivity >/dev/null
+          sleep 2
+          dump_ui shared-benefit
+          grep -q '지원금과 혜택' evidence-v33/shared-benefit.xml
+          adb exec-out screencap -p > evidence-v33/shared-benefit.png
+
+          adb shell am force-stop com.lifeagent.unified
+          adb shell am start -W -n com.lifeagent.unified/.CommercialMainActivity >/dev/null
+          sleep 1
+          dump_ui recovered
+          tap_contains evidence-v33/recovered.xml '작업함'
+          sleep 1
+          dump_ui tasks
+          grep -q '엄마에게 5만원 송금' evidence-v33/tasks.xml
+          adb exec-out screencap -p > evidence-v33/tasks.png
+
+          adb shell settings put system accelerometer_rotation 0
+          adb shell settings put system user_rotation 1
+          adb shell am force-stop com.lifeagent.unified
+          adb shell am start -W -n com.lifeagent.unified/.CommercialMainActivity >/dev/null
+          sleep 1
+          dump_ui landscape
+          grep -q 'LIFE AGENT' evidence-v33/landscape.xml
+          adb exec-out screencap -p > evidence-v33/landscape.png
+
+          adb shell settings put system font_scale 1.3
+          adb shell settings put system user_rotation 0
+          adb shell am force-stop com.lifeagent.unified
+          adb shell am start -W -n com.lifeagent.unified/.CommercialMainActivity >/dev/null
+          sleep 1
+          dump_ui large-font
+          grep -q '원하는 결과만 말하세요' evidence-v33/large-font.xml
+          adb exec-out screencap -p > evidence-v33/large-font.png
+          adb shell settings put system font_scale 1.0
+
+      - name: Skill surface and system service smoke
+        shell: bash
+        run: |
+          set -euo pipefail
+          for activity in ReservationActivity InsuranceActivity TransferActivity SignupActivity \
+            StreamRulesActivity VaultActivity ConnectionsActivity GeneralTaskActivity CommercialUpdateActivity; do
+            adb shell am start -W -n "com.lifeagent.unified/.${activity}" \
+              --es lifeagent.os.command '상용화 스모크 테스트' > "evidence-v33/${activity}.txt"
+            sleep 1
+            adb shell pidof com.lifeagent.unified >/dev/null
+          done
+          adb shell pm grant com.lifeagent.unified android.permission.ACCESS_COARSE_LOCATION
+          adb shell am start-foreground-service \
+            -a com.lifeagent.unified.action.START_LOCATION_SESSION \
+            -n com.lifeagent.unified/.CommercialLocationService > evidence-v33/location-start.txt
+          sleep 2
+          adb emu geo fix 126.9780 37.5665 >/dev/null
+          sleep 2
+          adb shell dumpsys activity services com.lifeagent.unified > evidence-v33/services.txt
+          grep -q 'CommercialLocationService' evidence-v33/services.txt
+          adb shell am startservice -a com.lifeagent.unified.action.STOP_LOCATION_SESSION \
+            -n com.lifeagent.unified/.CommercialLocationService >/dev/null || true
+          adb shell settings put secure enabled_notification_listeners \
+            com.lifeagent.unified/.CommercialNotificationListener
+          adb shell settings put secure autofill_service com.lifeagent.unified/.SafeAutofillService
+          sleep 1
+          adb shell dumpsys notification > evidence-v33/notification.txt
+          adb shell dumpsys autofill > evidence-v33/autofill.txt
+          grep -q 'CommercialNotificationListener' evidence-v33/notification.txt
+          grep -q 'SafeAutofillService' evidence-v33/autofill.txt
+
+      - name: Crash, permission and plaintext audit
+        shell: bash
+        run: |
+          set -euo pipefail
+          adb logcat -d -v threadtime > evidence-v33/logcat.txt
+          python3 - evidence-v33/logcat.txt <<'PY'
+          import sys
+          text=open(sys.argv[1],encoding='utf-8',errors='replace').read()
+          failures=[]
+          for chunk in text.split('FATAL EXCEPTION')[1:]:
+              if 'com.lifeagent.unified' in chunk[:3000]: failures.append(chunk[:3000])
+          if failures:
+              print('\n---\n'.join(failures)); raise SystemExit('APP_FATAL_EXCEPTION')
+          PY
+          adb shell pidof com.lifeagent.unified > evidence-v33/final-pid.txt
+          test -s evidence-v33/final-pid.txt
+          APK="$PROJECT_ROOT/app/build/outputs/apk/debug/app-debug.apk"
+          "$ANDROID_HOME/build-tools/35.0.0/aapt" dump permissions "$APK" > evidence-v33/permissions.txt
+          for forbidden in ACCESS_BACKGROUND_LOCATION READ_SMS RECEIVE_SMS READ_CONTACTS READ_CALL_LOG \
+            CALL_PHONE QUERY_ALL_PACKAGES SYSTEM_ALERT_WINDOW MANAGE_EXTERNAL_STORAGE; do
+            ! grep -q "$forbidden" evidence-v33/permissions.txt
+          done
+          adb shell run-as com.lifeagent.unified sh -c \
+            'grep -R -a -E "비타민|provider-test-receipt|123456|654321|추가서류가 필요" shared_prefs files 2>/dev/null' \
+            > evidence-v33/plaintext-scan.txt || true
+          test ! -s evidence-v33/plaintext-scan.txt
+
+      - name: Package verified artifacts
+        shell: bash
+        run: |
+          set -euo pipefail
+          DEBUG_APK="$PROJECT_ROOT/app/build/outputs/apk/debug/app-debug.apk"
+          RELEASE_APK="$PROJECT_ROOT/app/build/outputs/apk/release/app-release-unsigned.apk"
+          cp "$DEBUG_APK" dist-v33/Life-Agent-OS-v3.3-hardening-beta.apk
+          cp "$RELEASE_APK" dist-v33/Life-Agent-OS-v3.3-release-unsigned.apk
+          "$ANDROID_HOME/build-tools/35.0.0/zipalign" -c -v 4 \
+            dist-v33/Life-Agent-OS-v3.3-hardening-beta.apk > dist-v33/zipalign.txt
+          "$ANDROID_HOME/build-tools/35.0.0/apksigner" verify --verbose --print-certs \
+            dist-v33/Life-Agent-OS-v3.3-hardening-beta.apk > dist-v33/apksigner.txt
+          "$ANDROID_HOME/build-tools/35.0.0/aapt" dump badging \
+            dist-v33/Life-Agent-OS-v3.3-hardening-beta.apk > dist-v33/apk-badging.txt
+          grep -q "package: name='com.lifeagent.unified'" dist-v33/apk-badging.txt
+          grep -q "versionCode='330'" dist-v33/apk-badging.txt
+          grep -q "versionName='3.3.0-hardening-beta'" dist-v33/apk-badging.txt
+          unzip -t dist-v33/Life-Agent-OS-v3.3-hardening-beta.apk > dist-v33/unzip-test.txt
+          sha256sum dist-v33/Life-Agent-OS-v3.3-hardening-beta.apk \
+            > dist-v33/Life-Agent-OS-v3.3-hardening-beta.apk.sha256
+          sha256sum dist-v33/Life-Agent-OS-v3.3-release-unsigned.apk \
+            > dist-v33/Life-Agent-OS-v3.3-release-unsigned.apk.sha256
+          cp "$PROJECT_ROOT/app/build/reports/lint-results-debug.xml" dist-v33/
+          cp "$PROJECT_ROOT/app/build/reports/lint-results-debug.html" dist-v33/
+          tar -czf dist-v33/runtime-evidence-v3.3.tar.gz evidence-v33
+          sha256sum dist-v33/runtime-evidence-v3.3.tar.gz > dist-v33/runtime-evidence-v3.3.tar.gz.sha256
+          tar -czf dist-v33/life-agent-commercial-v3.3-source.tar.gz -C "$PROJECT_ROOT" \
+            app/src app/build.gradle settings.gradle build.gradle gradle.properties 2>/dev/null || \
+          tar -czf dist-v33/life-agent-commercial-v3.3-source.tar.gz -C "$PROJECT_ROOT" \
+            app/src app/build.gradle settings.gradle build.gradle
+          sha256sum dist-v33/life-agent-commercial-v3.3-source.tar.gz \
+            > dist-v33/life-agent-commercial-v3.3-source.tar.gz.sha256
+
+      - name: Write honest commercialization report
+        shell: bash
+        run: |
+          set -euo pipefail
+          CONTRACT_TESTS="$(python3 -c 'import json;print(json.load(open("evidence-v33/commercial-self-test.json"))["tests"])')"
+          STATE_TESTS="$(python3 -c 'import json;print(json.load(open("evidence-v33/commercial-state-self-test.json"))["tests"])')"
+          HASH="$(cut -d' ' -f1 dist-v33/Life-Agent-OS-v3.3-hardening-beta.apk.sha256)"
+          cat > dist-v33/COMMERCIALIZATION_AUDIT_V3.3.md <<EOF
+          # Life Agent OS v3.3 Commercial Hardening Audit
+
+          ## Verdict
+
+          **Installable core hardening beta: PASS**
+
+          **Every live external feature error-free and commercially launchable: NO**
+
+          The app core, UI, encrypted persistence, recovery, notification policy, coarse foreground location, strict autofill, task evidence policy, skill screens and Android 15 runtime passed. Live bank transfer, Monimo submission, AI telephone calls, AI subscription executors, benefits submission, merchant data and vendor-specific zero-tap behavior are still external release gates.
+
+          ## Verified in CI and Android 15 emulator
+
+          - Contract tests: ${CONTRACT_TESTS} PASS, 0 FAIL
+          - Encrypted state integration tests: ${STATE_TESTS} PASS, 0 FAIL
+          - Android Lint and JVM unit task: PASS
+          - Debug and unsigned release assembly: PASS
+          - Goal-first UI, share entry, rotation, 1.3x font, force-stop recovery: PASS
+          - Every declared skill activity launch: PASS
+          - Foreground coarse-location service: PASS
+          - Notification listener and safe autofill registration: PASS
+          - Fatal app exceptions: 0
+          - Forbidden permissions: 0
+          - Sensitive test markers in app files/preferences: 0
+          - APK signature, alignment, package, version and ZIP integrity: PASS
+
+          ## Hardening changes over v3.2
+
+          - Notification content is persisted as a semantic event label, not message text.
+          - Coarse location dedup is rounded to roughly neighborhood scale.
+          - Manual evidence cannot complete transfer, insurance claim or official benefit submission tasks.
+          - High-risk completion requires a signed provider path.
+          - Autofill setup opens the Android autofill service request surface directly.
+
+          ## Artifact
+
+          - Package: com.lifeagent.unified
+          - Version: 3.3.0-hardening-beta
+          - Version code: 330
+          - SHA-256: ${HASH}
+          - Installable signing: debug key for physical-device testing
+          - Production release: intentionally unsigned until a protected production signing key is provisioned
+          EOF
+          cat > dist-v33/INSTALL_AND_TEST_V3.3.md <<'EOF'
+          # Life Agent OS v3.3 first-device test
+
+          1. Disable notification access for every older Life Agent build.
+          2. Install the v3.3 hardening-beta APK.
+          3. Set a device lock before testing sensitive drafts or data deletion.
+          4. Store only non-secret profile fields under **내 정보**.
+          5. Under **자동화**, allow only the apps whose new notifications may be analyzed.
+          6. Grant notification access and optionally choose Life Agent as the autofill service.
+          7. Start location opportunities only while testing. A visible foreground notification remains and the session ends after two hours.
+          8. Do not use live bank transfer, live insurance submission or live AI calling until an authorized provider is connected and separately certified.
+          EOF
+
+      - name: Upload v3.3 audited candidate
+        uses: actions/upload-artifact@v4
+        with:
+          name: life-agent-os-v3.3-hardening-beta
+          path: dist-v33/*
+          if-no-files-found: error
+          retention-days: 7
