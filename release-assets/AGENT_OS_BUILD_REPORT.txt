@@ -1,0 +1,10 @@
+Life Agent OS v2 Android build
+package=com.lifeagent.unified
+version=2.0.0-agent-os-alpha
+versionCode=200
+minSdk=30
+targetSdk=35
+architecture=ContextEngine->SkillRegistry->PolicyKernel->ExecutorRouter->PersistentTaskGraph
+entry_points=app,share,selected_text,deep_link,quick_settings,home_shortcut,notification_context
+skills=reservation,insurance,transfer,signup,streaming,software_update,vault,connections,general
+status=BUILD_AND_VERIFICATION_PASS
