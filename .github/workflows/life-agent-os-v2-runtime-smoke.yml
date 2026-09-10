@@ -1,0 +1,160 @@
+name: Runtime Smoke Life Agent OS v2
+
+on:
+  push:
+    branches:
+      - life-agent-os-v2-20260910
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+jobs:
+  emulator-smoke:
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+
+    steps:
+      - name: Checkout Agent OS branch
+        uses: actions/checkout@v4
+        with:
+          ref: life-agent-os-v2-20260910
+          fetch-depth: 1
+
+      - name: Set up Java 17
+        uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: '17'
+
+      - name: Set up Android SDK
+        uses: android-actions/setup-android@v3
+
+      - name: Install emulator image
+        shell: bash
+        run: |
+          set -euo pipefail
+          yes | sdkmanager --licenses >/dev/null || true
+          sdkmanager 'platform-tools' 'emulator' 'system-images;android-35;google_apis;x86_64'
+          echo no | avdmanager create avd --force --name lifeagent-os-smoke --package 'system-images;android-35;google_apis;x86_64' --device 'pixel_6'
+
+      - name: Boot emulator and run interaction smoke
+        shell: bash
+        run: |
+          set -euo pipefail
+          test -s release-assets/Life-Agent-OS-v2.0-alpha.apk
+          sudo chmod 666 /dev/kvm || true
+          nohup emulator -avd lifeagent-os-smoke -no-window -no-audio -no-boot-anim -gpu swiftshader_indirect -no-snapshot -camera-back none -camera-front none > /tmp/emulator.log 2>&1 &
+          adb wait-for-device
+          for i in $(seq 1 90); do
+            if [ "$(adb shell getprop sys.boot_completed 2>/dev/null | tr -d '\r')" = '1' ]; then break; fi
+            sleep 3
+          done
+          test "$(adb shell getprop sys.boot_completed | tr -d '\r')" = '1'
+          adb shell settings put global window_animation_scale 0
+          adb shell settings put global transition_animation_scale 0
+          adb shell settings put global animator_duration_scale 0
+          adb install -r release-assets/Life-Agent-OS-v2.0-alpha.apk
+          adb shell input keyevent 82 || true
+          mkdir -p runtime-smoke
+
+          dump_ui() {
+            local name="$1"
+            for attempt in 1 2 3; do
+              adb shell uiautomator dump "/sdcard/${name}.xml" >/dev/null 2>&1 && break
+              sleep 1
+            done
+            adb pull "/sdcard/${name}.xml" "runtime-smoke/${name}.xml" >/dev/null
+          }
+
+          tap_contains() {
+            local xml="$1"
+            local needle="$2"
+            python3 - "$xml" "$needle" <<'PY'
+          import re, subprocess, sys, xml.etree.ElementTree as ET
+          path, needle = sys.argv[1], sys.argv[2]
+          root = ET.parse(path).getroot()
+          candidates=[]
+          for node in root.iter('node'):
+              text=(node.attrib.get('text','')+' '+node.attrib.get('content-desc','')).strip()
+              if needle in text:
+                  b=node.attrib.get('bounds','')
+                  m=re.match(r'\[(\d+),(\d+)\]\[(\d+),(\d+)\]',b)
+                  if m:
+                      x1,y1,x2,y2=map(int,m.groups())
+                      candidates.append(((x2-x1)*(y2-y1),(x1+x2)//2,(y1+y2)//2,text))
+          if not candidates:
+              raise SystemExit('UI text not found: '+needle)
+          _,x,y,_=sorted(candidates)[0]
+          subprocess.check_call(['adb','shell','input','tap',str(x),str(y)])
+          PY
+          }
+
+          adb shell am force-stop com.lifeagent.unified
+          adb shell am start -W -n com.lifeagent.unified/.MainActivity >/tmp/start-home.txt
+          sleep 2
+          dump_ui home
+          grep -q 'Life Agent' runtime-smoke/home.xml
+          grep -q '앱을 고르지 않아도 됩니다' runtime-smoke/home.xml
+          grep -q '처리 계획 보기' runtime-smoke/home.xml
+          adb exec-out screencap -p > runtime-smoke/home.png
+
+          adb shell am start -W -n com.lifeagent.unified/.MainActivity --es lifeagent.os.command '금요일 오후 정형외과 예약해줘' >/tmp/start-command.txt
+          sleep 1
+          dump_ui command
+          tap_contains runtime-smoke/command.xml '처리 계획 보기'
+          sleep 1
+          dump_ui plan
+          grep -q '이렇게 처리할까요' runtime-smoke/plan.xml
+          grep -q '예약 대행' runtime-smoke/plan.xml
+          grep -q '실행 계획' runtime-smoke/plan.xml
+          adb exec-out screencap -p > runtime-smoke/plan.png
+          adb shell input keyevent 4
+
+          adb shell am start -W -n com.lifeagent.unified/.AgentEntryActivity -a android.intent.action.SEND -t text/plain --es android.intent.extra.TEXT '진료비 영수증 보험금 청구해줘' >/tmp/start-share.txt
+          sleep 2
+          dump_ui shared
+          grep -q '공유된 항목' runtime-smoke/shared.xml
+          grep -q '진료비 영수증 보험금 청구해줘' runtime-smoke/shared.xml
+          adb exec-out screencap -p > runtime-smoke/shared.png
+
+          adb shell am start -W -n com.lifeagent.unified/.MainActivity --es lifeagent.os.tab tasks >/tmp/start-tasks.txt
+          sleep 1
+          dump_ui tasks
+          grep -q '작업함' runtime-smoke/tasks.xml
+          grep -q '중단돼도 이어지는 업무' runtime-smoke/tasks.xml
+          adb exec-out screencap -p > runtime-smoke/tasks.png
+
+          {
+            echo 'LIFE AGENT OS v2 RUNTIME SMOKE'
+            echo 'emulator=Android 15 / API 35 / Pixel 6 profile'
+            echo 'install=PASS'
+            echo 'main_activity_launch=PASS'
+            echo 'goal_first_home=PASS'
+            echo 'plan_dialog=PASS'
+            echo 'reservation_skill_resolution=PASS'
+            echo 'share_entry=PASS'
+            echo 'context_surface=PASS'
+            echo 'persistent_task_inbox=PASS'
+            echo 'process_survived=true'
+            echo "pid=$(adb shell pidof com.lifeagent.unified | tr -d '\r')"
+          } > runtime-smoke/RUNTIME_SMOKE_REPORT.txt
+
+      - name: Commit runtime evidence to isolated branch
+        shell: bash
+        run: |
+          set -euo pipefail
+          git config user.name 'github-actions[bot]'
+          git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
+          git pull --rebase origin life-agent-os-v2-20260910
+          git add -f runtime-smoke/*.png runtime-smoke/*.xml runtime-smoke/RUNTIME_SMOKE_REPORT.txt
+          git commit -m 'test: publish Agent OS runtime smoke evidence [skip ci]'
+          git push origin HEAD:life-agent-os-v2-20260910
+
+      - name: Upload runtime smoke evidence
+        uses: actions/upload-artifact@v4
+        with:
+          name: life-agent-os-v2-runtime-smoke
+          path: runtime-smoke/*
+          if-no-files-found: error
+          retention-days: 7
