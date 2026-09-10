@@ -1,0 +1,72 @@
+name: Publish Audited Life Agent Commercial APK
+
+on:
+  workflow_run:
+    workflows:
+      - Build and Audit Life Agent Commercial Hardening
+    types:
+      - completed
+
+permissions:
+  actions: read
+  contents: write
+
+jobs:
+  publish:
+    if: >-
+      github.event.workflow_run.conclusion == 'success' &&
+      github.event.workflow_run.head_branch == 'life-agent-commercial-hardening-v3-2-20260911'
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+
+    steps:
+      - name: Checkout audited branch
+        uses: actions/checkout@v4
+        with:
+          ref: life-agent-commercial-hardening-v3-2-20260911
+          fetch-depth: 1
+
+      - name: Download audited artifact from triggering run
+        uses: actions/download-artifact@v4
+        with:
+          name: life-agent-os-v3.2-hardening-beta
+          path: /tmp/audited
+          run-id: ${{ github.event.workflow_run.id }}
+          github-token: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Verify publication inputs
+        shell: bash
+        run: |
+          set -euo pipefail
+          test -s /tmp/audited/Life-Agent-OS-v3.2-hardening-beta.apk
+          test -s /tmp/audited/Life-Agent-OS-v3.2-hardening-beta.apk.sha256
+          test -s /tmp/audited/COMMERCIALIZATION_AUDIT.md
+          (cd /tmp/audited && sha256sum -c Life-Agent-OS-v3.2-hardening-beta.apk.sha256)
+          grep -q 'Core hardening beta: PASS' /tmp/audited/COMMERCIALIZATION_AUDIT.md
+          grep -q 'All live external services error-free: NOT VERIFIED' /tmp/audited/COMMERCIALIZATION_AUDIT.md
+
+      - name: Publish verified files to isolated branch
+        shell: bash
+        run: |
+          set -euo pipefail
+          rm -rf commercial-release-assets
+          mkdir -p commercial-release-assets
+          cp /tmp/audited/Life-Agent-OS-v3.2-hardening-beta.apk commercial-release-assets/
+          cp /tmp/audited/Life-Agent-OS-v3.2-hardening-beta.apk.sha256 commercial-release-assets/
+          cp /tmp/audited/Life-Agent-OS-v3.2-release-unsigned.apk commercial-release-assets/
+          cp /tmp/audited/Life-Agent-OS-v3.2-release-unsigned.apk.sha256 commercial-release-assets/
+          cp /tmp/audited/COMMERCIALIZATION_AUDIT.md commercial-release-assets/
+          cp /tmp/audited/INSTALL_AND_TEST.md commercial-release-assets/
+          cp /tmp/audited/life-agent-commercial-hardening-source.tar.gz commercial-release-assets/
+          cp /tmp/audited/life-agent-commercial-hardening-source.tar.gz.sha256 commercial-release-assets/
+          cp /tmp/audited/apk-badging.txt commercial-release-assets/
+          cp /tmp/audited/apksigner.txt commercial-release-assets/
+          cp /tmp/audited/lint-results-debug.xml commercial-release-assets/
+          tar -czf commercial-release-assets/runtime-evidence.tar.gz -C /tmp/audited runtime-evidence
+          sha256sum commercial-release-assets/runtime-evidence.tar.gz \
+            > commercial-release-assets/runtime-evidence.tar.gz.sha256
+          git config user.name 'github-actions[bot]'
+          git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
+          git add -f commercial-release-assets
+          git commit -m 'release: publish audited Life Agent v3.2 hardening beta [skip ci]'
+          git push origin HEAD:life-agent-commercial-hardening-v3-2-20260911
