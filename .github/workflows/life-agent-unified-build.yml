@@ -7,7 +7,7 @@ on:
   workflow_dispatch:
 
 permissions:
-  contents: write
+  contents: read
 
 jobs:
   build:
@@ -90,11 +90,12 @@ jobs:
           echo "status=$status" >> "$GITHUB_OUTPUT"
           exit 0
 
-      - name: Publish concise compile diagnostics
-        if: steps.assemble.outputs.status != '0'
+      - name: Prepare compile diagnostics
+        if: always() && steps.assemble.outputs.status != '0'
         shell: bash
         run: |
           set -euo pipefail
+          mkdir -p dist-failure
           {
             echo 'LIFE_AGENT_UNIFIED_BUILD_FAILURE'
             echo "run_id=$GITHUB_RUN_ID"
@@ -102,14 +103,18 @@ jobs:
             echo
             grep -n -E '(^|[[:space:]])(error:|FAILURE:|What went wrong|Execution failed|Caused by:|cannot find symbol|incompatible types|package .* does not exist)' /tmp/life-agent-gradle.log || true
             echo
-            echo '--- FINAL 220 LINES ---'
-            tail -n 220 /tmp/life-agent-gradle.log
-          } > life-agent-build/BUILD_FAILURE.log
-          git config user.name 'github-actions[bot]'
-          git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
-          git add life-agent-build/BUILD_FAILURE.log
-          git commit -m 'ci: capture unified Android compile diagnostics [skip ci]' || true
-          git push origin HEAD:life-agent-unified-build-v1-20260910
+            echo '--- FINAL 260 LINES ---'
+            tail -n 260 /tmp/life-agent-gradle.log
+          } > dist-failure/BUILD_FAILURE.log
+
+      - name: Upload compile diagnostics
+        if: always() && steps.assemble.outputs.status != '0'
+        uses: actions/upload-artifact@v4
+        with:
+          name: life-agent-unified-build-failure
+          path: dist-failure/BUILD_FAILURE.log
+          if-no-files-found: error
+          retention-days: 7
 
       - name: Stop after captured compile failure
         if: steps.assemble.outputs.status != '0'
