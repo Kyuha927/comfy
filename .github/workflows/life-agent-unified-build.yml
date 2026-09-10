@@ -7,7 +7,7 @@ on:
   workflow_dispatch:
 
 permissions:
-  contents: read
+  contents: write
 
 jobs:
   build:
@@ -17,6 +17,8 @@ jobs:
     steps:
       - name: Checkout isolated branch
         uses: actions/checkout@v4
+        with:
+          ref: life-agent-unified-build-v1-20260910
 
       - name: Restore unified source archive
         shell: bash
@@ -24,6 +26,7 @@ jobs:
           set -euo pipefail
           cat life-agent-build/source.tar.xz.b64.part* | base64 --decode > /tmp/life-agent-source.tar.xz
           echo '29919c8d8f0f4b535d1c1a05370e22d464ef7bdc1725730da21add0d1ac5f06b  /tmp/life-agent-source.tar.xz' | sha256sum -c -
+          rm -rf /tmp/life-agent-src
           mkdir -p /tmp/life-agent-src
           tar -xJf /tmp/life-agent-source.tar.xz -C /tmp/life-agent-src
           test -f /tmp/life-agent-src/life-agent-unified-v2/app/build.gradle
@@ -75,9 +78,42 @@ jobs:
           grep -q 'usesCleartextTraffic="false"' "$MANIFEST"
           ! grep -R -E '(sk-[A-Za-z0-9]{20,}|BEGIN (RSA |EC |OPENSSH )?PRIVATE KEY|api[_-]?key[[:space:]]*=[[:space:]]*[A-Za-z0-9_-]{16,})' "$ROOT" --exclude='*.md'
 
-      - name: Assemble unified APK
+      - name: Assemble unified APK and capture diagnostics
+        id: assemble
+        shell: bash
         working-directory: /tmp/life-agent-src/life-agent-unified-v2
-        run: gradle --no-daemon --stacktrace :app:assembleDebug
+        run: |
+          set +e
+          set -o pipefail
+          gradle --no-daemon --stacktrace :app:assembleDebug 2>&1 | tee /tmp/life-agent-gradle.log
+          status=${PIPESTATUS[0]}
+          echo "status=$status" >> "$GITHUB_OUTPUT"
+          exit 0
+
+      - name: Publish concise compile diagnostics
+        if: steps.assemble.outputs.status != '0'
+        shell: bash
+        run: |
+          set -euo pipefail
+          {
+            echo 'LIFE_AGENT_UNIFIED_BUILD_FAILURE'
+            echo "run_id=$GITHUB_RUN_ID"
+            echo "commit=$GITHUB_SHA"
+            echo
+            grep -n -E '(^|[[:space:]])(error:|FAILURE:|What went wrong|Execution failed|Caused by:|cannot find symbol|incompatible types|package .* does not exist)' /tmp/life-agent-gradle.log || true
+            echo
+            echo '--- FINAL 220 LINES ---'
+            tail -n 220 /tmp/life-agent-gradle.log
+          } > life-agent-build/BUILD_FAILURE.log
+          git config user.name 'github-actions[bot]'
+          git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
+          git add life-agent-build/BUILD_FAILURE.log
+          git commit -m 'ci: capture unified Android compile diagnostics [skip ci]' || true
+          git push origin HEAD:life-agent-unified-build-v1-20260910
+
+      - name: Stop after captured compile failure
+        if: steps.assemble.outputs.status != '0'
+        run: exit 1
 
       - name: Verify APK package, signature and contents
         shell: bash
