@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="app_name">Life Agent OS</string>
+    <string name="notification_listener_label">Life Agent 문맥 감지</string>
+    <string name="autofill_label">Life Agent 개인정보 자동입력</string>
+    <string name="tile_label">Life Agent</string>
+    <string name="location_channel">위치 기반 기회 감지</string>
+    <string name="location_active">위치 기반 추천이 켜져 있습니다</string>
+    <string name="autofill_description">개인정보 금고에서 이름, 연락처, 주소만 채웁니다. 비밀번호, 인증번호, 카드 보안정보는 채우지 않습니다.</string>
+</resources>
