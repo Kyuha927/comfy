@@ -1,0 +1,163 @@
+name: Build Life Agent OS v2.1 Opportunity Fixed
+
+on:
+  push:
+    branches:
+      - life-agent-os-opportunity-v21-final-20260911
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    timeout-minutes: 55
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          ref: life-agent-os-opportunity-v21-final-20260911
+          fetch-depth: 1
+
+      - name: Restore Agent OS and apply Opportunity overlay
+        shell: bash
+        run: |
+          set -euo pipefail
+          cat life-agent-build/source.tar.xz.b64.part* | base64 --decode > /tmp/base.tar.xz
+          echo '29919c8d8f0f4b535d1c1a05370e22d464ef7bdc1725730da21add0d1ac5f06b  /tmp/base.tar.xz' | sha256sum -c -
+          tar -tJf life-agent-opportunity-build/overlay.tar.xz > /tmp/overlay-files.txt
+          grep -q 'app/src/main/java/com/lifeagent/unified/OpportunityEngine.java' /tmp/overlay-files.txt
+          grep -q 'app/src/main/java/com/lifeagent/unified/OpportunityActivity.java' /tmp/overlay-files.txt
+          rm -rf /tmp/life-agent-src
+          mkdir -p /tmp/life-agent-src
+          tar -xJf /tmp/base.tar.xz -C /tmp/life-agent-src
+          ROOT=/tmp/life-agent-src/life-agent-unified-v2
+          test -f "$ROOT/app/build.gradle"
+          if [ -f life-agent-build/apply-patches.sh ]; then bash life-agent-build/apply-patches.sh "$ROOT"; fi
+          cp -R life-agent-build/patches/. "$ROOT/"
+          bash life-agent-build/apply-agent-os-v2.sh "$ROOT"
+          tar -xJf life-agent-opportunity-build/overlay.tar.xz -C "$ROOT"
+
+      - uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: '17'
+
+      - uses: android-actions/setup-android@v3
+
+      - name: Install Android SDK
+        shell: bash
+        run: |
+          yes | sdkmanager --licenses >/dev/null || true
+          sdkmanager 'platforms;android-35' 'build-tools;35.0.0' 'platform-tools'
+
+      - uses: gradle/actions/setup-gradle@v4
+        with:
+          gradle-version: '8.9'
+
+      - name: Validate source and privacy boundaries
+        shell: bash
+        run: |
+          set -euo pipefail
+          ROOT=/tmp/life-agent-src/life-agent-unified-v2
+          JAVA="$ROOT/app/src/main/java/com/lifeagent/unified"
+          MANIFEST="$ROOT/app/src/main/AndroidManifest.xml"
+          grep -q "versionCode 210" "$ROOT/app/build.gradle"
+          grep -q "versionName '2.1.0-opportunity-alpha'" "$ROOT/app/build.gradle"
+          grep -q 'ACCESS_COARSE_LOCATION' "$MANIFEST"
+          grep -q 'FOREGROUND_SERVICE_LOCATION' "$MANIFEST"
+          ! grep -q 'ACCESS_BACKGROUND_LOCATION' "$MANIFEST"
+          grep -q 'OpportunityActivity' "$MANIFEST"
+          grep -q 'OpportunityLocationService' "$MANIFEST"
+          grep -q 'opportunity.discovery' "$JAVA/AgentOsCore.java"
+          grep -q 'benefit.application' "$JAVA/AgentOsCore.java"
+          grep -q 'LOCAL_CONTEXT' "$JAVA/AgentOsCore.java"
+          grep -q 'OFFICIAL_API' "$JAVA/AgentOsCore.java"
+          grep -q 'LOCATION_CHANGED' "$JAVA/AgentOsCore.java"
+          grep -q 'raw_location_included", false' "$JAVA/OpportunityEngine.java"
+          grep -q 'legal_confirmation_delegated", false' "$JAVA/OpportunityEngine.java"
+          grep -q 'authentication_delegated", false' "$JAVA/OpportunityEngine.java"
+          grep -q 'AndroidKeyStore' "$JAVA/SecureStore.java"
+          grep -q 'usesCleartextTraffic="false"' "$MANIFEST"
+
+      - name: Assemble APK
+        working-directory: /tmp/life-agent-src/life-agent-unified-v2
+        run: gradle --no-daemon --stacktrace :app:assembleDebug
+
+      - name: Verify APK
+        shell: bash
+        run: |
+          set -euo pipefail
+          ROOT=/tmp/life-agent-src/life-agent-unified-v2
+          APK="$ROOT/app/build/outputs/apk/debug/app-debug.apk"
+          mkdir -p release-assets
+          cp "$APK" release-assets/Life-Agent-OS-v2.1-opportunity-alpha.apk
+          "$ANDROID_HOME/build-tools/35.0.0/zipalign" -c -v 4 release-assets/Life-Agent-OS-v2.1-opportunity-alpha.apk > release-assets/zipalign.txt
+          "$ANDROID_HOME/build-tools/35.0.0/apksigner" verify --verbose --print-certs release-assets/Life-Agent-OS-v2.1-opportunity-alpha.apk | tee release-assets/apksigner.txt
+          "$ANDROID_HOME/build-tools/35.0.0/aapt" dump badging release-assets/Life-Agent-OS-v2.1-opportunity-alpha.apk | tee release-assets/apk-badging.txt
+          grep -q "package: name='com.lifeagent.unified'" release-assets/apk-badging.txt
+          grep -q "versionCode='210'" release-assets/apk-badging.txt
+          grep -q "versionName='2.1.0-opportunity-alpha'" release-assets/apk-badging.txt
+          "$ANDROID_HOME/build-tools/35.0.0/aapt" dump permissions release-assets/Life-Agent-OS-v2.1-opportunity-alpha.apk | tee release-assets/apk-permissions.txt
+          grep -q 'ACCESS_COARSE_LOCATION' release-assets/apk-permissions.txt
+          grep -q 'FOREGROUND_SERVICE_LOCATION' release-assets/apk-permissions.txt
+          ! grep -q 'ACCESS_BACKGROUND_LOCATION' release-assets/apk-permissions.txt
+          unzip -t release-assets/Life-Agent-OS-v2.1-opportunity-alpha.apk | tee release-assets/unzip-test.txt
+          sha256sum release-assets/Life-Agent-OS-v2.1-opportunity-alpha.apk > release-assets/Life-Agent-OS-v2.1-opportunity-alpha.apk.sha256
+          tar -C /tmp/life-agent-src -czf release-assets/life-agent-os-v2.1-opportunity-source.tar.gz life-agent-unified-v2
+
+      - name: Android 15 UI smoke
+        uses: reactivecircus/android-emulator-runner@v2
+        with:
+          api-level: 35
+          target: google_apis
+          arch: x86_64
+          profile: pixel_6
+          disable-animations: true
+          emulator-options: -no-window -gpu swiftshader_indirect -noaudio -no-boot-anim -camera-back none
+          script: |
+            set -euo pipefail
+            APK="$GITHUB_WORKSPACE/release-assets/Life-Agent-OS-v2.1-opportunity-alpha.apk"
+            adb logcat -c
+            adb install -r "$APK"
+            adb shell pm grant com.lifeagent.unified android.permission.POST_NOTIFICATIONS || true
+            adb shell am start -W -n com.lifeagent.unified/.MainActivity
+            sleep 3
+            test -n "$(adb shell pidof com.lifeagent.unified | tr -d '\r')"
+            adb shell uiautomator dump /sdcard/home.xml >/dev/null
+            adb pull /sdcard/home.xml "$GITHUB_WORKSPACE/release-assets/home-uiautomator.xml" >/dev/null
+            adb exec-out screencap -p > "$GITHUB_WORKSPACE/release-assets/home.png"
+            grep -q 'Life Agent' "$GITHUB_WORKSPACE/release-assets/home-uiautomator.xml"
+            grep -q '맞춤 기회' "$GITHUB_WORKSPACE/release-assets/home-uiautomator.xml"
+            adb shell am start -W -n com.lifeagent.unified/.OpportunityActivity
+            sleep 3
+            adb shell uiautomator dump /sdcard/opportunity.xml >/dev/null
+            adb pull /sdcard/opportunity.xml "$GITHUB_WORKSPACE/release-assets/opportunity-uiautomator.xml" >/dev/null
+            adb exec-out screencap -p > "$GITHUB_WORKSPACE/release-assets/opportunity.png"
+            grep -q '맞춤 기회' "$GITHUB_WORKSPACE/release-assets/opportunity-uiautomator.xml"
+            grep -q '위치 문맥' "$GITHUB_WORKSPACE/release-assets/opportunity-uiautomator.xml"
+            if adb logcat -d | grep -E 'FATAL EXCEPTION: main|Process: com.lifeagent.unified' > "$GITHUB_WORKSPACE/release-assets/runtime-crash-scan.txt"; then exit 1; fi
+            echo NO_FATAL_EXCEPTION > "$GITHUB_WORKSPACE/release-assets/runtime-crash-scan.txt"
+
+      - name: Write receipt
+        shell: bash
+        run: |
+          cat > release-assets/OPPORTUNITY_BUILD_REPORT.txt <<'EOF'
+          Life Agent OS v2.1 Opportunity
+          package=com.lifeagent.unified
+          version=2.1.0-opportunity-alpha
+          versionCode=210
+          architecture=ContextEngine->OpportunityEngine->SkillRegistry->PolicyKernel->ExecutorRouter->PersistentTaskGraph
+          location=foreground-user-started,coarse-default,latest-only-encrypted,no-background-location-permission
+          application=discover->eligibility->documents->prefill->confirmation/auth->submit->receipt-verification
+          automatic_submit=verified-official-adapter+per-program-preauthorization+no-auth-only
+          android15_ui_smoke=PASS
+          status=BUILD_RUNTIME_AND_VERIFICATION_PASS
+          EOF
+
+      - uses: actions/upload-artifact@v4
+        with:
+          name: life-agent-os-v2.1-opportunity-alpha-fixed
+          path: release-assets/*
+          if-no-files-found: error
+          retention-days: 7
