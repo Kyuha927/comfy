@@ -86,10 +86,13 @@ jobs:
           grep -R -q 'MODEL_FREE' "$JAVA"
           grep -R -q 'HUMAN_GATE' "$JAVA"
           grep -R -q 'AndroidKeyStore' "$JAVA"
-          grep -R -q 'canHandle' "$JAVA/SkillManifest.java"
-          grep -R -q 'verification' "$JAVA/TaskStore.java"
-          grep -R -q 'Trigger' "$JAVA/RecipeEngine.java"
-          grep -R -q 'SkillRegistry' "$JAVA/AgentPlanner.java"
+          grep -q 'int score' "$JAVA/SkillManifest.java"
+          grep -q 'supports(String capability)' "$JAVA/SkillManifest.java"
+          grep -q 'verifiedEvidence' "$JAVA/TaskStore.java"
+          grep -q 'recordEvidence' "$JAVA/TaskStore.java"
+          grep -q 'triggerType' "$JAVA/RecipeEngine.java"
+          grep -q 'verificationType' "$JAVA/RecipeEngine.java"
+          grep -q 'SkillRegistry' "$JAVA/AgentPlanner.java"
           ! grep -R -E '(sk-[A-Za-z0-9]{20,}|BEGIN (RSA |EC |OPENSSH )?PRIVATE KEY|api[_-]?key[[:space:]]*=[[:space:]]*[A-Za-z0-9_-]{16,})' "$ROOT" --exclude='*.md'
 
       - name: Assemble Agent OS APK and capture diagnostics
