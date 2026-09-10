@@ -1,0 +1,117 @@
+name: Build Unified Life Agent Android APK
+
+on:
+  push:
+    branches:
+      - life-agent-unified-build-v1-20260910
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    timeout-minutes: 40
+
+    steps:
+      - name: Checkout isolated branch
+        uses: actions/checkout@v4
+
+      - name: Restore remaining source chunks
+        shell: bash
+        run: |
+          set -euo pipefail
+          mkdir -p /tmp/life-agent-source-parts
+          cp life-agent-build/source.tar.xz.b64.part00 /tmp/life-agent-source-parts/part00
+          cp life-agent-build/source.tar.xz.b64.part01 /tmp/life-agent-source-parts/part01
+          curl --fail --location --retry 3 --output /tmp/life-agent-source-parts/part02 'https://raw.githubusercontent.com/Kyuha927/codex-global-config/life-agent-unified-ui-v2-20260910/tmp/life-agent-unified-ui-v2/source.tar.xz.b64.part02?token=BR47FUAQH6T3YGHLRHPIVKLKUH7TZAA'
+          curl --fail --location --retry 3 --output /tmp/life-agent-source-parts/part03 'https://raw.githubusercontent.com/Kyuha927/codex-global-config/life-agent-unified-ui-v2-20260910/tmp/life-agent-unified-ui-v2/source.tar.xz.b64.part03?token=BR47FUD66DJBBVR2ZWPJSJDKUH7TZAA'
+          curl --fail --location --retry 3 --output /tmp/life-agent-source-parts/part04 'https://raw.githubusercontent.com/Kyuha927/codex-global-config/life-agent-unified-ui-v2-20260910/tmp/life-agent-unified-ui-v2/source.tar.xz.b64.part04?token=BR47FUAQKV7WP7IUUDAVCODKUH7TZAA'
+          curl --fail --location --retry 3 --output /tmp/life-agent-source-parts/part05 'https://raw.githubusercontent.com/Kyuha927/codex-global-config/life-agent-unified-ui-v2-20260910/tmp/life-agent-unified-ui-v2/source.tar.xz.b64.part05?token=BR47FUCPAMBYXUGO7PYPCNDKUH7TZAA'
+          cat /tmp/life-agent-source-parts/part* | base64 --decode > /tmp/life-agent-source.tar.xz
+          echo '29919c8d8f0f4b535d1c1a05370e22d464ef7bdc1725730da21add0d1ac5f06b  /tmp/life-agent-source.tar.xz' | sha256sum -c -
+          mkdir -p /tmp/life-agent-src
+          tar -xJf /tmp/life-agent-source.tar.xz -C /tmp/life-agent-src
+          test -f /tmp/life-agent-src/life-agent-unified-v2/app/build.gradle
+
+      - name: Set up Java 17
+        uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: '17'
+
+      - name: Set up Android SDK
+        uses: android-actions/setup-android@v3
+
+      - name: Install Android build components
+        shell: bash
+        run: |
+          set -euo pipefail
+          yes | sdkmanager --licenses >/dev/null || true
+          sdkmanager 'platforms;android-35' 'build-tools;35.0.0'
+
+      - name: Set up Gradle 8.9
+        uses: gradle/actions/setup-gradle@v4
+        with:
+          gradle-version: '8.9'
+
+      - name: Validate unified product contracts
+        shell: bash
+        run: |
+          set -euo pipefail
+          ROOT=/tmp/life-agent-src/life-agent-unified-v2
+          MANIFEST="$ROOT/app/src/main/AndroidManifest.xml"
+          grep -q "applicationId 'com.lifeagent.unified'" "$ROOT/app/build.gradle"
+          grep -q "versionName '1.1.0-unified-beta'" "$ROOT/app/build.gradle"
+          grep -q 'LifeAgentAutofillService' "$MANIFEST"
+          grep -q 'UnifiedNotificationListener' "$MANIFEST"
+          grep -q 'ReservationActivity' "$MANIFEST"
+          grep -q 'InsuranceActivity' "$MANIFEST"
+          grep -q 'TransferActivity' "$MANIFEST"
+          grep -q 'SignupActivity' "$MANIFEST"
+          grep -q 'StreamRulesActivity' "$MANIFEST"
+          grep -q 'RustDeskActivity' "$MANIFEST"
+          grep -q 'ConnectionsActivity' "$MANIFEST"
+          grep -R -q 'MODEL_FREE' "$ROOT/app/src/main/java/com/lifeagent/unified"
+          grep -R -q 'HUMAN_GATE' "$ROOT/app/src/main/java/com/lifeagent/unified"
+          grep -R -q 'AndroidKeyStore' "$ROOT/app/src/main/java/com/lifeagent/unified"
+          grep -q 'usesCleartextTraffic="false"' "$MANIFEST"
+
+      - name: Assemble unified APK
+        working-directory: /tmp/life-agent-src/life-agent-unified-v2
+        run: gradle --no-daemon --stacktrace :app:assembleDebug
+
+      - name: Verify APK package, signature and contents
+        shell: bash
+        run: |
+          set -euo pipefail
+          ROOT=/tmp/life-agent-src/life-agent-unified-v2
+          APK="$ROOT/app/build/outputs/apk/debug/app-debug.apk"
+          test -s "$APK"
+          mkdir -p dist
+          cp "$APK" dist/Life-Agent-v1.1-unified-beta.apk
+          "$ANDROID_HOME/build-tools/35.0.0/zipalign" -c -v 4 dist/Life-Agent-v1.1-unified-beta.apk > dist/zipalign.txt
+          "$ANDROID_HOME/build-tools/35.0.0/apksigner" verify --verbose --print-certs dist/Life-Agent-v1.1-unified-beta.apk | tee dist/apksigner.txt
+          "$ANDROID_HOME/build-tools/35.0.0/aapt" dump badging dist/Life-Agent-v1.1-unified-beta.apk | tee dist/apk-badging.txt
+          grep -q "package: name='com.lifeagent.unified'" dist/apk-badging.txt
+          grep -q "versionName='1.1.0-unified-beta'" dist/apk-badging.txt
+          sha256sum dist/Life-Agent-v1.1-unified-beta.apk > dist/Life-Agent-v1.1-unified-beta.apk.sha256
+          tar -C /tmp/life-agent-src -czf dist/life-agent-unified-v2-source.tar.gz life-agent-unified-v2
+          {
+            echo 'Life Agent unified Android build'
+            echo 'package=com.lifeagent.unified'
+            echo 'version=1.1.0-unified-beta'
+            echo 'versionCode=110'
+            echo 'minSdk=30'
+            echo 'targetSdk=35'
+            echo 'status=BUILD_AND_VERIFICATION_PASS'
+          } > dist/BUILD_REPORT.txt
+
+      - name: Upload installable unified APK
+        uses: actions/upload-artifact@v4
+        with:
+          name: life-agent-unified-v1.1-beta
+          path: dist/*
+          if-no-files-found: error
+          retention-days: 7
