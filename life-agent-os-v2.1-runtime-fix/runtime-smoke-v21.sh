@@ -90,10 +90,10 @@ assert_process_alive() {
   echo "$pid"
 }
 
-assert_no_fatal() {
+assert_clean_runtime_log() {
   local file=$1
-  if grep -Eq "FATAL EXCEPTION: main|Process: ${PACKAGE}.*PID" "$file"; then
-    fail "fatal exception found in $file"
+  if grep -Eq "FATAL EXCEPTION: main|Process: ${PACKAGE}.*PID| E LifeAgentStartup:" "$file"; then
+    fail "fatal exception or Life Agent startup error found in $file"
   fi
 }
 
@@ -118,7 +118,7 @@ for attempt in 1 2 3; do
   fi
   adb exec-out screencap -p > "$OUT/home-${attempt}.png"
   adb logcat -d -v threadtime > "$OUT/logcat-home-${attempt}.txt"
-  assert_no_fatal "$OUT/logcat-home-${attempt}.txt"
+  assert_clean_runtime_log "$OUT/logcat-home-${attempt}.txt"
 done
 
 # Deep-link navigation must stay inside the same Agent Shell.
@@ -163,7 +163,7 @@ assert_process_alive > "$OUT/pid-benefits.txt"
 adb exec-out screencap -p > "$OUT/benefits.png"
 
 adb logcat -d -v threadtime > "$OUT/logcat-final.txt"
-assert_no_fatal "$OUT/logcat-final.txt"
+assert_clean_runtime_log "$OUT/logcat-final.txt"
 
 {
   echo 'LIFE_AGENT_OS_V2_1_1_RUNTIME_SMOKE'
@@ -178,6 +178,7 @@ assert_no_fatal "$OUT/logcat-final.txt"
   echo 'encrypted_context_resume_after_force_stop=PASS'
   echo 'benefits_public_ui_entry=PASS'
   echo 'benefits_entry_without_permission_prompt=PASS'
+  echo 'startup_error_log=NONE'
   echo 'fatal_main_exception=NONE'
 } > "$OUT/RUNTIME_SMOKE_REPORT.txt"
 
