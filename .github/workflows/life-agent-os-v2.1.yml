@@ -44,7 +44,7 @@ jobs:
             bash life-agent-os-v2/apply-build-fixes.sh "$ROOT"
           fi
 
-          base64 --decode life-agent-os-v2.1/patch.tar.xz.b64 > /tmp/life-agent-os-v2.1-patch.tar.xz
+          cat life-agent-os-v2.1/patch.tar.xz.b64.part* | base64 --decode > /tmp/life-agent-os-v2.1-patch.tar.xz
           echo '9707e35885ec1ce3e5e1b31352f2bd341b91ae3e0716baa2df425256af41724a  /tmp/life-agent-os-v2.1-patch.tar.xz' | sha256sum -c -
           tar -xJf /tmp/life-agent-os-v2.1-patch.tar.xz -C "$ROOT"
 
