@@ -3,16 +3,11 @@ set -euo pipefail
 
 ROOT=${1:?usage: apply-runtime-fix.sh /path/to/life-agent-unified-v2}
 JAVA="$ROOT/app/src/main/java/com/lifeagent/unified"
-MAIN="$JAVA/MainActivity.java"
-SECURE="$JAVA/SecureStore.java"
-CONTEXT="$JAVA/ContextEngine.java"
-RUST="$JAVA/RustDeskUpdateChecker.java"
-BOOT="$JAVA/BootReceiver.java"
 GRADLE="$ROOT/app/build.gradle"
-
-for required in "$MAIN" "$SECURE" "$CONTEXT" "$RUST" "$BOOT" "$GRADLE"; do
-  test -f "$required"
+for name in MainActivity SecureStore ContextEngine RustDeskUpdateChecker BootReceiver DesignKit; do
+  test -f "$JAVA/$name.java"
 done
+test -f "$GRADLE"
 
 python3 - "$ROOT" <<'PY'
 from pathlib import Path
@@ -21,29 +16,26 @@ import sys
 root = Path(sys.argv[1])
 java = root / "app/src/main/java/com/lifeagent/unified"
 
-# The app declares Android 11 / API 30 as its minimum. String.isBlank() is not
-# available throughout that runtime range unless extra library desugaring is
-# configured, so use trim().isEmpty() everywhere instead.
 for path in java.glob("*.java"):
-    text = path.read_text(encoding="utf-8")
-    text = text.replace(".isBlank()", ".trim().isEmpty()")
+    text = path.read_text(encoding="utf-8").replace(".isBlank()", ".trim().isEmpty()")
     path.write_text(text, encoding="utf-8")
+
+def replace_once(path: Path, old: str, new: str, label: str) -> None:
+    text = path.read_text(encoding="utf-8")
+    if old not in text:
+        raise SystemExit(f"missing patch anchor: {label}")
+    path.write_text(text.replace(old, new, 1), encoding="utf-8")
 
 main = java / "MainActivity.java"
 text = main.read_text(encoding="utf-8")
 if "import android.util.Log;" not in text:
-    text = text.replace(
-        "import android.text.InputType;\n",
-        "import android.text.InputType;\nimport android.util.Log;\n",
-    )
+    text = text.replace("import android.text.InputType;\n", "import android.text.InputType;\nimport android.util.Log;\n", 1)
 if 'private static final String TAG = "LifeAgentStartup";' not in text:
-    text = text.replace(
-        "public final class MainActivity extends Activity {\n",
-        "public final class MainActivity extends Activity {\n"
-        '    private static final String TAG = "LifeAgentStartup";\n',
-    )
+    text = text.replace("public final class MainActivity extends Activity {\n",
+                        'public final class MainActivity extends Activity {\n    private static final String TAG = "LifeAgentStartup";\n', 1)
+main.write_text(text, encoding="utf-8")
 
-old_on_create = '''    @Override
+replace_once(main, '''    @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         DesignKit.applyWindow(this);
@@ -53,8 +45,7 @@ old_on_create = '''    @Override
         buildShell();
         render();
     }
-'''
-new_on_create = '''    @Override
+''', '''    @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         try {
@@ -66,31 +57,21 @@ new_on_create = '''    @Override
         buildShell();
         captureIncomingContextSafely(getIntent());
         render();
-
-        // The first frame must not depend on a background monitor, network, or JobScheduler.
         content.post(() -> RustDeskUpdateChecker.scheduleSafely(getApplicationContext()));
     }
-'''
-if old_on_create not in text:
-    raise SystemExit("MainActivity onCreate anchor not found")
-text = text.replace(old_on_create, new_on_create, 1)
+''', "MainActivity.onCreate")
 
-old_new_intent = '''        applyEntryIntent(intent);
+replace_once(main, '''        applyEntryIntent(intent);
         incomingContext = isInternalEntry(intent) ? null : ContextEngine.captureIntent(this, intent);
         render();
-'''
-new_new_intent = '''        applyEntryIntent(intent);
+''', '''        applyEntryIntent(intent);
         captureIncomingContextSafely(intent);
         render();
-'''
-if old_new_intent not in text:
-    raise SystemExit("MainActivity onNewIntent anchor not found")
-text = text.replace(old_new_intent, new_new_intent, 1)
+''', "MainActivity.onNewIntent")
 
-old_render = '''    private void render() {
+replace_once(main, '''    private void render() {
         content.removeAllViews();
-'''
-new_render = '''    private void render() {
+''', '''    private void render() {
         try {
             renderUnsafe();
         } catch (Throwable error) {
@@ -103,13 +84,8 @@ new_render = '''    private void render() {
 
     private void renderUnsafe() {
         content.removeAllViews();
-'''
-if old_render not in text:
-    raise SystemExit("MainActivity render anchor not found")
-text = text.replace(old_render, new_render, 1)
+''', "MainActivity.render")
 
-insert_anchor = '''    private void applyEntryIntent(Intent intent) {
-'''
 helpers = r'''    private void captureIncomingContextSafely(Intent intent) {
         if (isInternalEntry(intent)) {
             incomingContext = null;
@@ -141,7 +117,7 @@ helpers = r'''    private void captureIncomingContextSafely(Intent intent) {
                 ViewGroup.LayoutParams.MATCH_PARENT, ViewGroup.LayoutParams.WRAP_CONTENT));
 
         TextView detail = new TextView(this);
-        detail.setText("첫 화면 구성 중 일부 기능이 실패했습니다. 앱은 종료하지 않았으며, 재시도하거나 진단 정보를 확인할 수 있습니다.\n\n오류: "
+        detail.setText("첫 화면 구성 중 일부 기능이 실패했습니다. 앱은 종료하지 않았으며, 재시도할 수 있습니다.\n\n오류: "
                 + error.getClass().getSimpleName());
         detail.setTextSize(15f);
         detail.setTextColor(Color.rgb(76, 88, 82));
@@ -171,33 +147,21 @@ helpers = r'''    private void captureIncomingContextSafely(Intent intent) {
     }
 
 '''
-if insert_anchor not in text:
-    raise SystemExit("MainActivity helper insertion anchor not found")
-text = text.replace(insert_anchor, helpers + insert_anchor, 1)
-main.write_text(text, encoding="utf-8")
+replace_once(main, "    private void applyEntryIntent(Intent intent) {\n",
+             helpers + "    private void applyEntryIntent(Intent intent) {\n", "MainActivity.helpers")
 
 secure = java / "SecureStore.java"
-text = secure.read_text(encoding="utf-8")
-old_ctor = '''    private SecureStore(Context context) {
+replace_once(secure, '''    private SecureStore(Context context) {
         this.context = context;
         this.prefs = context.getSharedPreferences(PREFS, Context.MODE_PRIVATE);
         ensureKey();
     }
-'''
-new_ctor = '''    private SecureStore(Context context) {
+''', '''    private SecureStore(Context context) {
         this.context = context;
         this.prefs = context.getSharedPreferences(PREFS, Context.MODE_PRIVATE);
-        // Create the key lazily. A transient vendor Keystore failure must not kill
-        // the launcher before the user can reach diagnostics and recovery controls.
     }
-'''
-if old_ctor not in text:
-    raise SystemExit("SecureStore constructor anchor not found")
-text = text.replace(old_ctor, new_ctor, 1)
-
-insert_before_remove = '''    synchronized void remove(String key) {
-'''
-ready_method = '''    synchronized boolean isEncryptionReady() {
+''', "SecureStore.constructor")
+replace_once(secure, "    synchronized void remove(String key) {\n", '''    synchronized boolean isEncryptionReady() {
         try {
             ensureKey();
             return true;
@@ -206,47 +170,32 @@ ready_method = '''    synchronized boolean isEncryptionReady() {
         }
     }
 
-'''
-if insert_before_remove not in text:
-    raise SystemExit("SecureStore method insertion anchor not found")
-text = text.replace(insert_before_remove, ready_method + insert_before_remove, 1)
-
-# Background monitoring is opt-in. A fresh install should never schedule it while
-# the launcher is trying to draw its first frame.
+    synchronized void remove(String key) {
+''', "SecureStore.readiness")
+text = secure.read_text(encoding="utf-8")
 text = text.replace("        boolean rustDeskMonitor = true;", "        boolean rustDeskMonitor = false;")
 text = text.replace('json.optBoolean("rustDeskMonitor", true)', 'json.optBoolean("rustDeskMonitor", false)')
 secure.write_text(text, encoding="utf-8")
 
 context = java / "ContextEngine.java"
-text = context.read_text(encoding="utf-8")
-old_prune = '''    private static synchronized void prune(Context context) {
+replace_once(context, '''    private static synchronized void prune(Context context) {
         List<Event> events = load(context);
         SecureStore.Settings settings = SecureStore.get(context).loadSettings();
-'''
-new_prune = '''    private static synchronized void prune(Context context) {
+''', '''    private static synchronized void prune(Context context) {
         List<Event> events = load(context);
         if (events.isEmpty()) return;
         SecureStore.Settings settings = SecureStore.get(context).loadSettings();
-'''
-if old_prune not in text:
-    raise SystemExit("ContextEngine prune anchor not found")
-text = text.replace(old_prune, new_prune, 1)
-context.write_text(text, encoding="utf-8")
+''', "ContextEngine.prune")
 
 rust = java / "RustDeskUpdateChecker.java"
 text = rust.read_text(encoding="utf-8")
 if "import android.util.Log;" not in text:
-    text = text.replace("import android.os.Looper;\n", "import android.os.Looper;\nimport android.util.Log;\n")
+    text = text.replace("import android.os.Looper;\n", "import android.os.Looper;\nimport android.util.Log;\n", 1)
 if 'private static final String TAG = "LifeAgentRustDesk";' not in text:
-    text = text.replace(
-        '    private static final String API = "https://api.github.com/repos/rustdesk/rustdesk/releases/latest";\n',
-        '    private static final String TAG = "LifeAgentRustDesk";\n'
-        '    private static final String API = "https://api.github.com/repos/rustdesk/rustdesk/releases/latest";\n',
-    )
-
-schedule_anchor = '''    static void schedule(Context context) {
-'''
-safe_schedule = '''    static void scheduleSafely(Context context) {
+    text = text.replace('    private static final String API = "https://api.github.com/repos/rustdesk/rustdesk/releases/latest";\n',
+                        '    private static final String TAG = "LifeAgentRustDesk";\n    private static final String API = "https://api.github.com/repos/rustdesk/rustdesk/releases/latest";\n', 1)
+rust.write_text(text, encoding="utf-8")
+replace_once(rust, "    static void schedule(Context context) {\n", '''    static void scheduleSafely(Context context) {
         try {
             schedule(context);
         } catch (RuntimeException error) {
@@ -254,25 +203,62 @@ safe_schedule = '''    static void scheduleSafely(Context context) {
         }
     }
 
-'''
-if schedule_anchor not in text:
-    raise SystemExit("RustDesk schedule anchor not found")
-text = text.replace(schedule_anchor, safe_schedule + schedule_anchor, 1)
-text = text.replace(
-    "        scheduler.schedule(job);",
-    "        int result = scheduler.schedule(job);\n"
-    '        if (result != JobScheduler.RESULT_SUCCESS) Log.w(TAG, "RustDesk monitor was not scheduled");',
-    1,
-)
-rust.write_text(text, encoding="utf-8")
+    static void schedule(Context context) {
+''', "RustDesk.safeSchedule")
+replace_once(rust, "        scheduler.schedule(job);", '''        int result = scheduler.schedule(job);
+        if (result != JobScheduler.RESULT_SUCCESS) {
+            Log.w(TAG, "RustDesk monitor was not scheduled");
+        }''', "RustDesk.scheduleResult")
 
 boot = java / "BootReceiver.java"
-text = boot.read_text(encoding="utf-8")
-text = text.replace(
-    "RustDeskUpdateChecker.schedule(context);",
-    "RustDeskUpdateChecker.scheduleSafely(context);",
-)
+text = boot.read_text(encoding="utf-8").replace(
+    "RustDeskUpdateChecker.schedule(context);", "RustDeskUpdateChecker.scheduleSafely(context);")
 boot.write_text(text, encoding="utf-8")
+
+design = java / "DesignKit.java"
+replace_once(design, '''    static void applyWindow(Activity activity) {
+        Window window = activity.getWindow();
+        window.setStatusBarColor(BG);
+        window.setNavigationBarColor(SURFACE);
+        if (Build.VERSION.SDK_INT >= 30) {
+            WindowInsetsController controller = window.getInsetsController();
+            if (controller != null) {
+                controller.setSystemBarsAppearance(
+                        WindowInsetsController.APPEARANCE_LIGHT_STATUS_BARS
+                                | WindowInsetsController.APPEARANCE_LIGHT_NAVIGATION_BARS,
+                        WindowInsetsController.APPEARANCE_LIGHT_STATUS_BARS
+                                | WindowInsetsController.APPEARANCE_LIGHT_NAVIGATION_BARS);
+            }
+        } else {
+            window.getDecorView().setSystemUiVisibility(
+                    View.SYSTEM_UI_FLAG_LIGHT_STATUS_BAR | View.SYSTEM_UI_FLAG_LIGHT_NAVIGATION_BAR);
+        }
+    }
+''', '''    static void applyWindow(Activity activity) {
+        Window window = activity.getWindow();
+        window.setStatusBarColor(BG);
+        window.setNavigationBarColor(SURFACE);
+        View decor = window.getDecorView();
+        if (Build.VERSION.SDK_INT >= 30) {
+            decor.post(() -> {
+                try {
+                    WindowInsetsController controller = window.getInsetsController();
+                    if (controller != null) {
+                        int appearance = WindowInsetsController.APPEARANCE_LIGHT_STATUS_BARS
+                                | WindowInsetsController.APPEARANCE_LIGHT_NAVIGATION_BARS;
+                        controller.setSystemBarsAppearance(appearance, appearance);
+                    }
+                } catch (RuntimeException ignored) {
+                    decor.setSystemUiVisibility(
+                            View.SYSTEM_UI_FLAG_LIGHT_STATUS_BAR | View.SYSTEM_UI_FLAG_LIGHT_NAVIGATION_BAR);
+                }
+            });
+        } else {
+            decor.setSystemUiVisibility(
+                    View.SYSTEM_UI_FLAG_LIGHT_STATUS_BAR | View.SYSTEM_UI_FLAG_LIGHT_NAVIGATION_BAR);
+        }
+    }
+''', "DesignKit.applyWindow")
 
 gradle = root / "app/build.gradle"
 text = gradle.read_text(encoding="utf-8")
@@ -281,14 +267,14 @@ text = text.replace("versionName '2.1.0-agent-os-alpha'", "versionName '2.1.1-ru
 gradle.write_text(text, encoding="utf-8")
 PY
 
-# Static gates before Gradle starts.
 ! grep -R -q '\.isBlank()' "$JAVA"
 grep -q 'versionCode 211' "$GRADLE"
 grep -q "versionName '2.1.1-runtime-fix-alpha'" "$GRADLE"
-grep -q 'scheduleSafely' "$MAIN"
-grep -q 'private void renderUnsafe()' "$MAIN"
-grep -q 'isEncryptionReady' "$SECURE"
-grep -q 'if (events.isEmpty()) return;' "$CONTEXT"
-grep -q 'rustDeskMonitor = false' "$SECURE"
+grep -q 'scheduleSafely' "$JAVA/MainActivity.java"
+grep -q 'private void renderUnsafe()' "$JAVA/MainActivity.java"
+grep -q 'isEncryptionReady' "$JAVA/SecureStore.java"
+grep -q 'if (events.isEmpty()) return;' "$JAVA/ContextEngine.java"
+grep -q 'rustDeskMonitor = false' "$JAVA/SecureStore.java"
+grep -q 'decor.post(() ->' "$JAVA/DesignKit.java"
 
 echo 'LIFE_AGENT_OS_V2_1_RUNTIME_FIX_APPLIED'
