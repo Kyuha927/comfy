@@ -37,6 +37,52 @@ assert_ui_contains() {
   grep -Fq "$text" "$file" || fail "UI missing [$text] in $file"
 }
 
+tap_ui_contains() {
+  local file=$1
+  local needle=$2
+  python3 - "$file" "$needle" <<'PY'
+import re
+import subprocess
+import sys
+import xml.etree.ElementTree as ET
+
+path, needle = sys.argv[1], sys.argv[2]
+root = ET.parse(path).getroot()
+parents = {child: parent for parent in root.iter() for child in parent}
+candidates = []
+
+for node in root.iter("node"):
+    label = ((node.attrib.get("text", "") or "") + " " +
+             (node.attrib.get("content-desc", "") or "")).strip()
+    if needle not in label:
+        continue
+
+    target = node
+    current = node
+    while current in parents:
+        current = parents[current]
+        if current.attrib.get("clickable") == "true" and current.attrib.get("visible-to-user", "true") != "false":
+            target = current
+            break
+
+    match = re.fullmatch(r"\[(\d+),(\d+)\]\[(\d+),(\d+)\]", target.attrib.get("bounds", ""))
+    if not match:
+        continue
+    x1, y1, x2, y2 = map(int, match.groups())
+    if x2 <= x1 or y2 <= y1:
+        continue
+    clickable = target.attrib.get("clickable") == "true"
+    area = (x2 - x1) * (y2 - y1)
+    candidates.append((0 if clickable else 1, area, (x1 + x2) // 2, (y1 + y2) // 2, label))
+
+if not candidates:
+    raise SystemExit("UI target not found: " + needle)
+_, _, x, y, label = sorted(candidates)[0]
+print(f"tapping {label!r} at ({x},{y})")
+subprocess.check_call(["adb", "shell", "input", "tap", str(x), str(y)])
+PY
+}
+
 assert_process_alive() {
   local pid
   pid=$(adb shell pidof "$PACKAGE" 2>/dev/null | tr -d '\r' || true)
@@ -51,9 +97,8 @@ assert_no_fatal() {
   fi
 }
 
-# The previously distributed alpha used a disposable debug key, so this repair
-# lane deliberately performs a clean install. Update-signing continuity is a
-# separate production release gate and is never implied here.
+# Earlier alpha builds used disposable debug keys, so this lane intentionally
+# performs a clean install. Production signing continuity is a separate gate.
 adb uninstall "$PACKAGE" >/dev/null 2>&1 || true
 adb install "$APK" | tee "$OUT/install.txt"
 grep -Fq Success "$OUT/install.txt" || fail "APK installation failed"
@@ -100,8 +145,16 @@ assert_ui_contains "$OUT/resumed-context.xml" "$PROBE"
 assert_process_alive > "$OUT/pid-resume.txt"
 adb exec-out screencap -p > "$OUT/resumed-context.png"
 
-# New v2.1 feature surface must open without requesting permissions on entry.
-adb shell am start -W -n "$PACKAGE/.BenefitsActivity" | tee "$OUT/start-benefits.txt"
+# Clear only test data, then open the new benefits feature through the same
+# public UI path a user taps. Direct ADB launch is intentionally not used because
+# BenefitsActivity is correctly non-exported.
+adb shell pm clear "$PACKAGE" | tee "$OUT/clear-before-benefits.txt"
+grep -Fq Success "$OUT/clear-before-benefits.txt" || fail "could not reset test data"
+adb shell am start -W -n "$MAIN" | tee "$OUT/start-benefits-home.txt"
+sleep 3
+dump_ui benefits-home
+assert_ui_contains "$OUT/benefits-home.xml" "혜택·지원 자동 탐색"
+tap_ui_contains "$OUT/benefits-home.xml" "혜택·지원 자동 탐색"
 sleep 2
 dump_ui benefits
 assert_ui_contains "$OUT/benefits.xml" "혜택·지원 자동 탐색"
@@ -123,6 +176,7 @@ assert_no_fatal "$OUT/logcat-final.txt"
   echo 'deep_link_tasks=PASS'
   echo 'share_text_intake=PASS'
   echo 'encrypted_context_resume_after_force_stop=PASS'
+  echo 'benefits_public_ui_entry=PASS'
   echo 'benefits_entry_without_permission_prompt=PASS'
   echo 'fatal_main_exception=NONE'
 } > "$OUT/RUNTIME_SMOKE_REPORT.txt"
