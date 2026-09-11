@@ -1,0 +1,410 @@
+name: Build and Runtime Verify Life Agent OS v2.1.1
+
+on:
+  push:
+    branches:
+      - life-agent-os-v2.1-runtime-fix-20260912
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+concurrency:
+  group: life-agent-os-v2.1.1-runtime-fix-${{ github.ref }}
+  cancel-in-progress: true
+
+env:
+  APK_NAME: Life-Agent-OS-v2.1.1-runtime-fix-alpha.apk
+  PACKAGE_NAME: com.lifeagent.unified
+  VERSION_NAME: 2.1.1-runtime-fix-alpha
+  VERSION_CODE: '211'
+
+jobs:
+  build-apk:
+    name: Build repaired APK
+    runs-on: ubuntu-latest
+    timeout-minutes: 45
+
+    steps:
+      - name: Checkout runtime-fix branch
+        uses: actions/checkout@v4
+        with:
+          ref: ${{ github.ref_name }}
+          fetch-depth: 1
+
+      - name: Set up Java 17
+        uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: '17'
+
+      - name: Set up Android SDK
+        uses: android-actions/setup-android@v3
+
+      - name: Install Android 35 build components
+        shell: bash
+        run: |
+          set -euo pipefail
+          yes | sdkmanager --licenses >/dev/null || true
+          sdkmanager 'platform-tools' 'platforms;android-35' 'build-tools;35.0.0'
+
+      - name: Set up Gradle 8.9
+        uses: gradle/actions/setup-gradle@v4
+        with:
+          gradle-version: '8.9'
+
+      - name: Reconstruct verified source and apply runtime repair
+        shell: bash
+        run: |
+          set -euo pipefail
+
+          cat life-agent-build/source.tar.xz.b64.part* | base64 --decode > /tmp/life-agent-base.tar.xz
+          echo '29919c8d8f0f4b535d1c1a05370e22d464ef7bdc1725730da21add0d1ac5f06b  /tmp/life-agent-base.tar.xz' | sha256sum -c -
+          rm -rf /tmp/life-agent-src
+          mkdir -p /tmp/life-agent-src
+          tar -xJf /tmp/life-agent-base.tar.xz -C /tmp/life-agent-src
+          ROOT=/tmp/life-agent-src/life-agent-unified-v2
+          test -f "$ROOT/app/build.gradle"
+
+          if [ -f life-agent-build/apply-patches.sh ]; then
+            bash life-agent-build/apply-patches.sh "$ROOT"
+          fi
+
+          cat life-agent-os-v2/patch.tar.xz.b64.part* | base64 --decode > /tmp/life-agent-os-v2-patch.tar.xz
+          echo '20e0f1b2200d3dd537451b0c6ced4ed467191ba409fff0b7ae6b83ef74742b88  /tmp/life-agent-os-v2-patch.tar.xz' | sha256sum -c -
+          tar -xJf /tmp/life-agent-os-v2-patch.tar.xz -C "$ROOT"
+          if [ -f life-agent-os-v2/apply-build-fixes.sh ]; then
+            bash life-agent-os-v2/apply-build-fixes.sh "$ROOT"
+          fi
+
+          cat life-agent-os-v2.1/patch.tar.xz.b64.part* | base64 --decode > /tmp/life-agent-os-v2.1-patch.tar.xz
+          echo '9707e35885ec1ce3e5e1b31352f2bd341b91ae3e0716baa2df425256af41724a  /tmp/life-agent-os-v2.1-patch.tar.xz' | sha256sum -c -
+          tar -xJf /tmp/life-agent-os-v2.1-patch.tar.xz -C "$ROOT"
+
+          bash life-agent-os-v2.1-runtime-fix/apply-runtime-fix.sh "$ROOT"
+          echo "SOURCE_ROOT=$ROOT" >> "$GITHUB_ENV"
+
+      - name: Validate startup, compatibility and safety contracts
+        shell: bash
+        run: |
+          set -euo pipefail
+          ROOT="$SOURCE_ROOT"
+          JAVA="$ROOT/app/src/main/java/com/lifeagent/unified"
+          MANIFEST="$ROOT/app/src/main/AndroidManifest.xml"
+
+          grep -q "applicationId 'com.lifeagent.unified'" "$ROOT/app/build.gradle"
+          grep -q "versionCode 211" "$ROOT/app/build.gradle"
+          grep -q "versionName '2.1.1-runtime-fix-alpha'" "$ROOT/app/build.gradle"
+          grep -q 'minSdk 30' "$ROOT/app/build.gradle"
+          grep -q 'usesCleartextTraffic="false"' "$MANIFEST"
+
+          grep -q 'captureIncomingContextSafely' "$JAVA/MainActivity.java"
+          grep -q 'private void renderUnsafe()' "$JAVA/MainActivity.java"
+          grep -q 'showStartupRecovery' "$JAVA/MainActivity.java"
+          grep -q 'content.post(() -> RustDeskUpdateChecker.scheduleSafely' "$JAVA/MainActivity.java"
+          grep -q 'rustDeskMonitor = false' "$JAVA/SecureStore.java"
+          grep -q 'isEncryptionReady' "$JAVA/SecureStore.java"
+          grep -q 'scheduleSafely' "$JAVA/RustDeskUpdateChecker.java"
+          ! grep -R -q '\.isBlank()' "$JAVA"
+
+          grep -q 'PdfRenderer' "$JAVA/InsuranceActivity.java"
+          grep -q 'MAX_PDF_PAGES = 30' "$JAVA/InsuranceActivity.java"
+          grep -q 'application/pdf' "$JAVA/InsuranceActivity.java"
+          grep -q 'life.benefits.discovery' "$JAVA/SkillRegistry.java"
+          grep -q 'BenefitLocationService' "$MANIFEST"
+          grep -q 'AndroidKeyStore' "$JAVA/SecureStore.java"
+
+          ! grep -R -E '(sk-[A-Za-z0-9]{20,}|BEGIN (RSA |EC |OPENSSH )?PRIVATE KEY|api[_-]?key[[:space:]]*=[[:space:]]*[A-Za-z0-9_-]{16,})' "$ROOT" --exclude='*.md'
+          bash -n life-agent-os-v2.1-runtime-fix/apply-runtime-fix.sh
+          bash -n life-agent-os-v2.1-runtime-fix/runtime-smoke-v21.sh
+
+      - name: Assemble repaired APK
+        shell: bash
+        working-directory: ${{ env.SOURCE_ROOT }}
+        run: |
+          set -euo pipefail
+          gradle --no-daemon --stacktrace :app:assembleDebug 2>&1 | tee /tmp/life-agent-os-v2.1.1-gradle.log
+
+      - name: Verify APK identity, signature, alignment and archive
+        shell: bash
+        run: |
+          set -euo pipefail
+          ROOT="$SOURCE_ROOT"
+          APK="$ROOT/app/build/outputs/apk/debug/app-debug.apk"
+          DIST="$GITHUB_WORKSPACE/dist-build"
+          mkdir -p "$DIST"
+          test -s "$APK"
+          cp "$APK" "$DIST/$APK_NAME"
+
+          "$ANDROID_HOME/build-tools/35.0.0/zipalign" -c -v 4 "$DIST/$APK_NAME" | tee "$DIST/zipalign.txt"
+          "$ANDROID_HOME/build-tools/35.0.0/apksigner" verify --verbose --print-certs "$DIST/$APK_NAME" | tee "$DIST/apksigner.txt"
+          "$ANDROID_HOME/build-tools/35.0.0/aapt" dump badging "$DIST/$APK_NAME" | tee "$DIST/apk-badging.txt"
+
+          grep -q "package: name='$PACKAGE_NAME'" "$DIST/apk-badging.txt"
+          grep -q "versionCode='$VERSION_CODE'" "$DIST/apk-badging.txt"
+          grep -q "versionName='$VERSION_NAME'" "$DIST/apk-badging.txt"
+          grep -q "sdkVersion:'30'" "$DIST/apk-badging.txt"
+          grep -q "targetSdkVersion:'35'" "$DIST/apk-badging.txt"
+
+          unzip -t "$DIST/$APK_NAME" | tee "$DIST/unzip-test.txt"
+          sha256sum "$DIST/$APK_NAME" | tee "$DIST/$APK_NAME.sha256"
+          tar -C /tmp/life-agent-src -czf "$DIST/life-agent-os-v2.1.1-runtime-fix-source.tar.gz" life-agent-unified-v2
+          sha256sum "$DIST/life-agent-os-v2.1.1-runtime-fix-source.tar.gz" > "$DIST/life-agent-os-v2.1.1-runtime-fix-source.tar.gz.sha256"
+
+          {
+            echo 'Life Agent OS v2.1.1 runtime-fix alpha'
+            echo "commit=$GITHUB_SHA"
+            echo "package=$PACKAGE_NAME"
+            echo "version=$VERSION_NAME"
+            echo "versionCode=$VERSION_CODE"
+            echo 'minSdk=30'
+            echo 'targetSdk=35'
+            echo 'startup_background_work=deferred_and_guarded'
+            echo 'keystore_failure=fail_closed_without_launcher_crash'
+            echo 'android_11_string_compatibility=isBlank_removed'
+            echo 'signing=ephemeral_debug_key'
+            echo 'fresh_install_required=true'
+            echo 'status=BUILD_VERIFIED_AWAITING_RUNTIME_MATRIX'
+          } > "$DIST/BUILD_REPORT.txt"
+
+      - name: Upload build candidate
+        uses: actions/upload-artifact@v4
+        with:
+          name: life-agent-os-v2.1.1-build-candidate
+          path: dist-build/*
+          if-no-files-found: error
+          retention-days: 14
+
+      - name: Upload compile log on failure
+        if: failure()
+        uses: actions/upload-artifact@v4
+        with:
+          name: life-agent-os-v2.1.1-build-failure
+          path: /tmp/life-agent-os-v2.1.1-gradle.log
+          if-no-files-found: ignore
+          retention-days: 7
+
+  runtime-smoke:
+    name: Runtime smoke API ${{ matrix.api }}
+    needs: build-apk
+    runs-on: ubuntu-latest
+    timeout-minutes: 35
+    strategy:
+      fail-fast: false
+      matrix:
+        api: [30, 36]
+
+    steps:
+      - name: Checkout runtime test scripts
+        uses: actions/checkout@v4
+        with:
+          ref: ${{ github.ref_name }}
+          fetch-depth: 1
+
+      - name: Download the exact build candidate
+        uses: actions/download-artifact@v4
+        with:
+          name: life-agent-os-v2.1.1-build-candidate
+          path: candidate
+
+      - name: Set up Android SDK
+        uses: android-actions/setup-android@v3
+
+      - name: Install API ${{ matrix.api }} emulator
+        shell: bash
+        run: |
+          set -euo pipefail
+          yes | sdkmanager --licenses >/dev/null || true
+          sdkmanager 'platform-tools' 'emulator' 'system-images;android-${{ matrix.api }};google_apis;x86_64'
+          echo no | avdmanager create avd --force \
+            --name 'life-agent-api-${{ matrix.api }}' \
+            --package 'system-images;android-${{ matrix.api }};google_apis;x86_64' \
+            --device 'pixel_6'
+
+      - name: Boot emulator
+        shell: bash
+        run: |
+          set -euo pipefail
+          sudo chmod 666 /dev/kvm || true
+          nohup emulator \
+            -avd 'life-agent-api-${{ matrix.api }}' \
+            -no-window -no-audio -no-boot-anim \
+            -gpu swiftshader_indirect \
+            -no-snapshot -wipe-data \
+            -camera-back none -camera-front none \
+            > emulator-api-${{ matrix.api }}.log 2>&1 &
+
+          timeout 240 adb wait-for-device
+          for attempt in $(seq 1 120); do
+            if [ "$(adb shell getprop sys.boot_completed 2>/dev/null | tr -d '\r')" = '1' ]; then
+              break
+            fi
+            sleep 2
+          done
+          test "$(adb shell getprop sys.boot_completed | tr -d '\r')" = '1'
+          adb shell settings put global window_animation_scale 0
+          adb shell settings put global transition_animation_scale 0
+          adb shell settings put global animator_duration_scale 0
+          adb shell svc power stayon true || true
+          adb shell input keyevent 82 || true
+          adb shell getprop ro.build.version.sdk
+          adb shell getprop ro.build.version.release
+
+      - name: Run install, cold-launch and persistence smoke
+        shell: bash
+        env:
+          RUNTIME_OUT: runtime-evidence-api-${{ matrix.api }}
+        run: |
+          set -euo pipefail
+          chmod +x life-agent-os-v2.1-runtime-fix/runtime-smoke-v21.sh
+          life-agent-os-v2.1-runtime-fix/runtime-smoke-v21.sh "candidate/$APK_NAME"
+
+      - name: Collect emulator diagnostics
+        if: always()
+        shell: bash
+        run: |
+          set +e
+          mkdir -p runtime-evidence-api-${{ matrix.api }}
+          cp emulator-api-${{ matrix.api }}.log runtime-evidence-api-${{ matrix.api }}/emulator.log 2>/dev/null || true
+          adb shell dumpsys activity activities > runtime-evidence-api-${{ matrix.api }}/dumpsys-activity.txt 2>/dev/null || true
+          adb shell dumpsys package "$PACKAGE_NAME" > runtime-evidence-api-${{ matrix.api }}/dumpsys-package.txt 2>/dev/null || true
+          adb logcat -d -v threadtime > runtime-evidence-api-${{ matrix.api }}/logcat-complete.txt 2>/dev/null || true
+
+      - name: Upload API ${{ matrix.api }} runtime evidence
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: life-agent-os-v2.1.1-runtime-api-${{ matrix.api }}
+          path: runtime-evidence-api-${{ matrix.api }}/*
+          if-no-files-found: warn
+          retention-days: 14
+
+  publish-verified-alpha:
+    name: Publish only after both runtimes pass
+    needs: [build-apk, runtime-smoke]
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+
+    steps:
+      - name: Download verified build
+        uses: actions/download-artifact@v4
+        with:
+          name: life-agent-os-v2.1.1-build-candidate
+          path: verified
+
+      - name: Download Android 11 evidence
+        uses: actions/download-artifact@v4
+        with:
+          name: life-agent-os-v2.1.1-runtime-api-30
+          path: evidence/api-30
+
+      - name: Download Android 16 evidence
+        uses: actions/download-artifact@v4
+        with:
+          name: life-agent-os-v2.1.1-runtime-api-36
+          path: evidence/api-36
+
+      - name: Enforce final evidence gates
+        shell: bash
+        run: |
+          set -euo pipefail
+          test -s "verified/$APK_NAME"
+          grep -q 'api=30' evidence/api-30/RUNTIME_SMOKE_REPORT.txt
+          grep -q 'cold_launch_x3=PASS' evidence/api-30/RUNTIME_SMOKE_REPORT.txt
+          grep -q 'encrypted_context_resume_after_force_stop=PASS' evidence/api-30/RUNTIME_SMOKE_REPORT.txt
+          grep -q 'fatal_main_exception=NONE' evidence/api-30/RUNTIME_SMOKE_REPORT.txt
+          grep -q 'api=36' evidence/api-36/RUNTIME_SMOKE_REPORT.txt
+          grep -q 'cold_launch_x3=PASS' evidence/api-36/RUNTIME_SMOKE_REPORT.txt
+          grep -q 'encrypted_context_resume_after_force_stop=PASS' evidence/api-36/RUNTIME_SMOKE_REPORT.txt
+          grep -q 'fatal_main_exception=NONE' evidence/api-36/RUNTIME_SMOKE_REPORT.txt
+
+      - name: Prepare install package and release notes
+        shell: bash
+        run: |
+          set -euo pipefail
+          mkdir -p release-package/evidence-api-30 release-package/evidence-api-36
+          cp verified/* release-package/
+          cp evidence/api-30/RUNTIME_SMOKE_REPORT.txt release-package/evidence-api-30/
+          cp evidence/api-36/RUNTIME_SMOKE_REPORT.txt release-package/evidence-api-36/
+          cp evidence/api-30/home-1.png release-package/evidence-api-30/ 2>/dev/null || true
+          cp evidence/api-36/home-1.png release-package/evidence-api-36/ 2>/dev/null || true
+
+          cat > release-package/INSTALL_FIRST.txt <<'EOF'
+          LIFE AGENT OS v2.1.1 RUNTIME-FIX ALPHA
+
+          IMPORTANT
+          The previously distributed v2.0/v2.1 debug APKs used different disposable signing keys.
+          Android therefore cannot update them in place.
+
+          Install procedure
+          1. Uninstall the old Life Agent OS alpha once.
+          2. Install Life-Agent-OS-v2.1.1-runtime-fix-alpha.apk.
+          3. Open the app and confirm the normal “무엇을 맡길까요?” home screen appears.
+
+          Verified by CI
+          - Android 11 / API 30
+          - Android 16 / API 36
+          - Three cold launches on each API
+          - Normal first frame, process alive, task deep link
+          - Shared-text intake and encrypted context restoration after force-stop
+          - Benefits screen opens without a startup permission prompt
+
+          This remains an alpha build signed with an ephemeral debug key. It is not a production or Play Store signing build.
+          EOF
+
+          cat > RELEASE_NOTES.md <<EOF
+          # Life Agent OS v2.1.1 Runtime-Fix Alpha
+
+          This prerelease is published only after the same APK passes Android 11 (API 30) and Android 16 (API 36) runtime smoke tests.
+
+          ## Repaired
+          - Deferred and isolated nonessential RustDesk scheduling until after the first frame.
+          - Prevented transient Android Keystore failures from crashing the launcher while preserving fail-closed encrypted storage.
+          - Replaced unsupported minimum-SDK `String.isBlank()` runtime calls.
+          - Added a visible recovery surface instead of immediate process death when a screen renderer fails.
+
+          ## Required install step
+          Uninstall the earlier broken alpha once before installing this APK because the old CI used incompatible disposable debug signatures.
+
+          ## Evidence
+          - API 30: cold launch ×3, home UI, process survival, deep link, shared context persistence, benefits entry.
+          - API 36: the same matrix.
+
+          Build commit: `$GITHUB_SHA`
+          EOF
+
+          (cd release-package && zip -r ../Life-Agent-OS-v2.1.1-runtime-verified-alpha.zip .)
+          sha256sum Life-Agent-OS-v2.1.1-runtime-verified-alpha.zip > Life-Agent-OS-v2.1.1-runtime-verified-alpha.zip.sha256
+
+      - name: Upload runtime-verified bundle
+        uses: actions/upload-artifact@v4
+        with:
+          name: life-agent-os-v2.1.1-runtime-verified-alpha
+          path: |
+            release-package/*
+            Life-Agent-OS-v2.1.1-runtime-verified-alpha.zip
+            Life-Agent-OS-v2.1.1-runtime-verified-alpha.zip.sha256
+          if-no-files-found: error
+          retention-days: 30
+
+      - name: Publish durable GitHub prerelease
+        shell: bash
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          set -euo pipefail
+          TAG='life-agent-os-v2.1.1-runtime-fix-alpha'
+          ASSETS=(
+            "release-package/$APK_NAME"
+            "release-package/$APK_NAME.sha256"
+            "release-package/BUILD_REPORT.txt"
+            "release-package/INSTALL_FIRST.txt"
+            "Life-Agent-OS-v2.1.1-runtime-verified-alpha.zip"
+            "Life-Agent-OS-v2.1.1-runtime-verified-alpha.zip.sha256"
+          )
+          if gh release view "$TAG" --repo "$GITHUB_REPOSITORY" >/dev/null 2>&1; then
+            gh release edit "$TAG" --repo "$GITHUB_REPOSITORY" --target "$GITHUB_SHA" --title 'Life Agent OS v2.1.1 Runtime-Fix Alpha' --notes-file RELEASE_NOTES.md --prerelease
+            gh release upload "$TAG" --repo "$GITHUB_REPOSITORY" "${ASSETS[@]}" --clobber
+          else
+            gh release create "$TAG" --repo "$GITHUB_REPOSITORY" --target "$GITHUB_SHA" --title 'Life Agent OS v2.1.1 Runtime-Fix Alpha' --notes-file RELEASE_NOTES.md --prerelease "${ASSETS[@]}"
+          fi
