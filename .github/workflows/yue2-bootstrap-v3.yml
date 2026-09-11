@@ -1,0 +1,78 @@
+name: Publish Verified YuE2 Music OS Branch
+
+on:
+  push:
+    branches:
+      - yue2-music-os-v0.1-alpha-20260912
+    paths:
+      - ".github/workflows/yue2-bootstrap-v3.yml"
+
+permissions:
+  contents: write
+
+concurrency:
+  group: yue2-verified-publish-${{ github.ref }}
+  cancel-in-progress: false
+
+jobs:
+  verify-and-publish:
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    steps:
+      - name: Check out transport branch
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1
+        with:
+          fetch-depth: 0
+
+      - name: Decode and authenticate source bundle
+        shell: bash
+        run: |
+          set -euo pipefail
+          cat .bootstrap/yue2-music-os.tar.xz.b64.part-* | tr -d '\n\r' | base64 --decode > /tmp/yue2-music-os.tar.xz
+          echo "7bc2a91cc676eeb0583f9e2be90482ada2a0037f3ab5d575788ab3a84692d3a7  /tmp/yue2-music-os.tar.xz" | sha256sum -c -
+          mkdir -p /tmp/yue2-source
+          tar -xJf /tmp/yue2-music-os.tar.xz -C /tmp/yue2-source
+          test -f /tmp/yue2-source/yue2_music_os/releases/yue2-music-os/v0.1-alpha/RELEASE_STATUS.json
+          test -f /tmp/yue2-source/yue2_music_os/releases/yue2-music-os/v0.1-alpha/SHA256SUMS.txt
+
+      - name: Set up Python
+        uses: actions/setup-python@5fda3b95a4ea91299a34e894583c3862153e4b97
+        with:
+          python-version: "3.12"
+
+      - name: Verify release source
+        working-directory: /tmp/yue2-source/yue2_music_os/releases/yue2-music-os/v0.1-alpha
+        shell: bash
+        run: |
+          set -euo pipefail
+          python -m pip install -e '.[dev]'
+          python -m compileall -q src tests
+          node --check src/yue2_music_os/static/app.js
+          bash -n scripts/*.sh
+          pytest --cov=yue2_music_os --cov-branch --cov-report=term-missing --cov-fail-under=75
+          ./scripts/smoke.sh
+          python -m pip wheel . --no-deps --no-build-isolation -w /tmp/yue2-wheel
+          test -n "$(find /tmp/yue2-wheel -maxdepth 1 -name '*.whl' -print -quit)"
+          sha256sum -c SHA256SUMS.txt
+
+      - name: Publish immutable clean branch
+        shell: bash
+        env:
+          FINAL_BRANCH: yue2-music-os-v0.1-alpha-verified-20260912
+          BASE_COMMIT: 39243c99a259fe43a7484d3bde2107ffe8286bf1
+        run: |
+          set -euo pipefail
+          if git ls-remote --exit-code --heads origin "refs/heads/${FINAL_BRANCH}" >/dev/null 2>&1; then
+            echo "Verified branch already exists; refusing to overwrite it." >&2
+            exit 2
+          fi
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git checkout --detach "${BASE_COMMIT}"
+          git switch -c "${FINAL_BRANCH}"
+          mkdir -p releases/yue2-music-os
+          cp -a /tmp/yue2-source/yue2_music_os/releases/yue2-music-os/v0.1-alpha releases/yue2-music-os/
+          git add releases/yue2-music-os/v0.1-alpha
+          test -n "$(git status --porcelain)"
+          git commit -m "feat: add verified YuE2 Music OS v0.1 alpha"
+          git push origin "HEAD:refs/heads/${FINAL_BRANCH}"
