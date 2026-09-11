@@ -1,0 +1,73 @@
+name: Materialize YuE2 Music OS
+
+on:
+  push:
+    branches:
+      - yue2-music-os-v0.1-alpha-20260912
+    paths:
+      - ".bootstrap/yue2-music-os.tar.xz.b64.part-*"
+      - ".github/workflows/yue2-bootstrap.yml"
+
+permissions:
+  contents: write
+
+concurrency:
+  group: yue2-bootstrap-${{ github.ref }}
+  cancel-in-progress: false
+
+jobs:
+  materialize:
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - name: Check out bootstrap commit
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1
+        with:
+          fetch-depth: 0
+
+      - name: Decode and verify source bundle
+        shell: bash
+        run: |
+          set -euo pipefail
+          cat .bootstrap/yue2-music-os.tar.xz.b64.part-* | tr -d '\n\r' | base64 --decode > /tmp/yue2-music-os.tar.xz
+          echo "7bc2a91cc676eeb0583f9e2be90482ada2a0037f3ab5d575788ab3a84692d3a7  /tmp/yue2-music-os.tar.xz" | sha256sum -c -
+          mkdir -p /tmp/yue2-source
+          tar -xJf /tmp/yue2-music-os.tar.xz -C /tmp/yue2-source
+          test -f /tmp/yue2-source/yue2_music_os/releases/yue2-music-os/v0.1-alpha/RELEASE_STATUS.json
+          test -f /tmp/yue2-source/yue2_music_os/.github/workflows/yue2-music-os-ci.yml
+          cp -a /tmp/yue2-source/yue2_music_os/. ./
+          rm -rf .bootstrap .github/workflows/yue2-bootstrap.yml
+
+      - name: Set up Python
+        uses: actions/setup-python@5fda3b95a4ea91299a34e894583c3862153e4b97
+        with:
+          python-version: "3.12"
+          cache: pip
+          cache-dependency-path: releases/yue2-music-os/v0.1-alpha/pyproject.toml
+
+      - name: Install and verify materialized source
+        working-directory: releases/yue2-music-os/v0.1-alpha
+        shell: bash
+        run: |
+          set -euo pipefail
+          python -m pip install -e '.[dev]'
+          python -m compileall -q src tests
+          node --check src/yue2_music_os/static/app.js
+          bash -n scripts/*.sh
+          pytest --cov=yue2_music_os --cov-branch --cov-report=term-missing --cov-fail-under=75
+          ./scripts/smoke.sh
+          python -m pip wheel . --no-deps --no-build-isolation -w /tmp/yue2-wheel
+          sha256sum -c SHA256SUMS.txt
+
+      - name: Commit materialized release
+        shell: bash
+        run: |
+          set -euo pipefail
+          test ! -e .bootstrap
+          test ! -e .github/workflows/yue2-bootstrap.yml
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add -A
+          test -n "$(git status --porcelain)"
+          git commit -m "feat: materialize YuE2 Music OS v0.1 alpha"
+          git push origin HEAD:yue2-music-os-v0.1-alpha-20260912
