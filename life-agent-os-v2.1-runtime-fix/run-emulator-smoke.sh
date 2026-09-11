@@ -8,10 +8,10 @@ PACKAGE=${PACKAGE_NAME:-com.lifeagent.unified}
 AVD="life-agent-api-${API}"
 OUT="runtime-evidence/api-${API}"
 EMULATOR_PID=""
-SDK_ROOT=${ANDROID_SDK_ROOT:-${ANDROID_HOME:-}}
+SDK_ROOT=${ANDROID_HOME:-${ANDROID_SDK_ROOT:-}}
 
 if [ -z "$SDK_ROOT" ]; then
-  echo 'ANDROID_SDK_ROOT and ANDROID_HOME are both unset' >&2
+  echo 'ANDROID_HOME and ANDROID_SDK_ROOT are both unset' >&2
   exit 1
 fi
 
@@ -19,20 +19,35 @@ EMULATOR_BIN="$SDK_ROOT/emulator/emulator"
 ADB_BIN="$SDK_ROOT/platform-tools/adb"
 AVDMANAGER_BIN="$SDK_ROOT/cmdline-tools/latest/bin/avdmanager"
 
-# setup-android can expose command-line tools through PATH while leaving the
-# emulator directory out of PATH. Resolve every executable from the SDK root.
 if [ ! -x "$AVDMANAGER_BIN" ]; then
   AVDMANAGER_BIN=$(command -v avdmanager || true)
 fi
 for required in "$EMULATOR_BIN" "$ADB_BIN" "$AVDMANAGER_BIN"; do
   if [ -z "$required" ] || [ ! -x "$required" ]; then
     echo "Required Android SDK executable is missing: $required" >&2
-    find "$SDK_ROOT" -maxdepth 3 -type f -name 'emulator' -o -name 'adb' -o -name 'avdmanager' 2>/dev/null | sort >&2 || true
+    find "$SDK_ROOT" -maxdepth 4 -type f \( -name emulator -o -name adb -o -name avdmanager \) 2>/dev/null | sort >&2 || true
     exit 1
   fi
 done
 
 mkdir -p "$OUT"
+
+# avdmanager and emulator must resolve the same user/AVD directories. GitHub
+# runners can expose different HOME values between setup actions and shell steps,
+# so pin all Android user state inside this checkout before creating the AVD.
+ANDROID_STATE_ROOT="$PWD/.android-ci/api-${API}"
+export ANDROID_USER_HOME="$ANDROID_STATE_ROOT"
+export ANDROID_EMULATOR_HOME="$ANDROID_STATE_ROOT"
+export ANDROID_AVD_HOME="$ANDROID_STATE_ROOT/avd"
+mkdir -p "$ANDROID_AVD_HOME"
+
+{
+  echo "ANDROID_HOME=$SDK_ROOT"
+  echo "ANDROID_USER_HOME=$ANDROID_USER_HOME"
+  echo "ANDROID_EMULATOR_HOME=$ANDROID_EMULATOR_HOME"
+  echo "ANDROID_AVD_HOME=$ANDROID_AVD_HOME"
+  echo "HOME=$HOME"
+} > "$OUT/android-paths.txt"
 
 diagnostic_snapshot() {
   set +e
@@ -41,6 +56,8 @@ diagnostic_snapshot() {
   timeout 12 "$ADB_BIN" shell getprop > "$OUT/getprop.txt" 2>&1
   timeout 12 "$ADB_BIN" shell dumpsys activity activities > "$OUT/dumpsys-activity.txt" 2>&1
   timeout 12 "$ADB_BIN" shell dumpsys package "$PACKAGE" > "$OUT/dumpsys-package.txt" 2>&1
+  find "$ANDROID_STATE_ROOT" -maxdepth 4 -printf '%y %p\n' > "$OUT/avd-files.txt" 2>&1
+  "$EMULATOR_BIN" -list-avds > "$OUT/avd-list-final.txt" 2>&1
   df -h > "$OUT/runner-disk.txt" 2>&1
   free -h > "$OUT/runner-memory.txt" 2>&1
   set -e
@@ -58,10 +75,22 @@ cleanup() {
 }
 trap cleanup EXIT
 
+rm -rf "$ANDROID_AVD_HOME/$AVD.avd" "$ANDROID_AVD_HOME/$AVD.ini"
 echo no | "$AVDMANAGER_BIN" create avd --force \
   --name "$AVD" \
   --package "system-images;android-${API};google_apis;x86_64" \
-  --device "$DEVICE_PROFILE"
+  --device "$DEVICE_PROFILE" \
+  --path "$ANDROID_AVD_HOME/$AVD.avd"
+
+"$EMULATOR_BIN" -list-avds | tee "$OUT/avd-list-created.txt"
+grep -Fxq "$AVD" "$OUT/avd-list-created.txt" || {
+  echo "Created AVD is not visible to emulator: $AVD" >&2
+  find "$ANDROID_STATE_ROOT" "$HOME/.android" -maxdepth 5 -printf '%y %p\n' 2>/dev/null | sort >&2 || true
+  exit 1
+}
+
+test -f "$ANDROID_AVD_HOME/$AVD.ini"
+test -d "$ANDROID_AVD_HOME/$AVD.avd"
 
 sudo chmod 666 /dev/kvm 2>/dev/null || true
 nohup "$EMULATOR_BIN" \
@@ -115,7 +144,6 @@ fi
 "$ADB_BIN" shell getprop ro.build.version.sdk | tee "$OUT/api.txt"
 "$ADB_BIN" shell getprop ro.build.version.release | tee "$OUT/release.txt"
 
-# The nested smoke script uses adb from PATH. Put the exact platform-tools first.
 export PATH="$SDK_ROOT/platform-tools:$PATH"
 chmod +x life-agent-os-v2.1-runtime-fix/runtime-smoke-v21.sh
 RUNTIME_OUT="$OUT" life-agent-os-v2.1-runtime-fix/runtime-smoke-v21.sh "$APK"
