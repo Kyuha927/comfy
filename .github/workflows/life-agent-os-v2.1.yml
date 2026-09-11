@@ -31,19 +31,11 @@ jobs:
           tar -xJf /tmp/life-agent-base.tar.xz -C /tmp/life-agent-src
           ROOT=/tmp/life-agent-src/life-agent-unified-v2
           test -f "$ROOT/app/build.gradle"
-
-          if [ -f life-agent-build/apply-patches.sh ]; then
-            bash life-agent-build/apply-patches.sh "$ROOT"
-          fi
-
+          if [ -f life-agent-build/apply-patches.sh ]; then bash life-agent-build/apply-patches.sh "$ROOT"; fi
           cat life-agent-os-v2/patch.tar.xz.b64.part* | base64 --decode > /tmp/life-agent-os-v2-patch.tar.xz
           echo '20e0f1b2200d3dd537451b0c6ced4ed467191ba409fff0b7ae6b83ef74742b88  /tmp/life-agent-os-v2-patch.tar.xz' | sha256sum -c -
           tar -xJf /tmp/life-agent-os-v2-patch.tar.xz -C "$ROOT"
-
-          if [ -f life-agent-os-v2/apply-build-fixes.sh ]; then
-            bash life-agent-os-v2/apply-build-fixes.sh "$ROOT"
-          fi
-
+          if [ -f life-agent-os-v2/apply-build-fixes.sh ]; then bash life-agent-os-v2/apply-build-fixes.sh "$ROOT"; fi
           cat life-agent-os-v2.1/patch.tar.xz.b64.part* | base64 --decode > /tmp/life-agent-os-v2.1-patch.tar.xz
           echo '9707e35885ec1ce3e5e1b31352f2bd341b91ae3e0716baa2df425256af41724a  /tmp/life-agent-os-v2.1-patch.tar.xz' | sha256sum -c -
           tar -xJf /tmp/life-agent-os-v2.1-patch.tar.xz -C "$ROOT"
@@ -76,22 +68,16 @@ jobs:
           ROOT=/tmp/life-agent-src/life-agent-unified-v2
           JAVA="$ROOT/app/src/main/java/com/lifeagent/unified"
           MANIFEST="$ROOT/app/src/main/AndroidManifest.xml"
-
           grep -q "applicationId 'com.lifeagent.unified'" "$ROOT/app/build.gradle"
           grep -q "versionCode 210" "$ROOT/app/build.gradle"
           grep -q "versionName '2.1.0-agent-os-alpha'" "$ROOT/app/build.gradle"
-
-          for source in SkillManifest SkillRegistry ContextEngine PolicyKernel ExecutorRouter TaskStore RecipeEngine AgentPlanner SkillDispatcher Diagnostics BenefitsActivity BenefitDiscovery BenefitLocationService InsuranceActivity; do
-            test -f "$JAVA/$source.java"
-          done
-
+          for source in SkillManifest SkillRegistry ContextEngine PolicyKernel ExecutorRouter TaskStore RecipeEngine AgentPlanner SkillDispatcher Diagnostics BenefitsActivity BenefitDiscovery BenefitLocationService InsuranceActivity; do test -f "$JAVA/$source.java"; done
           grep -q 'FOREGROUND_SERVICE_LOCATION' "$MANIFEST"
           grep -q 'ACCESS_FINE_LOCATION' "$MANIFEST"
           grep -q 'BenefitLocationService' "$MANIFEST"
           grep -q 'BenefitsActivity' "$MANIFEST"
           grep -q 'application/pdf' "$MANIFEST"
           grep -q 'usesCleartextTraffic="false"' "$MANIFEST"
-
           grep -q 'life.benefits.discovery' "$JAVA/SkillRegistry.java"
           grep -q 'benefit.discover' "$JAVA/SkillRegistry.java"
           grep -q 'builtin.benefits.location' "$JAVA/RecipeEngine.java"
@@ -100,9 +86,8 @@ jobs:
           grep -q 'MAX_PDF_PAGES = 30' "$JAVA/InsuranceActivity.java"
           grep -q 'application/pdf' "$JAVA/InsuranceActivity.java"
           grep -q 'MODEL_FREE' "$JAVA/ExecutorRouter.java"
-          grep -q 'HUMAN_GATE' "$JAVA/ExecutorRouter.java"
+          grep -q 'HUMAN_ACTION' "$JAVA/ExecutorRouter.java"
           grep -R -q 'AndroidKeyStore' "$JAVA"
-
           ! grep -R -E '(sk-[A-Za-z0-9]{20,}|BEGIN (RSA |EC |OPENSSH )?PRIVATE KEY|api[_-]?key[[:space:]]*=[[:space:]]*[A-Za-z0-9_-]{16,})' "$ROOT" --exclude='*.md'
 
       - name: Assemble Agent OS v2.1 APK and capture diagnostics
@@ -123,16 +108,7 @@ jobs:
         run: |
           set -euo pipefail
           mkdir -p dist-failure
-          {
-            echo 'LIFE_AGENT_OS_V2_1_BUILD_FAILURE'
-            echo "run_id=$GITHUB_RUN_ID"
-            echo "commit=$GITHUB_SHA"
-            echo
-            grep -n -E '(^|[[:space:]])(error:|FAILURE:|What went wrong|Execution failed|Caused by:|cannot find symbol|incompatible types|package .* does not exist)' /tmp/life-agent-os-v21-gradle.log || true
-            echo
-            echo '--- FINAL 360 LINES ---'
-            tail -n 360 /tmp/life-agent-os-v21-gradle.log
-          } > dist-failure/BUILD_FAILURE.log
+          { echo 'LIFE_AGENT_OS_V2_1_BUILD_FAILURE'; echo "run_id=$GITHUB_RUN_ID"; echo "commit=$GITHUB_SHA"; echo; grep -n -E '(^|[[:space:]])(error:|FAILURE:|What went wrong|Execution failed|Caused by:|cannot find symbol|incompatible types|package .* does not exist)' /tmp/life-agent-os-v21-gradle.log || true; echo; echo '--- FINAL 360 LINES ---'; tail -n 360 /tmp/life-agent-os-v21-gradle.log; } > dist-failure/BUILD_FAILURE.log
 
       - name: Upload compile diagnostics
         if: always() && steps.assemble.outputs.status != '0'
@@ -164,22 +140,10 @@ jobs:
           grep -q "versionName='2.1.0-agent-os-alpha'" dist/apk-badging.txt
           unzip -t dist/Life-Agent-OS-v2.1-benefits-pdf-alpha.apk | tee dist/unzip-test.txt
           sha256sum dist/Life-Agent-OS-v2.1-benefits-pdf-alpha.apk > dist/Life-Agent-OS-v2.1-benefits-pdf-alpha.apk.sha256
-
           rm -rf "$ROOT/app/build" "$ROOT/.gradle"
           tar -C /tmp/life-agent-src -czf dist/life-agent-os-v2.1-source.tar.gz life-agent-unified-v2
           sha256sum dist/life-agent-os-v2.1-source.tar.gz > dist/life-agent-os-v2.1-source.tar.gz.sha256
-
-          {
-            echo 'Life Agent OS v2.1 Android build'
-            echo 'package=com.lifeagent.unified'
-            echo 'version=2.1.0-agent-os-alpha'
-            echo 'versionCode=210'
-            echo 'minSdk=30'
-            echo 'targetSdk=35'
-            echo 'benefits=location-aware discovery + conversation tags + official-source handoff + policy-gated application preparation'
-            echo 'insurance_pdf=SAF PDF input + encrypted raw PDF + PdfRenderer + on-device Korean OCR + existing Monimo claim graph'
-            echo 'status=BUILD_AND_VERIFICATION_PASS'
-          } > dist/BUILD_REPORT.txt
+          { echo 'Life Agent OS v2.1 Android build'; echo 'package=com.lifeagent.unified'; echo 'version=2.1.0-agent-os-alpha'; echo 'versionCode=210'; echo 'minSdk=30'; echo 'targetSdk=35'; echo 'benefits=location-aware discovery + conversation tags + official-source handoff + policy-gated application preparation'; echo 'insurance_pdf=SAF PDF input + encrypted raw PDF + PdfRenderer + on-device Korean OCR + existing Monimo claim graph'; echo 'status=BUILD_AND_VERIFICATION_PASS'; } > dist/BUILD_REPORT.txt
 
       - name: Upload installable Agent OS v2.1 package
         uses: actions/upload-artifact@v4
