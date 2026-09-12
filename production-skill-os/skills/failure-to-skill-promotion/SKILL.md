@@ -1,6 +1,6 @@
 ---
 name: failure-to-skill-promotion
-description: Convert repeated 2D/Blender/Unity production failures into compact reusable skills without fossilizing one-off hacks. Use after a failure is actually diagnosed and repaired.
+description: Convert repeated 2D/Blender/Unity production failures into compact reusable skills without fossilizing one-off hacks. Use only after a failure is actually observed, diagnosed, repaired, and evidenced.
 ---
 
 # Failure → Skill Promotion
@@ -24,23 +24,44 @@ Store only operational facts:
 - evidence receipts;
 - last verified date.
 
-Do not paste full chat history into the skill.
+Do not paste full chat history into the skill. The purpose is compression, not archival bloat.
 
-## Promotion gate
-Promote only when all are true:
-1. failure was reproduced or directly observed in the target system;
-2. repair succeeds through the real production path;
-3. smallest discriminating regression/smoke passes;
-4. visible failures have visual/runtime evidence;
-5. repair is bounded enough to avoid collateral changes;
-6. rollback is known;
-7. version/context constraints are explicit.
+## Mechanical promotion gate
+Record evidence as JSONL events matching `router/evidence_event.schema.json`.
+The latest state of every gate must be PASS:
+
+1. `reproduction` — target system actually exhibited the failure;
+2. `repair` — bounded repair succeeded;
+3. `same_path_verification` — success came through the real production path;
+4. `rollback` — recovery path was exercised or discriminatingly verified;
+5. `regression` — smallest repeatable smoke/regression passed;
+6. `receipt` — durable evidence was recorded.
+
+All six PASS events must share the same `environment` and `execution_path`. Every event needs a non-empty receipt.
+
+Run:
+
+```bash
+python production-skill-os/router/promotion_engine.py validate --evidence <events.jsonl>
+python production-skill-os/router/promotion_engine.py assess \
+  --evidence <events.jsonl> \
+  --record-id <failure-id>
+```
+
+The engine only emits a proposal. It never edits the catalog or promotes a record by itself.
+
+## Canonical scope
+A canonical record must include a non-empty `scope`, at minimum the proven environment and execution path. Automatic reuse outside that scope is forbidden.
 
 ## Upgrade behavior
 When a canonical record fails:
 - stop automatic reuse for that context;
-- open a new candidate or mark the old one deprecated/superseded;
+- append a FAIL evidence event for the broken gate;
 - investigate the delta, not the entire historical problem;
-- update the regression test before re-promotion.
+- update the regression before re-promotion;
+- deprecate or supersede the old record if the fingerprint/repair contract changed.
+
+## Duplicate control
+The router rejects duplicate active fingerprints. Prefer sharpening or superseding one record over accumulating near-duplicates.
 
 The knowledge base must get **smaller and sharper**, not merely longer.
