@@ -2,6 +2,15 @@
 
 Corrected 2026-09-12 handoff pack.
 
+## 2026-09-12 실행 결과 요약
+
+[전체 Work 결과·마감 상태 보고서](WORK_RESULTS_WEBGPT.md)를 추가했습니다.
+
+- 18개 핸드오프 결과를 한 표에 정리했습니다.
+- 9건은 실제 `gpt-6-astra / ultra` 실행 컨텍스트를 확인했습니다.
+- 16:00 KST 전역 마감 후 상태는 `PAUSED_AWAITING_USER_COMMAND`이며, 이 보고서 작성으로 기존 작업을 재개하지 않습니다.
+- 총괄 판정은 `REVIEW`입니다. 제품별 `PASS`·`REVIEW`·`BLOCKED`와 남은 검증을 보고서에 분리했습니다.
+
 ## Hard routing rules
 - Work models only: **GPT-6 Astra / GPT-5.6 Sol / GPT-5.6 Terra / GPT-5.6 Luna**.
 - **Never route to any Pro model/profile in Work.**
