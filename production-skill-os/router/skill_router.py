@@ -10,22 +10,13 @@ from __future__ import annotations
 import argparse
 import json
 import re
-import sys
 from pathlib import Path
 from typing import Any, Iterable
 
 ALLOWED_STATUSES = {"canonical", "candidate", "external_advisory", "deprecated"}
 REQUIRED_FIELDS = {
-    "id",
-    "domain",
-    "status",
-    "match",
-    "diagnosis_probes",
-    "repair",
-    "verification",
-    "rollback",
-    "confidence",
-    "evidence",
+    "id", "domain", "status", "match", "diagnosis_probes", "repair",
+    "verification", "rollback", "confidence", "evidence",
 }
 
 
@@ -54,6 +45,22 @@ def load_jsonl(path: Path) -> list[dict[str, Any]]:
     return records
 
 
+def _strs(value: Any) -> list[str]:
+    return [str(x).lower() for x in value] if isinstance(value, list) else []
+
+
+def fingerprint_key(record: dict[str, Any]) -> str:
+    match = record.get("match", {})
+    return "|".join(
+        [
+            str(record.get("domain", "")).lower(),
+            ",".join(sorted(_strs(match.get("error_codes")))),
+            ",".join(sorted(normalize_text(x) for x in _strs(match.get("contains_all")))),
+            ",".join(sorted(normalize_text(x) for x in _strs(match.get("contains_any")))),
+        ]
+    )
+
+
 def validate_record(record: dict[str, Any]) -> list[str]:
     errors: list[str] = []
     missing = sorted(REQUIRED_FIELDS - set(record))
@@ -74,26 +81,34 @@ def validate_record(record: dict[str, Any]) -> list[str]:
             errors.append(f"{key} must be a list")
     if "rollback" in record and not isinstance(record["rollback"], (str, list)):
         errors.append("rollback must be a string or list")
+    if record.get("status") == "canonical":
+        scope = record.get("scope")
+        if not isinstance(scope, dict) or not scope:
+            errors.append("canonical record requires non-empty scope")
     return errors
 
 
 def validate_catalog(records: list[dict[str, Any]]) -> list[str]:
     errors: list[str] = []
-    seen: dict[str, int] = {}
-    for rec in records:
-        rid = str(rec.get("id", "<missing-id>"))
-        line = rec.get("_line", "?")
-        for err in validate_record(rec):
-            errors.append(f"line {line} ({rid}): {err}")
-        if rid in seen:
-            errors.append(f"line {line} ({rid}): duplicate id; first seen on line {seen[rid]}")
+    seen_ids: dict[str, int] = {}
+    seen_fingerprints: dict[str, str] = {}
+    for record in records:
+        record_id = str(record.get("id", "<missing-id>"))
+        line = record.get("_line", "?")
+        for error in validate_record(record):
+            errors.append(f"line {line} ({record_id}): {error}")
+        if record_id in seen_ids:
+            errors.append(f"line {line} ({record_id}): duplicate id; first seen on line {seen_ids[record_id]}")
         else:
-            seen[rid] = int(line) if isinstance(line, int) else -1
+            seen_ids[record_id] = int(line) if isinstance(line, int) else -1
+        fingerprint = fingerprint_key(record)
+        if fingerprint in seen_fingerprints and record.get("status") != "deprecated":
+            errors.append(
+                f"line {line} ({record_id}): duplicate fingerprint with {seen_fingerprints[fingerprint]}"
+            )
+        else:
+            seen_fingerprints[fingerprint] = record_id
     return errors
-
-
-def _strs(value: Any) -> list[str]:
-    return [str(x).lower() for x in value] if isinstance(value, list) else []
 
 
 def score_record(record: dict[str, Any], domain: str, error_code: str, text: str) -> tuple[int, list[str]] | None:
@@ -129,12 +144,8 @@ def score_record(record: dict[str, Any], domain: str, error_code: str, text: str
 
 
 def select_record(
-    records: Iterable[dict[str, Any]],
-    *,
-    domain: str,
-    error_code: str,
-    text: str,
-    statuses: set[str],
+    records: Iterable[dict[str, Any]], *, domain: str, error_code: str,
+    text: str, statuses: set[str]
 ) -> dict[str, Any] | None:
     candidates: list[tuple[int, str, dict[str, Any], list[str]]] = []
     for record in records:
@@ -147,22 +158,19 @@ def select_record(
         candidates.append((score, str(record.get("id", "")), record, reasons))
     if not candidates:
         return None
-    candidates.sort(key=lambda x: (-x[0], x[1]))
+    candidates.sort(key=lambda item: (-item[0], item[1]))
     score, _, record, reasons = candidates[0]
-    result = {k: v for k, v in record.items() if not k.startswith("_")}
+    result = {key: value for key, value in record.items() if not key.startswith("_")}
     result["route_score"] = score
     result["route_reasons"] = reasons
     return result
 
 
 def build_parser() -> argparse.ArgumentParser:
-    p = argparse.ArgumentParser(description=__doc__)
-    p.add_argument("--catalog", type=Path, default=Path(__file__).with_name("failure_catalog.jsonl"))
-    sub = p.add_subparsers(dest="command", required=True)
-
-    validate = sub.add_parser("validate", help="validate catalog structure")
-    validate.set_defaults(command="validate")
-
+    parser = argparse.ArgumentParser(description=__doc__)
+    parser.add_argument("--catalog", type=Path, default=Path(__file__).with_name("failure_catalog.jsonl"))
+    sub = parser.add_subparsers(dest="command", required=True)
+    sub.add_parser("validate", help="validate catalog structure")
     lookup = sub.add_parser("lookup", help="select one bounded repair record")
     lookup.add_argument("--domain", default="")
     lookup.add_argument("--error-code", default="")
@@ -172,7 +180,7 @@ def build_parser() -> argparse.ArgumentParser:
         action="store_true",
         help="also consider candidate/external_advisory records; never auto-execute them",
     )
-    return p
+    return parser
 
 
 def main(argv: list[str] | None = None) -> int:
@@ -185,8 +193,7 @@ def main(argv: list[str] | None = None) -> int:
 
     errors = validate_catalog(records)
     if args.command == "validate":
-        payload = {"ok": not errors, "records": len(records), "errors": errors}
-        print(json.dumps(payload, ensure_ascii=False, indent=2))
+        print(json.dumps({"ok": not errors, "records": len(records), "errors": errors}, ensure_ascii=False, indent=2))
         return 0 if not errors else 1
 
     if errors:
@@ -196,13 +203,7 @@ def main(argv: list[str] | None = None) -> int:
     statuses = {"canonical"}
     if args.include_advisory:
         statuses |= {"candidate", "external_advisory"}
-    result = select_record(
-        records,
-        domain=args.domain,
-        error_code=args.error_code,
-        text=args.text,
-        statuses=statuses,
-    )
+    result = select_record(records, domain=args.domain, error_code=args.error_code, text=args.text, statuses=statuses)
     if result is None:
         print(json.dumps({"ok": False, "route": "NOVEL_OR_UNVERIFIED", "escalate": True}, ensure_ascii=False))
         return 2
