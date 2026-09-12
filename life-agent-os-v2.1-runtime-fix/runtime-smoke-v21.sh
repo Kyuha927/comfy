@@ -158,7 +158,7 @@ tap_ui_contains "$OUT/benefits-home.xml" "혜택·지원 자동 탐색"
 sleep 2
 dump_ui benefits
 assert_ui_contains "$OUT/benefits.xml" "혜택·지원 자동 탐색"
-assert_ui_contains "$OUT/benefits.xml" "위치 확인 전입니다."
+assert_ui_contains "$OUT/benefits.xml" "최근 위치 없음"
 assert_process_alive > "$OUT/pid-benefits.txt"
 adb exec-out screencap -p > "$OUT/benefits.png"
 
