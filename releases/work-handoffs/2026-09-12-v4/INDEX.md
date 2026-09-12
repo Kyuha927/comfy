@@ -2,14 +2,16 @@
 
 Corrected 2026-09-12 handoff pack.
 
-## 2026-09-12 실행 결과 요약
+## 2026-09-12 실행 결과 정정 요약
 
-[전체 Work 결과·마감 상태 보고서](WORK_RESULTS_WEBGPT.md)를 추가했습니다.
+[정정 감사보고서: 실제 완료·검증 대조](WORK_AUDIT_CORRECTED_2026-09-12.md)를 먼저 확인하십시오.
 
-- 18개 핸드오프 결과를 한 표에 정리했습니다.
-- 9건은 실제 `gpt-6-astra / ultra` 실행 컨텍스트를 확인했습니다.
-- 16:00 KST 전역 마감 후 상태는 `PAUSED_AWAITING_USER_COMMAND`이며, 이 보고서 작성으로 기존 작업을 재개하지 않습니다.
-- 총괄 판정은 `REVIEW`입니다. 제품별 `PASS`·`REVIEW`·`BLOCKED`와 남은 검증을 보고서에 분리했습니다.
+- 정정 감사 기준으로 18개 전체 제품·통합 완료는 **0/18 확인되지 않았습니다**.
+- 6건은 제한된 하위 범위만 검증됐고, 10건은 `REVIEW`·부분 완료, 2건은 요청 범위 기준 `BLOCKED`입니다.
+- 기존 [Work 결과·마감 상태 보고서](WORK_RESULTS_WEBGPT.md)는 시작·재개·체크포인트·마감 통제의 역사 기록이며, 전체 완료 증명이 아닙니다.
+- 9건에서만 시작·재개 시점의 실제 `gpt-6-astra / ultra` 컨텍스트가 관찰됐고, 18개 전체의 모델 전환이나 최종 응답 모델은 확인되지 않았습니다.
+- 전역 마감 상태는 `PAUSED_AWAITING_USER_COMMAND`입니다. 이 정정 보고서 작성으로 기존 작업을 재개하지 않습니다.
+- 총괄 판정은 `REVIEW`입니다.
 
 ## Hard routing rules
 - Work models only: **GPT-6 Astra / GPT-5.6 Sol / GPT-5.6 Terra / GPT-5.6 Luna**.
