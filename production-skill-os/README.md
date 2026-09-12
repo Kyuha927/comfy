@@ -6,7 +6,7 @@ This is a **cross-cutting substrate**, not a new orchestration lane. It is inten
 
 ## Non-negotiable rule
 
-**Failure → bounded diagnosis → verified repair → regression proof → skill promotion.**
+**Failure → bounded diagnosis → verified repair → same-path regression proof → skill promotion.**
 
 A successful tool/API receipt is never enough. A skill becomes `canonical` only after the target project reproduces the failure and proves the repair through the same execution path used in production.
 
@@ -25,16 +25,47 @@ External tips, including useful patterns extracted from `psmon/pencil-creator`, 
 ```text
 production-skill-os/
 ├── README.md
+├── adapters/
+│   └── route_packet.py
+├── docs/
+│   └── CONSUMER_INTEGRATION.md
 ├── router/
 │   ├── skill_router.py
+│   ├── promotion_engine.py
+│   ├── evidence_event.schema.json
 │   └── failure_catalog.jsonl
 ├── skills/
 │   ├── 2d-motion-compression/SKILL.md
 │   ├── blender-transactional-verify/SKILL.md
 │   ├── unity-playmode-verify/SKILL.md
 │   └── failure-to-skill-promotion/SKILL.md
-└── tests/test_skill_router.py
+└── tests/
+    ├── test_skill_router.py
+    ├── test_promotion_engine.py
+    └── test_route_packet.py
 ```
+
+## Low-token event contract
+
+Consumers should emit one small failure event instead of forwarding a full transcript/log bundle:
+
+```json
+{
+  "domain": "blender_bridge",
+  "error_code": "HTTP_429",
+  "message": "MCP SSE probe returned 429",
+  "environment": "blender-pro-bridge-local",
+  "execution_path": "webgpt->bridge->blender"
+}
+```
+
+Then call:
+
+```bash
+python production-skill-os/adapters/route_packet.py --event failure.json
+```
+
+A known canonical match returns only its bounded diagnosis, repair, verification, rollback, and scope. A novel failure returns a compact novelty packet for escalation.
 
 ## Router contract
 
@@ -58,24 +89,38 @@ python production-skill-os/router/skill_router.py lookup \
 
 Advisory matches return `auto_execute_allowed: false` and `escalate: true`.
 
+The router also rejects duplicate active fingerprints. A canonical record is invalid unless it contains an explicit non-empty `scope`.
+
 ## Promotion states
 
 | State | Meaning | Automatic repair? |
 |---|---|---:|
 | `external_advisory` | useful elsewhere, not reproduced here | No |
 | `candidate` | observed locally, repair not yet proven enough | No |
-| `canonical` | local reproduction + repair + regression evidence | Yes, within its bounded contract |
+| `canonical` | local reproduction + repair + same-path regression evidence | Yes, only within its scope |
 | `deprecated` | superseded or invalidated | No |
 
-Minimum promotion evidence:
+## Mechanical promotion gate
 
-- stable fingerprint or exact error code;
-- smallest discriminating diagnosis probe;
-- verified repair with version/context constraints;
-- same-path verification, including visual/runtime evidence where relevant;
-- rollback/recovery path;
-- at least one regression test or reproducible smoke;
-- source receipt (revision/build hash/screenshot/render/job id/log excerpt).
+Promotion is no longer a prose-only judgment. Record evidence events for exactly six gates:
+
+1. `reproduction`
+2. `repair`
+3. `same_path_verification`
+4. `rollback`
+5. `regression`
+6. `receipt`
+
+Each event needs `environment`, `execution_path`, `observed_at`, and a non-empty receipt. The latest event for every gate must be PASS, and all PASS gates must share one environment and one execution path.
+
+```bash
+python production-skill-os/router/promotion_engine.py validate --evidence evidence.jsonl
+python production-skill-os/router/promotion_engine.py assess \
+  --evidence evidence.jsonl \
+  --record-id UNITY_EXAMPLE
+```
+
+The promotion engine returns a deterministic proposal plus evidence SHA-256. It **never modifies the catalog**. This prevents a noisy successful run from silently teaching the system a permanent workaround.
 
 ## Blender integration
 
@@ -96,6 +141,8 @@ scene_info/head revision
 → verify pixels/hash/scene state
 → otherwise restore previous revision as a new revision
 ```
+
+Receipts should prefer revision numbers, durable job IDs, preview SHA-256 values, audit receipts, exact error codes, and restore revisions.
 
 ## Unity integration
 
@@ -135,13 +182,23 @@ Do not analyze a full video at maximum temporal density from frame zero. Spend v
 ## Model escalation policy
 
 ```text
-canonical fingerprint + deterministic recipe  → script/tool path first
-known skill but ambiguous parameters          → normal reasoning worker
-new failure or cross-system conflict           → architecture/root-cause worker
-visual/spatial disagreement after evidence     → strongest visual reviewer
+canonical fingerprint + in-scope deterministic recipe → script/tool path first
+known skill but ambiguous parameters                  → normal reasoning worker
+new failure or cross-system conflict                  → architecture/root-cause worker
+visual/spatial disagreement after evidence            → strongest visual reviewer
 ```
 
 The point is not to use weaker models everywhere. The point is to stop paying frontier-model tokens for questions the pipeline already answered yesterday.
+
+## Tests
+
+The core uses only the Python standard library.
+
+```bash
+python -m unittest discover -s production-skill-os/tests -v
+```
+
+Current local validation for this revision: **15 tests PASS**, covering catalog validation, advisory isolation, exact-code routing, duplicate IDs/fingerprints, canonical scope, six-gate promotion, latest-failure precedence, path/environment mismatch rejection, and compact consumer packets.
 
 ## Current observed blocker
 
