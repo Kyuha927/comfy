@@ -1,6 +1,6 @@
 {
-  "schema_version": "1.1.1",
-  "receipt_id": "PSOS_LIN_3D_AUTHORITY_BINDING_20260914",
+  "schema_version": "1.2.0",
+  "receipt_id": "PSOS_LIN_3D_AUTHORITY_BINDING_20260914_CHAT_VALIDATION",
   "status": "CURRENT_AUTHORITY_BOUND_FAIL_CLOSED",
   "binding_commit_identity": "GIT_COMMIT_CONTAINING_THIS_RECEIPT",
   "active_guard_implementation_commit": "f31eeea8f3cfb78b02185753bd32dca96f663031",
@@ -9,10 +9,26 @@
   "lin_authority": {
     "repository": "Kyuha927/lastline-echoes",
     "branch": "lin-aster-tripo-r01-20260913",
-    "commit": "fe792b86655ae6724c01065cd8b244c3d82fb76b",
+    "commit": "d3767d9228d072a72a564981d55b5790c0fea93b",
+    "tree_sha": "846bd9bec2077c4942ea74e89fc0f99610d9f920",
     "ssot_blob_sha": "090130fae6b1e0d35222bc7d450262a5d03d2555",
-    "live_state_blob_sha": "fa20ad41e1c8ec5df81d06e7a927e2428049f4d7",
+    "live_state_blob_sha": "d7aeb48460f3bbefbcb7c34c83004288376e96af",
     "gate_id": "LIN_ASTER_3D_TOOL_CAPABILITY_GATE_V1"
+  },
+  "latest_same_path_validation": {
+    "receipt_path": "work/handovers/2026-09-14/LIN_ASTER_8_CAPABILITY_SAME_PATH_VALIDATION_CHAT_RECEIPT_20260914.md",
+    "receipt_commit": "6ba07ed3656fcbf55a52de83056ea53650fc20df",
+    "status": "PARTIAL_EXECUTION_BLOCKED_DEPENDENCIES",
+    "capabilities_requested": 8,
+    "capabilities_passed": 0,
+    "capabilities_blocked": 8,
+    "verified_for_lin_3d_before": 0,
+    "verified_for_lin_3d_after": 0,
+    "registry_top_level_status_changes": 0,
+    "tripo_jobs": 0,
+    "tripo_credits_spent": 0,
+    "bridge_health": "BLOCKED_MCP_SSE_404",
+    "canon_bytes_changed": false
   },
   "authority_design": {
     "durable_capability_inventory": "TOOL_CAPABILITY_REGISTRY.json",

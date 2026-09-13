@@ -1,0 +1,53 @@
+{
+  "schema_version": "1.0",
+  "receipt_id": "PSOS_LIN_8_CAPABILITY_CHAT_VALIDATION_20260914",
+  "status": "RECORDED_BLOCKED_DEPENDENCIES_NO_PROMOTIONS",
+  "lin_authority": {
+    "repository": "Kyuha927/lastline-echoes",
+    "branch": "lin-aster-tripo-r01-20260913",
+    "head": "d3767d9228d072a72a564981d55b5790c0fea93b",
+    "ssot_blob_sha": "090130fae6b1e0d35222bc7d450262a5d03d2555",
+    "live_state_blob_sha": "d7aeb48460f3bbefbcb7c34c83004288376e96af"
+  },
+  "source_receipt": {
+    "path": "work/handovers/2026-09-14/LIN_ASTER_8_CAPABILITY_SAME_PATH_VALIDATION_CHAT_RECEIPT_20260914.md",
+    "commit": "6ba07ed3656fcbf55a52de83056ea53650fc20df"
+  },
+  "execution_surface": {
+    "chat": true,
+    "authenticated_tripo": false,
+    "tripo_api_key_present": false,
+    "blender_bridge_health": "BLOCKED_MCP_SSE_404",
+    "blender_executable_present": false,
+    "computer_use_action_present": false,
+    "real_device_session_present": false
+  },
+  "results": {
+    "cap.tripo.h31.head_component_ultra": "BLOCKED_DEPENDENCY",
+    "cap.tripo.h31.hair_component_ultra": "BLOCKED_DEPENDENCY",
+    "cap.tripo.h31.body_outfit_component_ultra": "BLOCKED_DEPENDENCY",
+    "cap.tripo.h31.coat_component_ultra": "BLOCKED_DEPENDENCY",
+    "cap.blender_bridge.transactional_edit_render_reopen_rollback": "BLOCKED_TRANSPORT_AND_DEPENDENCY",
+    "cap.astra.computer_use.visual_blender_assembly": "BLOCKED_SURFACE_AND_DEPENDENCY",
+    "cap.lin.controlled_manual_retopology": "BLOCKED_DEPENDENCY",
+    "cap.lin.mobile_hero_real_device_validation": "BLOCKED_DEPENDENCY"
+  },
+  "promotion": {
+    "verified_for_lin_3d_before": 0,
+    "verified_for_lin_3d_after": 0,
+    "registry_top_level_status_changes": 0,
+    "reason": "NO_L8_SAME_PATH_PASS_OR_ARTIFACT_IDS"
+  },
+  "spend": {
+    "tripo_jobs": 0,
+    "tripo_credits": 0,
+    "paid_action": false
+  },
+  "safety": {
+    "canon_bytes_changed": false,
+    "auto_canon_promotion": false,
+    "auto_final_lock": false,
+    "auto_merge": false,
+    "production_asset_mutation": false
+  }
+}
