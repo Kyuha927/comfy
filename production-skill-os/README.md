@@ -129,14 +129,27 @@ The promotion engine returns a deterministic proposal plus evidence SHA-256. It 
 ### Character generation and interactive assembly
 
 For new editable character builds, the default route is defined by
-`skills/blender-character-tripo-astra/SKILL.md`:
+`skills/blender-character-tripo-astra/SKILL.md`.
+
+Resolve project-specific canon and image-edit restrictions first, then choose one source strategy:
 
 ```text
-approved references
-→ split HEAD / HAIR / BODY_CLOTHING
+DEDICATED_PART_REFERENCES
+approved HEAD / HAIR / BODY_CLOTHING packets
 → Tripo Smart Mesh P2.0 part generation
 → per-part geometry gate
-→ GPT-6 Astra Computer Use supervised Blender assembly
+
+FULL_BODY_MULTIVIEW_PART_AWARE
+exact approved full-body multiview masters
+→ Tripo Smart Mesh P2.0 full-body generation
+→ Generate in Parts or copied-candidate 3D segmentation
+→ logical part geometry gate
+```
+
+Both routes continue through:
+
+```text
+GPT-6 Astra Computer Use supervised Blender assembly
 → Blender Bridge/MCP deterministic inspection, exact operations, verification, checkpoint, and rollback
 → rig/deformation/expression evidence
 → fixed-camera renders and fresh-process reopen
@@ -144,7 +157,7 @@ approved references
 
 The control planes are intentionally asymmetric. Astra Computer Use is the primary interactive operator for visual assembly and supervised setup. Bridge/MCP is the secondary deterministic plane for exact state, typed edits, durable jobs, pixel/state evidence, and safe restoration. Do not ask Astra to model the character from zero when a usable Tripo path exists, and do not make MCP the default creative GUI operator.
 
-Hair requires front, left, right, and back input for a production candidate. Head and body may begin from a front candidate, but authoritative multiview input is preferred. Provider or model receipts never replace geometry and rendered-pixel inspection.
+Tripo-first does not authorize editing a locked master. If part packets are not approved or source editing is prohibited, preserve the exact full-body multiview inputs and isolate components only in generated 3D space. Dedicated production hair requires front, left, right, and back approved references. Provider or model receipts never replace geometry and rendered-pixel inspection.
 
 This is an active user-directed routing policy, not an automatic quality claim. Reusable performance and repair claims still pass through the same evidence and promotion gates.
 
@@ -224,7 +237,7 @@ The core uses only the Python standard library.
 python -m unittest discover -s production-skill-os/tests -v
 ```
 
-Current validation for this revision is expected to cover **19 tests**: the original 15 catalog, routing, promotion, and compact-packet tests plus four merge guards for the Tripo/Astra/Bridge character route, mandatory hair multiview, evidence/fallback rules, and consumer discovery.
+Current validation for this revision is expected to cover **19 tests**: the original 15 catalog, routing, promotion, and compact-packet tests plus four merge guards for Tripo/Astra/Bridge control order, source-gated part strategy and hair multiview, evidence/fallback rules, and consumer discovery.
 
 ## Current observed blocker
 
