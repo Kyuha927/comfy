@@ -1,0 +1,17 @@
+{
+  "schema_version": "1.0",
+  "receipt_id": "LIN_AUTHORITY_CONNECTOR_PREFLIGHT_20260914T021826+0900",
+  "verified_by": "ChatGPT GitHub connector with repository read permission",
+  "checked_at_kst": "2026-09-14T02:18:26+09:00",
+  "repository": "Kyuha927/lastline-echoes",
+  "branch": "lin-aster-tripo-r01-20260913",
+  "head_sha": "e1b02b1773366677a543d764bd68638e13da1a27",
+  "parent_sha": "6211d63a1a91a896e496483584b67592a6d430c7",
+  "tree_sha": "55892f3c826937f285b9a5eea625b139e122e483",
+  "commit_message": "validation: publish strict GPT-5.6 XHigh harness evidence and CI boundary",
+  "branch_api_url": "https://api.github.com/repos/Kyuha927/lastline-echoes/branches/lin-aster-tripo-r01-20260913",
+  "cross_repository_ci_read_available": false,
+  "interpretation": "Pinned preflight attestation. CI must validate this exact receipt and may not silently substitute another LIN head.",
+  "production_mutation_authorized": false,
+  "canon_mutation_authorized": false
+}

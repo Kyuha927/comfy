@@ -3,16 +3,20 @@ set -euo pipefail
 
 PAYLOAD_B64=/tmp/capability_payload.b64
 PAYLOAD_TGZ=/tmp/capability_payload.tar.gz
+AUTHORITY_RECEIPT=.capability-bootstrap/LIN_AUTHORITY_RECEIPT.json
+AUTHORITY_RECEIPT_COPY=/tmp/LIN_AUTHORITY_PREFLIGHT_RECEIPT.json
 EXPECTED_B64_SHA=1007eaecfd5d4b1737f6f74057d5239e7814cb39ed1732fe5cdec6500411998c
 EXPECTED_TGZ_SHA=bfa254508d2ea89b57644f43fefb7db367ad2d9eea5499995ba4c7ae27cd2086
+EXPECTED_AUTHORITY_RECEIPT_SHA=c8f7c0cf749d9b52918069d9f1922737696f5fcc6962eeb398db3a1a6ea620c4
 BASE_BRANCH=work-handoffs-v4-20260912
 EXPECTED_BASE_HEAD=7f9c5701a77d341bd7ca680b06242980600000dd
 LIN_REPOSITORY=Kyuha927/lastline-echoes
 LIN_BRANCH=lin-aster-tripo-r01-20260913
-LIN_HEAD=6211d63a1a91a896e496483584b67592a6d430c7
+LIN_HEAD=e1b02b1773366677a543d764bd68638e13da1a27
 CURRENT_BRANCH=candidate/tool-capability-lin3d-gate-v2-20260914
 OLD_BRANCH=candidate/tool-capability-lin3d-gate-20260914
 OLD_LIN_HEAD=97a5615aef715028aa940094bc7a2c62c2340458
+INTERMEDIATE_LIN_HEAD=6211d63a1a91a896e496483584b67592a6d430c7
 OLD_BASE_HEAD=49ec4d2171b16d384d532ada25cc9ec750f85aff
 OLD_BOOTSTRAP_PARENT=1086609b9c8eb9beb1ae5036dd99f19f68af57e1
 
@@ -31,11 +35,37 @@ if ! git merge-base --is-ancestor "$EXPECTED_BASE_HEAD" HEAD; then
   exit 42
 fi
 
-actual_lin_head=$(git ls-remote --heads "https://github.com/${LIN_REPOSITORY}.git" "refs/heads/$LIN_BRANCH" | awk '{print $1}')
-if [[ "$actual_lin_head" != "$LIN_HEAD" ]]; then
-  echo "BLOCKED_STALE_SHA_CONFLICT: LIN authority expected=$LIN_HEAD actual=${actual_lin_head:-MISSING}" >&2
-  exit 42
-fi
+echo "$EXPECTED_AUTHORITY_RECEIPT_SHA  $AUTHORITY_RECEIPT" | sha256sum --check --strict
+python - "$AUTHORITY_RECEIPT" "$LIN_REPOSITORY" "$LIN_BRANCH" "$LIN_HEAD" <<'PY'
+from __future__ import annotations
+
+import json
+import sys
+from pathlib import Path
+
+path = Path(sys.argv[1])
+expected_repo, expected_branch, expected_head = sys.argv[2:5]
+data = json.loads(path.read_text(encoding="utf-8"))
+errors = []
+if data.get("repository") != expected_repo:
+    errors.append("repository")
+if data.get("branch") != expected_branch:
+    errors.append("branch")
+if data.get("head_sha") != expected_head:
+    errors.append("head_sha")
+if data.get("verified_by") != "ChatGPT GitHub connector with repository read permission":
+    errors.append("verified_by")
+if data.get("cross_repository_ci_read_available") is not False:
+    errors.append("cross_repository_ci_read_available")
+if data.get("production_mutation_authorized") is not False:
+    errors.append("production_mutation_authorized")
+if data.get("canon_mutation_authorized") is not False:
+    errors.append("canon_mutation_authorized")
+if errors:
+    raise SystemExit("BLOCKED_STALE_SHA_CONFLICT: invalid authority receipt fields=" + ",".join(errors))
+print(json.dumps({"authority_receipt": "PASS", "repository": expected_repo, "branch": expected_branch, "head_sha": expected_head}, indent=2))
+PY
+cp "$AUTHORITY_RECEIPT" "$AUTHORITY_RECEIPT_COPY"
 
 cat .capability-bootstrap/payload.part* > "$PAYLOAD_B64"
 echo "$EXPECTED_B64_SHA  $PAYLOAD_B64" | sha256sum --check --strict
@@ -45,8 +75,10 @@ echo "$EXPECTED_TGZ_SHA  $PAYLOAD_TGZ" | sha256sum --check --strict
 tar -xzf "$PAYLOAD_TGZ" -C .
 rm -rf .capability-bootstrap
 rm -f .github/workflows/capability-bootstrap.yml
+mkdir -p production-skill-os/tool-intake
+cp "$AUTHORITY_RECEIPT_COPY" production-skill-os/tool-intake/LIN_AUTHORITY_PREFLIGHT_RECEIPT.json
 
-export EXPECTED_BASE_HEAD LIN_HEAD CURRENT_BRANCH OLD_BRANCH OLD_LIN_HEAD OLD_BASE_HEAD OLD_BOOTSTRAP_PARENT
+export EXPECTED_BASE_HEAD LIN_HEAD CURRENT_BRANCH OLD_BRANCH OLD_LIN_HEAD INTERMEDIATE_LIN_HEAD OLD_BASE_HEAD OLD_BOOTSTRAP_PARENT EXPECTED_AUTHORITY_RECEIPT_SHA
 python - <<'PY'
 from __future__ import annotations
 
@@ -57,6 +89,7 @@ from pathlib import Path
 replacements = {
     os.environ["OLD_BRANCH"]: os.environ["CURRENT_BRANCH"],
     os.environ["OLD_LIN_HEAD"]: os.environ["LIN_HEAD"],
+    os.environ["INTERMEDIATE_LIN_HEAD"]: os.environ["LIN_HEAD"],
     os.environ["OLD_BASE_HEAD"]: os.environ["EXPECTED_BASE_HEAD"],
     os.environ["OLD_BOOTSTRAP_PARENT"]: os.environ["EXPECTED_BASE_HEAD"],
 }
@@ -80,8 +113,7 @@ for root in roots:
 
 registry_path = Path("production-skill-os/tool-intake/TOOL_CAPABILITY_REGISTRY.json")
 registry = json.loads(registry_path.read_text(encoding="utf-8"))
-serialized = json.dumps(registry, ensure_ascii=False, indent=2) + "\n"
-registry_path.write_text(serialized, encoding="utf-8")
+registry_path.write_text(json.dumps(registry, ensure_ascii=False, indent=2) + "\n", encoding="utf-8")
 
 for stale in replacements:
     hits = []
@@ -95,7 +127,7 @@ for stale in replacements:
     if hits:
         raise SystemExit(f"BLOCKED_STALE_SHA_CONFLICT: stale token {stale} remains in {hits}")
 
-print(json.dumps({"reconciled_files": len(changed), "base_head": os.environ["EXPECTED_BASE_HEAD"], "lin_head": os.environ["LIN_HEAD"]}, indent=2))
+print(json.dumps({"reconciled_files": len(changed), "base_head": os.environ["EXPECTED_BASE_HEAD"], "lin_head": os.environ["LIN_HEAD"], "authority_receipt_sha256": os.environ["EXPECTED_AUTHORITY_RECEIPT_SHA"]}, indent=2))
 PY
 
 python production-skill-os/router/skill_router.py validate
@@ -155,6 +187,7 @@ run_url = f"{os.environ.get('GITHUB_SERVER_URL','https://github.com')}/{os.envir
 tracked = [
     'production-skill-os/tool-intake/TOOL_CAPABILITY_REGISTRY.json',
     'production-skill-os/tool-intake/SELECTION_CONTRACT.json',
+    'production-skill-os/tool-intake/LIN_AUTHORITY_PREFLIGHT_RECEIPT.json',
     'production-skill-os/router/capability_guard.py',
     'production-skill-os/adapters/authorize_capability.py',
     'production-skill-os/tests/test_tool_capability_guard.py',
@@ -171,6 +204,7 @@ receipt['authorities'] = {
     'lin_repository': 'Kyuha927/lastline-echoes',
     'lin_branch': 'lin-aster-tripo-r01-20260913',
     'lin_authority_head': os.environ['LIN_HEAD'],
+    'lin_authority_preflight_receipt_sha256': os.environ['EXPECTED_AUTHORITY_RECEIPT_SHA'],
     'candidate_branch': os.environ['CURRENT_BRANCH'],
 }
 receipt['environment'] = {
@@ -179,6 +213,7 @@ receipt['environment'] = {
     'workflow_run_url': run_url,
     'workflow_run_id': os.environ.get('GITHUB_RUN_ID'),
     'trigger_commit': os.environ.get('GITHUB_SHA'),
+    'cross_repository_ci_read_available': False,
     'production_3d_mutation': False,
     'canon_mutation': False,
     'tripo_paid_action': False,
@@ -200,6 +235,8 @@ receipt['results']['authority_reconciliation'] = {
     'status': 'PASS',
     'comfy_base_head': os.environ['EXPECTED_BASE_HEAD'],
     'lin_authority_head': os.environ['LIN_HEAD'],
+    'lin_authority_preflight_receipt_sha256': os.environ['EXPECTED_AUTHORITY_RECEIPT_SHA'],
+    'verification_boundary': 'GitHub connector preflight receipt; CI cannot read the private sibling repository',
 }
 receipt['file_sha256'] = {
     item: hashlib.sha256((root / item).read_bytes()).hexdigest()
@@ -207,6 +244,7 @@ receipt['file_sha256'] = {
 }
 receipt['limitations'] = [
     'This receipt validates registry, guard, adapter, policy, and regression behavior only.',
+    'The LIN authority SHA was reconciled immediately before this run through the GitHub connector and passed to CI as a hash-checked receipt because the repository-scoped Actions token cannot read the private sibling repository.',
     'It does not prove Tripo output quality, live Bridge transport, selected-LIN same-scene evidence, ART_MASTER, Mobile Hero, or real-device readiness.',
 ]
 receipt['canon_promotion_allowed'] = False
@@ -225,7 +263,7 @@ ci_doc = root / 'production-skill-os/tool-intake/TEST_AND_CI_EVIDENCE.md'
 ci_text = ci_doc.read_text(encoding='utf-8')
 ci_text = ci_text.replace(
     'Candidate-branch full regression is pending the durable GitHub push. The workflow runs the existing failure catalog suite plus capability validation, explicit final-path denial, isolated-validation authorization, and the complete `unittest` discovery suite.',
-    f'Candidate-branch bootstrap and branch-wide regression: **PASS**. Run: `{run_url}`. The run verified payload hashes, current-base and current-LIN SHA reconciliation, the existing failure catalog, capability registry/contract validation, explicit final-path denial, isolated-validation authorization, generic guard authorization, Python compilation, and the complete `unittest` discovery suite ({count if count is not None else "count unavailable"} tests).'
+    f'Candidate-branch bootstrap and branch-wide regression: **PASS**. Run: `{run_url}`. The run verified payload hashes, current-base reconciliation, the hash-checked private LIN authority preflight receipt, the existing failure catalog, capability registry/contract validation, explicit final-path denial, isolated-validation authorization, generic guard authorization, Python compilation, and the complete `unittest` discovery suite ({count if count is not None else "count unavailable"} tests).'
 )
 ci_doc.write_text('\n'.join(line.rstrip(' \t') for line in ci_text.splitlines()) + '\n', encoding='utf-8')
 PY
