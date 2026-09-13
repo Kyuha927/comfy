@@ -1,0 +1,30 @@
+{
+  "schema_version": "1.0.0",
+  "receipt_id": "PSOS_LIN_3D_AUTHORITY_BINDING_20260914",
+  "status": "CURRENT_AUTHORITY_BOUND_FAIL_CLOSED",
+  "binding_commit_identity": "GIT_COMMIT_CONTAINING_THIS_RECEIPT",
+  "registry_snapshot_commit": "d95ecd9a39c42c456d58a94cf8225dd4a232c3a6",
+  "registry_blob_sha": "2e2bd0f16d8211f06bfd2cd21c15772c3a6e8128",
+  "lin_authority": {
+    "repository": "Kyuha927/lastline-echoes",
+    "branch": "lin-aster-tripo-r01-20260913",
+    "commit": "31532b8073c94e4b414b5d6827c938c0e97d27ea",
+    "ssot_blob_sha": "dd4000fa995566416d019a2e5e5f1ff3fae2781d",
+    "live_state_blob_sha": "d6518581dd0f9aebc0ba256a1d87d74ed49e1c58",
+    "gate_id": "LIN_ASTER_3D_TOOL_CAPABILITY_GATE_V1"
+  },
+  "authority_design": {
+    "durable_capability_inventory": "TOOL_CAPABILITY_REGISTRY.json",
+    "mutable_current_lin_binding": "SELECTION_CONTRACT.json",
+    "production_authorization_reads_current_binding": true,
+    "registry_snapshot_head_can_be_historical": true,
+    "stale_requested_lin_head_action": "BLOCKED_STALE_LIN_AUTHORITY"
+  },
+  "verified_for_lin_3d": 0,
+  "unknown_or_unverified_final_use": "DENY",
+  "final_lock_authority": "USER_ONLY",
+  "auto_merge": false,
+  "auto_canon_promotion": false,
+  "asset_mutation": false,
+  "paid_action": false
+}

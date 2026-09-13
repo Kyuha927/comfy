@@ -1,10 +1,10 @@
-\
 #!/usr/bin/env python3
 """Fail-closed capability selector for Production Skill OS and LIN ASTER 3D.
 
-This module validates the durable capability registry and authorizes one exact
-capability/version for one explicit scope. It never invokes the capability,
-mutates a 3D asset, merges a branch, or promotes canon.
+The capability registry is durable inventory/evidence state. The selection
+contract is the mutable binding to the exact current LIN authority head.
+This module never invokes a capability, mutates a 3D asset, merges a branch,
+or promotes canon.
 """
 from __future__ import annotations
 
@@ -156,8 +156,7 @@ def validate_record(record: dict[str, Any], required_fields: set[str]) -> list[s
     if record.get("mutates_3d_state") is True and not _nonempty_list(record.get("rollback_behavior")):
         errors.append(f"{capability_id}: 3D mutation requires rollback behavior")
 
-    same_path = record.get("lin_3d_same_path_test")
-    if not isinstance(same_path, dict):
+    if not isinstance(record.get("lin_3d_same_path_test"), dict):
         errors.append(f"{capability_id}: lin_3d_same_path_test must be an object")
 
     return errors
@@ -169,8 +168,7 @@ def validate_registry(registry: dict[str, Any]) -> list[str]:
     if not isinstance(records, list):
         return ["registry.records must be a list"]
 
-    declared_statuses = registry.get("allowed_statuses")
-    if set(declared_statuses or []) != ALLOWED_STATUSES:
+    if set(registry.get("allowed_statuses") or []) != ALLOWED_STATUSES:
         errors.append("registry.allowed_statuses does not match the enforced status set")
 
     required = registry.get("required_record_fields")
@@ -232,6 +230,83 @@ def validate_registry(registry: dict[str, Any]) -> list[str]:
     return errors
 
 
+def validate_contract(registry: dict[str, Any], contract: dict[str, Any]) -> list[str]:
+    """Validate the mutable current-authority binding without weakening registry evidence."""
+    errors: list[str] = []
+    if contract.get("registry_path") != "production-skill-os/tool-intake/TOOL_CAPABILITY_REGISTRY.json":
+        errors.append("selection contract registry_path mismatch")
+
+    authority = contract.get("authority")
+    registry_authority = registry.get("lin_3d_authority")
+    if not isinstance(authority, dict):
+        errors.append("selection contract authority must be an object")
+        return errors
+    if not isinstance(registry_authority, dict):
+        errors.append("registry.lin_3d_authority must be an object")
+        return errors
+
+    for key in (
+        "repository",
+        "branch",
+        "branch_head_at_reconciliation",
+        "ssot_path",
+        "ssot_blob_sha",
+        "live_state_path",
+        "live_state_blob_sha",
+        "production_control_policy_id",
+        "final_lock_authority",
+    ):
+        if not _nonempty_str(authority.get(key)):
+            errors.append(f"selection contract authority.{key} is required")
+
+    for key in ("repository", "branch", "ssot_path", "live_state_path", "production_control_policy_id"):
+        if authority.get(key) != registry_authority.get(key):
+            errors.append(f"selection contract authority.{key} must match registry authority identity")
+
+    if authority.get("final_lock_authority") != "USER_ONLY":
+        errors.append("selection contract final lock authority must remain USER_ONLY")
+    if authority.get("auto_merge") is not False or authority.get("auto_canon") is not False:
+        errors.append("selection contract automatic merge/canon must remain false")
+
+    invariants = contract.get("invariants")
+    if not isinstance(invariants, dict):
+        errors.append("selection contract invariants must be an object")
+    else:
+        if invariants.get("final_lock_authority") != "USER_ONLY":
+            errors.append("selection contract must preserve USER_ONLY final lock authority")
+        if invariants.get("automatic_merge") is not False:
+            errors.append("selection contract automatic_merge must remain false")
+        if invariants.get("automatic_canon_promotion") is not False:
+            errors.append("selection contract automatic_canon_promotion must remain false")
+        if invariants.get("unknown_or_unverified_final_use") != "DENY":
+            errors.append("selection contract unknown/unverified final use must remain DENY")
+
+    scopes = contract.get("scopes")
+    if not isinstance(scopes, dict):
+        errors.append("selection contract scopes must be an object")
+    else:
+        final_scope = scopes.get("LIN_3D_FINAL", {})
+        if final_scope.get("allowed_statuses") != ["VERIFIED_FOR_LIN_3D"]:
+            errors.append("LIN_3D_FINAL must allow only VERIFIED_FOR_LIN_3D")
+        if final_scope.get("canon_promotion_allowed") is not False:
+            errors.append("LIN_3D_FINAL cannot promote canon")
+        validation_scope = scopes.get("LIN_3D_VALIDATION", {})
+        if validation_scope.get("production_3d_mutation_allowed") is not False:
+            errors.append("LIN_3D_VALIDATION cannot mutate production 3D state")
+        if validation_scope.get("canon_promotion_allowed") is not False:
+            errors.append("LIN_3D_VALIDATION cannot promote canon")
+
+    return errors
+
+
+def current_lin_authority(registry: dict[str, Any], contract: dict[str, Any] | None = None) -> dict[str, Any]:
+    """Return current authority. Selection contract wins for the mutable HEAD binding."""
+    if contract is not None and isinstance(contract.get("authority"), dict):
+        return contract["authority"]
+    authority = registry.get("lin_3d_authority")
+    return authority if isinstance(authority, dict) else {}
+
+
 def find_capability(registry: dict[str, Any], capability_id: str) -> dict[str, Any] | None:
     for record in registry.get("records", []):
         if isinstance(record, dict) and record.get("capability_id") == capability_id:
@@ -260,13 +335,16 @@ def authorize(
     requested_version: str,
     scope: str,
     lin_authority_head: str,
+    contract: dict[str, Any] | None = None,
     isolated_workspace: bool = False,
     no_production_mutation: bool = False,
     no_canon_mutation: bool = False,
 ) -> dict[str, Any]:
     errors = validate_registry(registry)
+    if contract is not None:
+        errors.extend(validate_contract(registry, contract))
     if errors:
-        result = _deny("BLOCKED_REGISTRY_INVALID", "Registry validation failed")
+        result = _deny("BLOCKED_REGISTRY_INVALID", "Registry or selection contract validation failed")
         result["details"] = errors
         return result
 
@@ -284,13 +362,17 @@ def authorize(
             capability=capability,
         )
 
-    expected_head = str(registry["lin_3d_authority"]["branch_head_at_reconciliation"])
-    if scope.startswith("LIN_3D") and lin_authority_head != expected_head:
-        return _deny(
-            "BLOCKED_STALE_LIN_AUTHORITY",
-            f"LIN authority head {lin_authority_head!r} does not match {expected_head!r}",
-            capability=capability,
-        )
+    authority = current_lin_authority(registry, contract)
+    expected_head = str(authority.get("branch_head_at_reconciliation", ""))
+    if scope.startswith("LIN_3D"):
+        if not expected_head:
+            return _deny("BLOCKED_REGISTRY_INVALID", "Current LIN authority head is missing", capability=capability)
+        if lin_authority_head != expected_head:
+            return _deny(
+                "BLOCKED_STALE_LIN_AUTHORITY",
+                f"LIN authority head {lin_authority_head!r} does not match {expected_head!r}",
+                capability=capability,
+            )
 
     status = capability.get("status")
     authorized_scopes = capability.get("authorized_scopes", [])
@@ -328,7 +410,7 @@ def authorize(
         if same_path.get("status") != "PASS" or not same_path.get("artifact_ids"):
             return _deny("BLOCKED_SAME_PATH_EVIDENCE_MISSING", "Same-path evidence is incomplete", capability=capability)
         tests = capability.get("regression_tests", [])
-        if not tests or any(item.get("status") != "PASS" for item in tests if isinstance(item, dict)):
+        if not tests or any(not isinstance(item, dict) or item.get("status") != "PASS" for item in tests):
             return _deny(
                 "BLOCKED_ROLLBACK_OR_REGRESSION_EVIDENCE_MISSING",
                 "Regression evidence is incomplete",
@@ -386,17 +468,14 @@ def main(argv: list[str] | None = None) -> int:
         return 3
 
     errors = validate_registry(registry)
-    contract_registry = contract.get("registry_path")
-    if contract_registry != "production-skill-os/tool-intake/TOOL_CAPABILITY_REGISTRY.json":
-        errors.append("selection contract registry_path mismatch")
-    if contract.get("invariants", {}).get("final_lock_authority") != "USER_ONLY":
-        errors.append("selection contract must preserve USER_ONLY final lock authority")
+    errors.extend(validate_contract(registry, contract))
 
     if args.command == "validate":
         payload = {
             "ok": not errors,
             "records": len(registry.get("records", [])),
             "summary": registry.get("summary"),
+            "current_lin_authority_head": current_lin_authority(registry, contract).get("branch_head_at_reconciliation"),
             "errors": errors,
             "canon_promotion_allowed": False,
             "automatic_merge_allowed": False,
@@ -410,6 +489,7 @@ def main(argv: list[str] | None = None) -> int:
 
     result = authorize(
         registry,
+        contract=contract,
         capability_id=args.capability_id,
         requested_version=args.version,
         scope=args.scope,
