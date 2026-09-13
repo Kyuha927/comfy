@@ -26,6 +26,6 @@ jobs:
         with:
           ref: ${{ github.ref_name }}
           fetch-depth: 0
-      - name: Reconcile authorities, validate, test, and commit final gate
+      - name: Reconcile authorities, validate, test, and commit non-workflow gate
         shell: bash
-        run: bash .capability-bootstrap/apply.sh
+        run: bash .capability-bootstrap/apply-wrapper.sh
