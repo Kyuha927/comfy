@@ -36,10 +36,12 @@ production-skill-os/
 │   └── failure_catalog.jsonl
 ├── skills/
 │   ├── 2d-motion-compression/SKILL.md
+│   ├── blender-character-tripo-astra/SKILL.md
 │   ├── blender-transactional-verify/SKILL.md
 │   ├── unity-playmode-verify/SKILL.md
 │   └── failure-to-skill-promotion/SKILL.md
 └── tests/
+    ├── test_blender_character_route.py
     ├── test_skill_router.py
     ├── test_promotion_engine.py
     └── test_route_packet.py
@@ -124,6 +126,30 @@ The promotion engine returns a deterministic proposal plus evidence SHA-256. It 
 
 ## Blender integration
 
+### Character generation and interactive assembly
+
+For new editable character builds, the default route is defined by
+`skills/blender-character-tripo-astra/SKILL.md`:
+
+```text
+approved references
+→ split HEAD / HAIR / BODY_CLOTHING
+→ Tripo Smart Mesh P2.0 part generation
+→ per-part geometry gate
+→ GPT-6 Astra Computer Use supervised Blender assembly
+→ Blender Bridge/MCP deterministic inspection, exact operations, verification, checkpoint, and rollback
+→ rig/deformation/expression evidence
+→ fixed-camera renders and fresh-process reopen
+```
+
+The control planes are intentionally asymmetric. Astra Computer Use is the primary interactive operator for visual assembly and supervised setup. Bridge/MCP is the secondary deterministic plane for exact state, typed edits, durable jobs, pixel/state evidence, and safe restoration. Do not ask Astra to model the character from zero when a usable Tripo path exists, and do not make MCP the default creative GUI operator.
+
+Hair requires front, left, right, and back input for a production candidate. Head and body may begin from a front candidate, but authoritative multiview input is preferred. Provider or model receipts never replace geometry and rendered-pixel inspection.
+
+This is an active user-directed routing policy, not an automatic quality claim. Reusable performance and repair claims still pass through the same evidence and promotion gates.
+
+### Transactional Bridge verification
+
 The current Blender bridge already has the right primitives for low-token operation: exact `expected_revision`, idempotent `request_id`, durable jobs, preview pixel receipts, cancellation, restore-as-new-revision, typed edits, and garment audits.
 
 A Blender canonical skill should therefore be a **small typed-operation recipe plus evidence contract**, not free-form Python. On an uncertain response, reuse the same request id; never invent a new mutation merely to see whether the old one worked.
@@ -198,7 +224,7 @@ The core uses only the Python standard library.
 python -m unittest discover -s production-skill-os/tests -v
 ```
 
-Current local validation for this revision: **15 tests PASS**, covering catalog validation, advisory isolation, exact-code routing, duplicate IDs/fingerprints, canonical scope, six-gate promotion, latest-failure precedence, path/environment mismatch rejection, and compact consumer packets.
+Current validation for this revision is expected to cover **19 tests**: the original 15 catalog, routing, promotion, and compact-packet tests plus four merge guards for the Tripo/Astra/Bridge character route, mandatory hair multiview, evidence/fallback rules, and consumer discovery.
 
 ## Current observed blocker
 
