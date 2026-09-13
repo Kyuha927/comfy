@@ -1,0 +1,44 @@
+{
+  "schema_version": "1.0",
+  "status": "PASS_NATIVE",
+  "error_code": null,
+  "surface": {
+    "kind": "CHAT",
+    "native_image_generation_available": true
+  },
+  "source": {
+    "provider": "google-drive",
+    "file_id": "synthetic-file-id",
+    "file_name": "reference.png",
+    "mime_type": "image/png",
+    "size_bytes": 1024,
+    "width": 1024,
+    "height": 1536,
+    "exact_match": true,
+    "raw_fetch": true
+  },
+  "integrity": {
+    "verification_available": true,
+    "verified": true,
+    "sha256_after_fetch": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa",
+    "sha256_before_bind": "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa"
+  },
+  "reference_bind": {
+    "bound": true,
+    "evidence_id": "synthetic-bind-evidence"
+  },
+  "native_generation": {
+    "generator": "chatgpt-native-image-generation",
+    "invoked": true,
+    "reference_count": 1,
+    "result_inline": true,
+    "external_api_calls": 0,
+    "api_fallback_used": false
+  },
+  "security": {
+    "drive_write_calls": 0,
+    "sharing_changes": 0,
+    "secrets_exposed": false,
+    "raw_pixels_logged": false
+  }
+}

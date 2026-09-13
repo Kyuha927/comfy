@@ -1,0 +1,37 @@
+name: Validate Drive Reference Image Bridge
+
+on:
+  push:
+    paths:
+      - '.agents/plugins/marketplace.json'
+      - 'plugins/drive-reference-image-bridge/**'
+      - '.github/workflows/drive-reference-image-bridge.yml'
+  pull_request:
+    paths:
+      - '.agents/plugins/marketplace.json'
+      - 'plugins/drive-reference-image-bridge/**'
+      - '.github/workflows/drive-reference-image-bridge.yml'
+
+permissions:
+  contents: read
+
+jobs:
+  validate:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    defaults:
+      run:
+        working-directory: plugins/drive-reference-image-bridge
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - name: Install test dependencies
+        run: python -m pip install --disable-pip-version-check pillow pytest jsonschema
+      - name: Static package gate
+        run: python scripts/validate_plugin.py --repo-root ../..
+      - name: Unit and contract tests
+        run: pytest -q
+      - name: Validate blocked real-source receipt
+        run: python skills/drive-reference-image/scripts/validate_receipt.py validation/canonical-source-receipt.json

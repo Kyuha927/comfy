@@ -1,0 +1,20 @@
+{
+  "name": "kyuha-chat-production-plugins",
+  "interface": {
+    "displayName": "Kyuha Chat Production Plugins"
+  },
+  "plugins": [
+    {
+      "name": "drive-reference-image-bridge",
+      "source": {
+        "source": "local",
+        "path": "./plugins/drive-reference-image-bridge"
+      },
+      "policy": {
+        "installation": "AVAILABLE",
+        "authentication": "ON_INSTALL"
+      },
+      "category": "Productivity"
+    }
+  ]
+}
