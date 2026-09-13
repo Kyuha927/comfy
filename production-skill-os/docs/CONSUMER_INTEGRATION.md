@@ -46,7 +46,8 @@ receipt into success without terminal job state plus scene/pixel evidence.
 For new editable character builds, consumers must load
 `skills/blender-character-tripo-astra/SKILL.md` before choosing a Blender control path.
 
-First resolve the project-specific canon and image-edit policy. Then choose exactly one source strategy:
+First resolve the project-specific canon and image-edit policy. Then perform a character-specific
+preflight and choose exactly one source strategy:
 
 ```text
 DEDICATED_PART_REFERENCES
@@ -64,9 +65,11 @@ exact approved full-body multiview masters
 Both strategies continue through:
 
 ```text
-GPT-6 Astra Computer Use supervised Blender assembly
+Tripo candidate selection and geometry acceptance before texture commitment
+-> GPT-6 Astra Computer Use supervised Blender assembly
+-> optional recorded human manual correction when faster or safer
 -> Blender Bridge/MCP deterministic verification and exact edits
--> rig/deformation/expression checks
+-> rig/deformation/secondary-motion/expression checks
 -> fixed-camera render evidence
 -> checkpoint, fresh-process reopen, and rollback proof
 ```
@@ -74,8 +77,8 @@ GPT-6 Astra Computer Use supervised Blender assembly
 Use an execution path equivalent to one of:
 
 ```text
-approved-parts->tripo-p2->astra-computer-use->bridge-verify
-full-body-multiview->tripo-p2->part-aware-3d->astra-computer-use->bridge-verify
+approved-parts->tripo-p2->geometry-gate->astra-computer-use->bridge-verify
+full-body-multiview->tripo-p2->part-aware-3d->geometry-gate->astra-computer-use->bridge-verify
 ```
 
 The routing policy is user-directed and active for new character work. It is not a blanket quality
@@ -88,24 +91,53 @@ Mandatory consumer behavior:
 - use dedicated part generation only when complete approved part packets exist;
 - otherwise preserve the exact full-body multiview source and isolate parts in generated 3D space;
 - require front/left/right/back input for dedicated production hair candidates;
+- use a head soft-start budget near 2,000 to 5,000 polygons unless justified otherwise;
+- reject painted-flat eye regions and require recessed orbital structure plus independently addressable eyes and pupils/irises;
+- treat texture generation as a post-geometry acceptance transition and preserve rejected Tripo job IDs;
 - use Astra Computer Use as the primary interactive operator for visual assembly and supervised setup;
-- use Bridge/MCP as the secondary deterministic plane for inspection, exact operations, checkpointing,
-  rendered-pixel/state verification, rollback, and receipts;
-- do not silently revert to MCP-primary interaction, another provider, or a weaker model route;
+- use Bridge/MCP as the deterministic state-critical plane for inspection, exact operations, checkpointing, rendered-pixel/state verification, rollback, recovery, and receipts;
+- allow bounded human manual placement or repair when faster or safer, but record and independently verify it;
+- do not run the character build as one unattended prompt;
+- do not silently revert to MCP-primary creative interaction, another provider, or a weaker model route;
+- do not force destructive neck welding; separate aligned meshes may pass when required camera, shading, and deformation evidence passes;
+- use discrete expression-head mesh/state switching as the first stable fallback when shape-key correspondence is not proven;
+- declare every custom rigging or secondary-motion app, add-on, script, or template with exact version and artifact identity;
 - do not claim success from provider, model, or API receipts without geometry and pixel evidence;
 - require explicit user review before canon or final-lock promotion.
 
+The preflight receipt must include reference authority and hashes, image-edit policy, part-packet
+completeness, hair unseen-side risk, garment/accessory segmentation risk, polygon and rig targets,
+required expressions, secondary-motion needs, available Computer Use/Bridge/human lanes, declared
+helper dependencies, chosen route, rejected alternatives, blockers, and next gate.
+
 Character-route receipts should include the source strategy; approved reference hashes; applicable
 image-edit policy; dedicated part-input hashes or exact full-body multiview hashes; Tripo model/version,
-job IDs and export hashes; Generate in Parts or segmentation receipts when used; geometry-gate results;
-requested and actual Astra route and Computer Use availability; Blender version, object inventory,
-dimensions, revisions, job IDs, preview hashes, save/reopen proof, rollback proof, visible defects, and
-the next bounded correction.
+job IDs, rejected-candidate reasons, texture state and export hashes; Generate in Parts or segmentation
+receipts when used; geometry-gate results; requested and actual Astra route and Computer Use
+availability; any human manual edits; declared helper dependencies; Blender version, object inventory,
+dimensions, revisions, job IDs, preview hashes, neck strategy, expression strategy, save/reopen proof,
+rollback proof, visible defects, and the next bounded correction.
 
-If Tripo, Astra Computer Use, authoritative references, or required dedicated hair views are unavailable,
-report the exact blocker and continue only independent work. Do not conceal the missing lane by using
-Astra for zero-base modeling, editing a locked source without authority, or making Bridge/MCP the
-creative GUI operator.
+If Tripo, Astra Computer Use, authoritative references, required dedicated hair views, or declared
+helper dependencies are unavailable, report the exact blocker and continue only independent work. Do
+not conceal the missing lane by using Astra for zero-base modeling, editing a locked source without
+authority, silently changing provider/model, or making Bridge/MCP the creative GUI operator.
+
+## Merge-omission rejection
+
+A consumer integration or merge candidate must be rejected as incomplete if it preserves only the
+high-level `Tripo -> Astra -> Bridge` slogan while omitting any of the following operational gates:
+
+- source-gated part versus full-body route selection;
+- geometry-before-texture candidate selection;
+- hair four-view requirement;
+- recessed orbital and independently addressable eye geometry;
+- supervised non-one-shot assembly;
+- deterministic Bridge checkpoint/reopen/rollback evidence;
+- non-destructive neck-seam policy;
+- expression mesh switching fallback;
+- declared custom helper dependencies;
+- character-specific preflight and explicit user approval.
 
 ## Unity binding
 
