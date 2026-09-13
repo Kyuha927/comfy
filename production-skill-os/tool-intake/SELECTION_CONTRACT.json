@@ -1,5 +1,5 @@
 {
-  "schema_version": "1.1.2",
+  "schema_version": "1.1.3",
   "contract_id": "PSOS_CAPABILITY_SELECTION_CONTRACT_20260914",
   "status": "CANDIDATE_FAIL_CLOSED_CURRENT_AUTHORITY_BOUND",
   "registry_path": "production-skill-os/tool-intake/TOOL_CAPABILITY_REGISTRY.json",
@@ -7,11 +7,11 @@
   "authority": {
     "repository": "Kyuha927/lastline-echoes",
     "branch": "lin-aster-tripo-r01-20260913",
-    "branch_head_at_reconciliation": "82e85a5b615261b4d4cc892cce33095f09c1414e",
+    "branch_head_at_reconciliation": "fe792b86655ae6724c01065cd8b244c3d82fb76b",
     "ssot_path": "work/handovers/2026-09-13/00_READ_FIRST_LIN_ASTER_3D_ROUTE.md",
-    "ssot_blob_sha": "38f381153b470645caa885567cd504ed4a72a359",
+    "ssot_blob_sha": "090130fae6b1e0d35222bc7d450262a5d03d2555",
     "live_state_path": "work/handovers/2026-09-13/LIN_ASTER_3D_LIVE_STATE.json",
-    "live_state_blob_sha": "7ba31106934b7edd4663de5d141a97f709e646a4",
+    "live_state_blob_sha": "fa20ad41e1c8ec5df81d06e7a927e2428049f4d7",
     "production_control_path": "work/handovers/2026-09-13/LIN_ASTER_3D_PRODUCTION_CONTROL_CURRENT.md",
     "production_control_policy_id": "LIN_ASTER_3D_PRODUCTION_CONTROL_V1_2",
     "final_lock_authority": "USER_ONLY",
@@ -20,54 +20,20 @@
   },
   "scopes": {
     "GENERIC_PRODUCTION": {
-      "allowed_statuses": [
-        "ABSORBED_GENERIC",
-        "VERIFIED_FOR_LIN_3D"
-      ],
-      "requirements": [
-        "exact_version_match",
-        "registry_valid",
-        "scope_explicitly_authorized"
-      ],
+      "allowed_statuses": ["ABSORBED_GENERIC", "VERIFIED_FOR_LIN_3D"],
+      "requirements": ["exact_version_match", "registry_valid", "scope_explicitly_authorized"],
       "production_3d_mutation_allowed": false,
       "canon_promotion_allowed": false
     },
     "LIN_3D_VALIDATION": {
-      "allowed_statuses": [
-        "REVIEWED",
-        "TEST_REQUIRED",
-        "ISOLATED_PASS",
-        "LIN_3D_TEST_REQUIRED"
-      ],
-      "requirements": [
-        "exact_version_match",
-        "registry_valid",
-        "scope_explicitly_authorized",
-        "isolated_workspace",
-        "no_production_mutation",
-        "no_canon_mutation",
-        "current_lin_authority_head_match"
-      ],
+      "allowed_statuses": ["REVIEWED", "TEST_REQUIRED", "ISOLATED_PASS", "LIN_3D_TEST_REQUIRED"],
+      "requirements": ["exact_version_match", "registry_valid", "scope_explicitly_authorized", "isolated_workspace", "no_production_mutation", "no_canon_mutation", "current_lin_authority_head_match"],
       "production_3d_mutation_allowed": false,
       "canon_promotion_allowed": false
     },
     "LIN_3D_FINAL": {
-      "allowed_statuses": [
-        "VERIFIED_FOR_LIN_3D"
-      ],
-      "requirements": [
-        "exact_version_match",
-        "registry_valid",
-        "scope_explicitly_authorized",
-        "evidence_level_L8",
-        "same_path_pass",
-        "same_environment_receipts",
-        "nonempty_artifact_ids",
-        "regression_pass",
-        "rollback_proven",
-        "current_lin_authority_head_match",
-        "user_review_still_required"
-      ],
+      "allowed_statuses": ["VERIFIED_FOR_LIN_3D"],
+      "requirements": ["exact_version_match", "registry_valid", "scope_explicitly_authorized", "evidence_level_L8", "same_path_pass", "same_environment_receipts", "nonempty_artifact_ids", "regression_pass", "rollback_proven", "current_lin_authority_head_match", "user_review_still_required"],
       "production_3d_mutation_allowed": true,
       "canon_promotion_allowed": false
     }
