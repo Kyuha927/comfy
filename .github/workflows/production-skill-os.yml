@@ -4,10 +4,12 @@ on:
   push:
     paths:
       - 'production-skill-os/**'
+      - 'releases/work-handoffs/2026-09-13-v5/BLENDER_CONTROL_PLANE_CONTINUE_NO_CANON_MERGE.md'
       - '.github/workflows/production-skill-os.yml'
   pull_request:
     paths:
       - 'production-skill-os/**'
+      - 'releases/work-handoffs/2026-09-13-v5/BLENDER_CONTROL_PLANE_CONTINUE_NO_CANON_MERGE.md'
       - '.github/workflows/production-skill-os.yml'
   workflow_dispatch:
 
