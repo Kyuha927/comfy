@@ -46,24 +46,36 @@ receipt into success without terminal job state plus scene/pixel evidence.
 For new editable character builds, consumers must load
 `skills/blender-character-tripo-astra/SKILL.md` before choosing a Blender control path.
 
-The default production path is:
+First resolve the project-specific canon and image-edit policy. Then choose exactly one source strategy:
 
 ```text
-approved references
--> split HEAD / HAIR / BODY_CLOTHING
+DEDICATED_PART_REFERENCES
+approved HEAD / HAIR / BODY_CLOTHING packets
 -> Tripo Smart Mesh P2.0 part generation
 -> per-part geometry gate
--> GPT-6 Astra Computer Use supervised Blender assembly
+
+FULL_BODY_MULTIVIEW_PART_AWARE
+exact approved full-body multiview masters
+-> Tripo Smart Mesh P2.0 full-body generation
+-> Generate in Parts or copied-candidate 3D segmentation
+-> logical part geometry gate
+```
+
+Both strategies continue through:
+
+```text
+GPT-6 Astra Computer Use supervised Blender assembly
 -> Blender Bridge/MCP deterministic verification and exact edits
 -> rig/deformation/expression checks
 -> fixed-camera render evidence
 -> checkpoint, fresh-process reopen, and rollback proof
 ```
 
-Use an execution path equivalent to:
+Use an execution path equivalent to one of:
 
 ```text
-reference-split->tripo-p2->astra-computer-use->bridge-verify
+approved-parts->tripo-p2->astra-computer-use->bridge-verify
+full-body-multiview->tripo-p2->part-aware-3d->astra-computer-use->bridge-verify
 ```
 
 The routing policy is user-directed and active for new character work. It is not a blanket quality
@@ -72,7 +84,10 @@ claim about any provider result. Reusable repair claims still require the six ev
 Mandatory consumer behavior:
 
 - do not route zero-base character modeling to Astra when usable Tripo generation is available;
-- require front/left/right/back input for production hair candidates;
+- do not crop, redraw, inpaint, recolor, retouch, or otherwise edit a locked reference unless the exact task authorizes that derivative operation;
+- use dedicated part generation only when complete approved part packets exist;
+- otherwise preserve the exact full-body multiview source and isolate parts in generated 3D space;
+- require front/left/right/back input for dedicated production hair candidates;
 - use Astra Computer Use as the primary interactive operator for visual assembly and supervised setup;
 - use Bridge/MCP as the secondary deterministic plane for inspection, exact operations, checkpointing,
   rendered-pixel/state verification, rollback, and receipts;
@@ -80,14 +95,17 @@ Mandatory consumer behavior:
 - do not claim success from provider, model, or API receipts without geometry and pixel evidence;
 - require explicit user review before canon or final-lock promotion.
 
-Character-route receipts should include approved reference hashes; derived part-input hashes; Tripo
-model/version/job IDs and export hashes; geometry-gate results; requested and actual Astra route and
-Computer Use availability; Blender version, object inventory, dimensions, revisions, job IDs, preview
-hashes, save/reopen proof, rollback proof, visible defects, and the next bounded correction.
+Character-route receipts should include the source strategy; approved reference hashes; applicable
+image-edit policy; dedicated part-input hashes or exact full-body multiview hashes; Tripo model/version,
+job IDs and export hashes; Generate in Parts or segmentation receipts when used; geometry-gate results;
+requested and actual Astra route and Computer Use availability; Blender version, object inventory,
+dimensions, revisions, job IDs, preview hashes, save/reopen proof, rollback proof, visible defects, and
+the next bounded correction.
 
-If Tripo, Astra Computer Use, authoritative references, or required hair views are unavailable, report
-the exact blocker and continue only independent work. Do not conceal the missing lane by using Astra
-for zero-base modeling or by making Bridge/MCP the creative GUI operator.
+If Tripo, Astra Computer Use, authoritative references, or required dedicated hair views are unavailable,
+report the exact blocker and continue only independent work. Do not conceal the missing lane by using
+Astra for zero-base modeling, editing a locked source without authority, or making Bridge/MCP the
+creative GUI operator.
 
 ## Unity binding
 
