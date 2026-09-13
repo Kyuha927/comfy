@@ -5,6 +5,13 @@ ROOT = Path(__file__).resolve().parents[1]
 SKILL = ROOT / "skills" / "blender-character-tripo-astra" / "SKILL.md"
 README = ROOT / "README.md"
 CONSUMER = ROOT / "docs" / "CONSUMER_INTEGRATION.md"
+HANDOFF = (
+    ROOT.parent
+    / "releases"
+    / "work-handoffs"
+    / "2026-09-13-v5"
+    / "BLENDER_CONTROL_PLANE_CONTINUE_NO_CANON_MERGE.md"
+)
 
 
 class BlenderCharacterRoutePolicyTests(unittest.TestCase):
@@ -77,6 +84,18 @@ class BlenderCharacterRoutePolicyTests(unittest.TestCase):
         self.assertIn("treat texture generation as a post-geometry acceptance transition", consumer)
         self.assertIn("do not force destructive neck welding", consumer)
         self.assertIn("Merge-omission rejection", consumer)
+
+    def test_safe_continuation_handoff_exists_and_cannot_claim_canon(self):
+        text = HANDOFF.read_text(encoding="utf-8")
+        self.assertIn("HANDOFF_ID=BLENDER_CONTROL_PLANE_CONTINUE_NO_CANON_MERGE_V1", text)
+        self.assertIn("TRIPO_FIRST=REQUIRED_WHEN_AUTHORIZED_AND_USABLE", text)
+        self.assertIn("ASTRA_ZERO_BASE_CHARACTER_MODELING=FORBIDDEN", text)
+        self.assertIn("VISUAL_INTERACTIVE_PRIMARY=GPT6_ASTRA_COMPUTER_USE", text)
+        self.assertIn("DETERMINISTIC_STATE_CRITICAL_PRIMARY=BLENDER_BRIDGE_MCP_OR_REVIEWED_SCRIPT", text)
+        self.assertIn("70948cc8e2f34d23d317d7fd798c6a2aa9de41d8", text)
+        self.assertIn("AUTO_MERGE=false", text)
+        self.assertIn("AUTO_CANON_PROMOTION=false", text)
+        self.assertIn("READY_FOR_USER_REVIEW", text)
 
 
 if __name__ == "__main__":
