@@ -82,7 +82,8 @@ jobs:
           python -m pytest -q plugins/drive-reference-image-bridge/tests
           python plugins/drive-reference-image-bridge/skills/drive-reference-image/scripts/validate_receipt.py plugins/drive-reference-image-bridge/validation/canonical-source-receipt.json
           python -m compileall -q plugins/drive-reference-image-bridge
-          rm -rf '.github/bootstrap' '.github/workflows/bootstrap-drive-reference-image-bridge.yml'
+          rm -rf '.github/bootstrap'
+          rm -f '.github/workflows/drive-reference-image-bridge.yml'
       - name: Commit verified production source
         shell: bash
         run: |
