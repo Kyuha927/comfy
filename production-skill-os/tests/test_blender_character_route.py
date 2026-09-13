@@ -10,7 +10,7 @@ CONSUMER = ROOT / "docs" / "CONSUMER_INTEGRATION.md"
 class BlenderCharacterRoutePolicyTests(unittest.TestCase):
     def test_skill_exists_and_pins_primary_route(self):
         text = SKILL.read_text(encoding="utf-8")
-        self.assertIn("Tripo Smart Mesh P2.0", text)
+        self.assertIn("Smart Mesh P2.0", text)
         self.assertIn("GPT-6 Astra Computer Use is the primary interactive Blender path", text)
         self.assertIn("Blender Bridge/MCP is the deterministic state-critical plane", text)
         self.assertIn("Do not ask GPT-6 Astra to create the character mesh from zero", text)
