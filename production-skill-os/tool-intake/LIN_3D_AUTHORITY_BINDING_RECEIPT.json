@@ -1,5 +1,5 @@
 {
-  "schema_version": "1.1.0",
+  "schema_version": "1.1.1",
   "receipt_id": "PSOS_LIN_3D_AUTHORITY_BINDING_20260914",
   "status": "CURRENT_AUTHORITY_BOUND_FAIL_CLOSED",
   "binding_commit_identity": "GIT_COMMIT_CONTAINING_THIS_RECEIPT",
@@ -9,9 +9,9 @@
   "lin_authority": {
     "repository": "Kyuha927/lastline-echoes",
     "branch": "lin-aster-tripo-r01-20260913",
-    "commit": "9cbf3a21f1693029b70aa4cbbe6b3d5b392acf56",
-    "ssot_blob_sha": "04281cb0c5450bc62887ea37b88709ad8f95f9b8",
-    "live_state_blob_sha": "5171dc328f99b8a99a1c194d2637cefb53534b3d",
+    "commit": "fe792b86655ae6724c01065cd8b244c3d82fb76b",
+    "ssot_blob_sha": "090130fae6b1e0d35222bc7d450262a5d03d2555",
+    "live_state_blob_sha": "fa20ad41e1c8ec5df81d06e7a927e2428049f4d7",
     "gate_id": "LIN_ASTER_3D_TOOL_CAPABILITY_GATE_V1"
   },
   "authority_design": {
