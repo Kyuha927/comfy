@@ -1,0 +1,36 @@
+{
+  "name": "drive-reference-image-bridge",
+  "version": "0.1.0",
+  "description": "Use an exact Google Drive image as a reference for ChatGPT native image generation in an ordinary Chat, without the OpenAI Image API.",
+  "author": {
+    "name": "Kyuha927",
+    "url": "https://github.com/Kyuha927"
+  },
+  "homepage": "https://github.com/Kyuha927/comfy/tree/drive-reference-image-bridge-native-chat-20260914/plugins/drive-reference-image-bridge",
+  "repository": "https://github.com/Kyuha927/comfy",
+  "license": "MIT",
+  "keywords": [
+    "google-drive",
+    "reference-image",
+    "chatgpt-images",
+    "native-image-generation",
+    "no-api"
+  ],
+  "skills": "./skills/",
+  "interface": {
+    "displayName": "Drive Reference Image Bridge",
+    "shortDescription": "Drive image to native ChatGPT image generation",
+    "longDescription": "Resolve an exact Google Drive image, verify its original bytes, bind it as the current Chat reference image, and invoke ChatGPT native image generation. External image APIs are prohibited.",
+    "developerName": "Kyuha927",
+    "category": "Productivity",
+    "capabilities": ["Read"],
+    "websiteURL": "https://github.com/Kyuha927/comfy/tree/drive-reference-image-bridge-native-chat-20260914/plugins/drive-reference-image-bridge",
+    "privacyPolicyURL": "https://github.com/Kyuha927/comfy/blob/drive-reference-image-bridge-native-chat-20260914/plugins/drive-reference-image-bridge/PRIVACY.md",
+    "termsOfServiceURL": "https://github.com/Kyuha927/comfy/blob/drive-reference-image-bridge-native-chat-20260914/plugins/drive-reference-image-bridge/TERMS.md",
+    "defaultPrompt": [
+      "Use an exact image from my Google Drive as the primary reference and generate a new image with ChatGPT native image generation.",
+      "드라이브의 정확한 이미지 정본을 참조해서 일반 챗의 이미지 생성 기능으로 새 이미지를 생성해."
+    ],
+    "brandColor": "#315C72"
+  }
+}

@@ -1,0 +1,97 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://github.com/Kyuha927/comfy/drive-reference-image-receipt.schema.json",
+  "title": "Drive Reference Image Bridge receipt",
+  "type": "object",
+  "required": [
+    "schema_version",
+    "status",
+    "surface",
+    "source",
+    "integrity",
+    "reference_bind",
+    "native_generation",
+    "security"
+  ],
+  "properties": {
+    "schema_version": {"const": "1.0"},
+    "status": {
+      "type": "string",
+      "pattern": "^(PASS_NATIVE|BLOCKED_[A-Z0-9_]+)$"
+    },
+    "error_code": {
+      "type": ["string", "null"],
+      "pattern": "^BLOCKED_[A-Z0-9_]+$"
+    },
+    "surface": {
+      "type": "object",
+      "required": ["kind", "native_image_generation_available"],
+      "properties": {
+        "kind": {"enum": ["CHAT", "WORK", "OTHER"]},
+        "native_image_generation_available": {"type": "boolean"}
+      },
+      "additionalProperties": false
+    },
+    "source": {
+      "type": "object",
+      "required": ["provider", "file_id", "file_name", "mime_type", "size_bytes", "width", "height", "exact_match", "raw_fetch"],
+      "properties": {
+        "provider": {"const": "google-drive"},
+        "file_id": {"type": "string", "minLength": 1},
+        "file_name": {"type": "string", "minLength": 1},
+        "mime_type": {"enum": ["image/png", "image/jpeg", "image/webp"]},
+        "size_bytes": {"type": "integer", "minimum": 1, "maximum": 20971520},
+        "width": {"type": "integer", "minimum": 32, "maximum": 8192},
+        "height": {"type": "integer", "minimum": 32, "maximum": 8192},
+        "exact_match": {"type": "boolean"},
+        "raw_fetch": {"type": "boolean"}
+      },
+      "additionalProperties": false
+    },
+    "integrity": {
+      "type": "object",
+      "required": ["verification_available", "verified", "sha256_before_bind", "sha256_after_fetch"],
+      "properties": {
+        "verification_available": {"type": "boolean"},
+        "verified": {"type": "boolean"},
+        "sha256_after_fetch": {"type": ["string", "null"], "pattern": "^[a-f0-9]{64}$"},
+        "sha256_before_bind": {"type": ["string", "null"], "pattern": "^[a-f0-9]{64}$"}
+      },
+      "additionalProperties": false
+    },
+    "reference_bind": {
+      "type": "object",
+      "required": ["bound", "evidence_id"],
+      "properties": {
+        "bound": {"type": "boolean"},
+        "evidence_id": {"type": ["string", "null"]}
+      },
+      "additionalProperties": false
+    },
+    "native_generation": {
+      "type": "object",
+      "required": ["generator", "invoked", "reference_count", "result_inline", "external_api_calls", "api_fallback_used"],
+      "properties": {
+        "generator": {"enum": ["chatgpt-native-image-generation", "none"]},
+        "invoked": {"type": "boolean"},
+        "reference_count": {"type": "integer", "minimum": 0},
+        "result_inline": {"type": "boolean"},
+        "external_api_calls": {"type": "integer", "minimum": 0},
+        "api_fallback_used": {"type": "boolean"}
+      },
+      "additionalProperties": false
+    },
+    "security": {
+      "type": "object",
+      "required": ["drive_write_calls", "sharing_changes", "secrets_exposed", "raw_pixels_logged"],
+      "properties": {
+        "drive_write_calls": {"type": "integer", "minimum": 0},
+        "sharing_changes": {"type": "integer", "minimum": 0},
+        "secrets_exposed": {"type": "boolean"},
+        "raw_pixels_logged": {"type": "boolean"}
+      },
+      "additionalProperties": false
+    }
+  },
+  "additionalProperties": false
+}

@@ -1,0 +1,8 @@
+{"id":"direct_exact_name_ko","should_activate":true,"prompt":"드라이브의 02_LEFT_SIDE_TPOSE_CANONICAL_LOCKED.png를 주 참조로 사용해서 오른쪽 측면 T포즈를 생성해. 얼굴과 의상을 유지해."}
+{"id":"direct_url_en","should_activate":true,"prompt":"Use this Google Drive image as the primary reference and generate a rear turnaround: https://drive.google.com/file/d/FILE_ID/view"}
+{"id":"indirect_canon_ko","should_activate":true,"prompt":"내 드라이브에 있는 LIN 좌측 정본을 참고해서 반대 측면 만들어."}
+{"id":"ambiguous_name","should_activate":true,"expected_error":"BLOCKED_DRIVE_IMAGE_AMBIGUOUS","prompt":"Use character.png from Drive as reference."}
+{"id":"missing","should_activate":true,"expected_error":"BLOCKED_DRIVE_IMAGE_NOT_FOUND","prompt":"Use definitely-does-not-exist-9f81.png from Drive and generate a portrait."}
+{"id":"generic_generation","should_activate":false,"prompt":"Generate a watercolor landscape."}
+{"id":"drive_organization","should_activate":false,"prompt":"Move all PNG files in Drive to an archive folder."}
+{"id":"api_request","should_activate":false,"prompt":"Write Python code that calls the OpenAI Images API."}

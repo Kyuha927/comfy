@@ -1,0 +1,13 @@
+{
+  "probe": {
+    "bytes_modified": false,
+    "file_name": "02_LEFT_SIDE_TPOSE_CANONICAL_LOCKED.png",
+    "height": 1536,
+    "mime_type": "image/png",
+    "mode": "RGB",
+    "sha256": "99c36237f3b84d98d674ded2f95a8c137096f0b6fea1875da189e7254e7276ee",
+    "size_bytes": 1469732,
+    "width": 1024
+  },
+  "status": "PASS"
+}
