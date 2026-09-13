@@ -15,9 +15,11 @@ class BlenderCharacterRoutePolicyTests(unittest.TestCase):
         self.assertIn("Blender Bridge/MCP is the secondary deterministic plane", text)
         self.assertIn("Do not ask GPT-6 Astra to create the character mesh from zero", text)
 
-    def test_hair_multiview_and_part_split_are_mandatory(self):
+    def test_source_gated_part_strategy_and_hair_multiview_are_mandatory(self):
         text = SKILL.read_text(encoding="utf-8")
-        self.assertIn("HEAD`, `HAIR`, and `BODY_CLOTHING", text)
+        self.assertIn("DEDICATED_PART_REFERENCES", text)
+        self.assertIn("FULL_BODY_MULTIVIEW_PART_AWARE", text)
+        self.assertIn("Do not crop, mask, redraw, retouch, recolor, inpaint", text)
         self.assertIn("front, left, right, and back", text)
         self.assertIn("A single-view hair result is provisional", text)
 
@@ -32,7 +34,11 @@ class BlenderCharacterRoutePolicyTests(unittest.TestCase):
         readme = README.read_text(encoding="utf-8")
         consumer = CONSUMER.read_text(encoding="utf-8")
         self.assertIn("blender-character-tripo-astra/SKILL.md", readme)
-        self.assertIn("reference-split->tripo-p2->astra-computer-use->bridge-verify", consumer)
+        self.assertIn("approved-parts->tripo-p2->astra-computer-use->bridge-verify", consumer)
+        self.assertIn(
+            "full-body-multiview->tripo-p2->part-aware-3d->astra-computer-use->bridge-verify",
+            consumer,
+        )
         self.assertIn("do not route zero-base character modeling to Astra", consumer)
 
 
