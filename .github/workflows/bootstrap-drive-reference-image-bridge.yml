@@ -1,0 +1,41 @@
+name: Bootstrap Drive Reference Image Bridge
+
+on:
+  push:
+    branches:
+      - drive-reference-image-bridge-native-chat-20260914
+    paths:
+      - '.github/bootstrap/drive-reference-image-bridge-source.tar.gz.b64'
+      - '.github/workflows/bootstrap-drive-reference-image-bridge.yml'
+
+permissions:
+  contents: write
+
+jobs:
+  expand-source:
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+      - name: Verify and expand source bundle
+        shell: bash
+        run: |
+          set -euo pipefail
+          BUNDLE='.github/bootstrap/drive-reference-image-bridge-source.tar.gz.b64'
+          ARCHIVE="$RUNNER_TEMP/drive-reference-image-bridge-source.tar.gz"
+          base64 --decode "$BUNDLE" > "$ARCHIVE"
+          echo 'a88ce8363e59124a85c91aa0c330afde2421711f18a8f4413590f1efbc4151b3  '"$ARCHIVE" | sha256sum --check --strict
+          tar -xzf "$ARCHIVE" -C .
+          rm -f "$BUNDLE" '.github/workflows/bootstrap-drive-reference-image-bridge.yml'
+      - name: Commit expanded production source
+        shell: bash
+        run: |
+          set -euo pipefail
+          git config user.name 'github-actions[bot]'
+          git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
+          git add --all
+          git diff --cached --check
+          git commit -m 'feat: add native Chat Drive reference image plugin'
+          git push origin "HEAD:${GITHUB_REF_NAME}"
