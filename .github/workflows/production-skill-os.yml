@@ -1,4 +1,4 @@
-name: Verify Production Skill OS
+name: Verify Production Skill OS Capability Gate
 
 on:
   push:
@@ -16,18 +16,97 @@ on:
 permissions:
   contents: read
 
+concurrency:
+  group: production-skill-os-${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
 jobs:
-  test:
+  capability-gate:
     runs-on: ubuntu-latest
-    timeout-minutes: 5
+    timeout-minutes: 10
     steps:
       - name: Checkout
         uses: actions/checkout@v4
+        with:
+          fetch-depth: 2
+
       - name: Set up Python
         uses: actions/setup-python@v5
         with:
           python-version: '3.12'
-      - name: Validate catalog
+
+      - name: Validate skill catalog
         run: python production-skill-os/router/skill_router.py validate
-      - name: Run standard-library regression suite
+
+      - name: Validate capability registry and selection contract
+        run: python production-skill-os/router/capability_guard.py validate
+
+      - name: Prove unverified LIN capability is denied from final path
+        shell: bash
+        run: |
+          set -euo pipefail
+          LIN_HEAD=$(python - <<'PY'
+          import json
+          from pathlib import Path
+          print(json.loads(Path('production-skill-os/tool-intake/SELECTION_CONTRACT.json').read_text())['authority']['branch_head_at_reconciliation'])
+          PY
+          )
+          set +e
+          python production-skill-os/adapters/authorize_capability.py \
+            --capability-id cap.tripo.h31.head_component_ultra \
+            --version v3.1-20260211 \
+            --scope LIN_3D_FINAL \
+            --lin-authority-head "$LIN_HEAD" > /tmp/lin-final-deny.json
+          code=$?
+          set -e
+          test "$code" -eq 2
+          grep -q 'BLOCKED_CAPABILITY_NOT_VERIFIED_FOR_LIN_3D' /tmp/lin-final-deny.json
+
+      - name: Prove isolated LIN validation is bounded and non-production
+        shell: bash
+        run: |
+          set -euo pipefail
+          LIN_HEAD=$(python - <<'PY'
+          import json
+          from pathlib import Path
+          print(json.loads(Path('production-skill-os/tool-intake/SELECTION_CONTRACT.json').read_text())['authority']['branch_head_at_reconciliation'])
+          PY
+          )
+          python production-skill-os/adapters/authorize_capability.py \
+            --capability-id cap.tripo.h31.head_component_ultra \
+            --version v3.1-20260211 \
+            --scope LIN_3D_VALIDATION \
+            --lin-authority-head "$LIN_HEAD" \
+            --isolated-workspace \
+            --no-production-mutation \
+            --no-canon-mutation > /tmp/lin-validation-allow.json
+          grep -q 'CAPABILITY_AUTHORIZED' /tmp/lin-validation-allow.json
+          grep -q '"production_3d_mutation_allowed": false' /tmp/lin-validation-allow.json
+          grep -q '"canon_promotion_allowed": false' /tmp/lin-validation-allow.json
+
+      - name: Prove exact-version generic guard authorization
+        run: |
+          python production-skill-os/adapters/authorize_capability.py \
+            --capability-id cap.production_skill_os.fail_closed_selection \
+            --version 1.0.0-candidate.20260914 \
+            --scope GENERIC_PRODUCTION > /tmp/generic-guard-allow.json
+          grep -q 'CAPABILITY_AUTHORIZED' /tmp/generic-guard-allow.json
+          grep -q '"canon_promotion_allowed": false' /tmp/generic-guard-allow.json
+
+      - name: Run complete standard-library regression suite
         run: python -m unittest discover -s production-skill-os/tests -v
+
+      - name: Compile executable gate surfaces
+        run: python -m compileall -q production-skill-os/router production-skill-os/adapters production-skill-os/tests
+
+      - name: Reject whitespace defects in the candidate commit
+        shell: bash
+        run: |
+          if git rev-parse HEAD^ >/dev/null 2>&1; then
+            git diff --check HEAD^ HEAD
+          else
+            git diff --check
+          fi
+
+      - name: Confirm bootstrap workflow is absent
+        run: test ! -e .github/workflows/capability-bootstrap.yml
