@@ -1,0 +1,27 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "title": "Production Skill OS evidence event",
+  "type": "object",
+  "required": [
+    "event_id",
+    "record_id",
+    "gate",
+    "outcome",
+    "environment",
+    "execution_path",
+    "receipt",
+    "observed_at"
+  ],
+  "properties": {
+    "event_id": {"type": "string", "minLength": 1},
+    "record_id": {"type": "string", "minLength": 1},
+    "gate": {"enum": ["reproduction", "repair", "same_path_verification", "rollback", "regression", "receipt"]},
+    "outcome": {"enum": ["pass", "fail"]},
+    "environment": {"type": "string", "minLength": 1},
+    "execution_path": {"type": "string", "minLength": 1},
+    "receipt": {"type": "string", "minLength": 1},
+    "observed_at": {"type": "string", "format": "date-time"},
+    "notes": {"type": "string"}
+  },
+  "additionalProperties": true
+}
