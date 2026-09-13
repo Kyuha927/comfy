@@ -1,0 +1,37 @@
+{
+  "candidate": "webgpt-browser-control-plane",
+  "version": "0.1.0a2",
+  "status": "CONDITIONAL_OFFLINE_PASS_PRODUCTION_BLOCKED",
+  "production_ready": false,
+  "production_promotion_granted": false,
+  "design_checkpoint_date": "2026-09-14",
+  "verified": {
+    "official_route_reconciliation": "PASS_DESIGN_ONLY",
+    "policy_core": "PASS_OFFLINE_ONLY",
+    "finite_permits": "PASS_OFFLINE_ONLY",
+    "atomic_permit_approval_consumption": "PASS_OFFLINE_ONLY",
+    "durable_job_state_machine": "PASS_OFFLINE_ONLY",
+    "concurrency_invariants": "PASS_OFFLINE_ONLY",
+    "ssrf_and_redirect_policy": "PASS_OFFLINE_ONLY",
+    "prompt_injection_boundary": "PASS_OFFLINE_ONLY",
+    "secret_redaction_and_evidence_chain": "PASS_OFFLINE_ONLY",
+    "real_chromium_dom_pixel_trace": "PASS_OFFLINE_ONLY",
+    "r3_requires_dom_pixel_network": "PASS_OFFLINE_ONLY"
+  },
+  "blocked_or_not_run": {
+    "live_browser_network_navigation_in_validation_container": "BLOCKED_BY_BROWSER_ADMIN_POLICY_URLBLOCKLIST_ALL",
+    "chatgpt_browser_tool_roundtrip": "NOT_RUN",
+    "eligible_write_capable_chatgpt_custom_app": "NOT_RUN",
+    "secure_mcp_tunnel": "NOT_RUN",
+    "mcp_transport": "CONTRACT_ONLY",
+    "target_mac_real_site_e2e": "NOT_RUN",
+    "existing_chrome_profile_route": "NOT_RUN",
+    "production_identity_key_management_rbac": "NOT_RUN",
+    "external_evidence_anchoring": "NOT_RUN",
+    "otel_observability": "NOT_RUN",
+    "asvs_mapping_and_penetration_test": "NOT_RUN",
+    "crash_reboot_partition_soak_upgrade": "NOT_RUN",
+    "independent_release_review": "NOT_RUN"
+  },
+  "hard_rule": "No blocked, not-run, unknown, design-only, or offline-only gate may be presented as a production pass."
+}
