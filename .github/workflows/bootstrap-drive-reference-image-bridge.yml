@@ -6,6 +6,7 @@ on:
       - drive-reference-image-bridge-native-chat-20260914
     paths:
       - '.github/bootstrap/drive-reference-image-bridge-source.tar.gz.b64'
+      - '.github/bootstrap/drive-reference-image-bridge-source.manifest.sha256'
       - '.github/workflows/bootstrap-drive-reference-image-bridge.yml'
 
 permissions:
@@ -24,11 +25,15 @@ jobs:
         run: |
           set -euo pipefail
           BUNDLE='.github/bootstrap/drive-reference-image-bridge-source.tar.gz.b64'
+          MANIFEST='.github/bootstrap/drive-reference-image-bridge-source.manifest.sha256'
           ARCHIVE="$RUNNER_TEMP/drive-reference-image-bridge-source.tar.gz"
           base64 --decode "$BUNDLE" > "$ARCHIVE"
-          echo 'a88ce8363e59124a85c91aa0c330afde2421711f18a8f4413590f1efbc4151b3  '"$ARCHIVE" | sha256sum --check --strict
+          gzip --test "$ARCHIVE"
           tar -xzf "$ARCHIVE" -C .
-          rm -f "$BUNDLE" '.github/workflows/bootstrap-drive-reference-image-bridge.yml'
+          test "$(wc -l < "$MANIFEST")" -eq 27
+          sha256sum --check --strict "$MANIFEST"
+          sha256sum "$ARCHIVE"
+          rm -f "$BUNDLE" "$MANIFEST" '.github/workflows/bootstrap-drive-reference-image-bridge.yml'
       - name: Commit expanded production source
         shell: bash
         run: |
