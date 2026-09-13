@@ -6,7 +6,7 @@
   "repository": "Kyuha927/lastline-echoes",
   "branch": "lin-aster-tripo-r01-20260913",
   "head_sha": "e1b02b1773366677a543d764bd68638e13da1a27",
-  "parent_sha": "6211d63a1a91a896e496483584b67592a6d430c7",
+  "parent_sha": "e1b02b1773366677a543d764bd68638e13da1a27",
   "tree_sha": "55892f3c826937f285b9a5eea625b139e122e483",
   "commit_message": "validation: publish strict GPT-5.6 XHigh harness evidence and CI boundary",
   "branch_api_url": "https://api.github.com/repos/Kyuha927/lastline-echoes/branches/lin-aster-tripo-r01-20260913",

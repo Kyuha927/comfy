@@ -1,0 +1,96 @@
+{
+  "schema_version": "1.0.0",
+  "contract_id": "PSOS_CAPABILITY_SELECTION_CONTRACT_20260914",
+  "status": "CANDIDATE_FAIL_CLOSED",
+  "registry_path": "production-skill-os/tool-intake/TOOL_CAPABILITY_REGISTRY.json",
+  "authority": {
+    "repository": "Kyuha927/lastline-echoes",
+    "branch": "lin-aster-tripo-r01-20260913",
+    "branch_head_at_reconciliation": "e1b02b1773366677a543d764bd68638e13da1a27",
+    "ssot_path": "work/handovers/2026-09-13/00_READ_FIRST_LIN_ASTER_3D_ROUTE.md",
+    "ssot_blob_sha": "612fd6347f7d203f9b6d8a3737a72bbaf7a6f0fe",
+    "live_state_path": "work/handovers/2026-09-13/LIN_ASTER_3D_LIVE_STATE.json",
+    "live_state_blob_sha": "f44c283bd5c02a1a8e8b3adf7785c867d78b0c2f",
+    "production_control_path": "work/handovers/2026-09-13/LIN_ASTER_3D_PRODUCTION_CONTROL_CURRENT.md",
+    "production_control_policy_id": "LIN_ASTER_3D_PRODUCTION_CONTROL_V1_2",
+    "final_lock_authority": "USER_ONLY",
+    "auto_merge": false,
+    "auto_canon": false
+  },
+  "scopes": {
+    "GENERIC_PRODUCTION": {
+      "allowed_statuses": [
+        "ABSORBED_GENERIC",
+        "VERIFIED_FOR_LIN_3D"
+      ],
+      "requirements": [
+        "exact_version_match",
+        "registry_valid",
+        "scope_explicitly_authorized"
+      ],
+      "production_3d_mutation_allowed": false,
+      "canon_promotion_allowed": false
+    },
+    "LIN_3D_VALIDATION": {
+      "allowed_statuses": [
+        "REVIEWED",
+        "TEST_REQUIRED",
+        "ISOLATED_PASS",
+        "LIN_3D_TEST_REQUIRED"
+      ],
+      "requirements": [
+        "exact_version_match",
+        "registry_valid",
+        "scope_explicitly_authorized",
+        "isolated_workspace",
+        "no_production_mutation",
+        "no_canon_mutation",
+        "current_lin_authority_head_match"
+      ],
+      "production_3d_mutation_allowed": false,
+      "canon_promotion_allowed": false
+    },
+    "LIN_3D_FINAL": {
+      "allowed_statuses": [
+        "VERIFIED_FOR_LIN_3D"
+      ],
+      "requirements": [
+        "exact_version_match",
+        "registry_valid",
+        "scope_explicitly_authorized",
+        "evidence_level_L8",
+        "same_path_pass",
+        "same_environment_receipts",
+        "nonempty_artifact_ids",
+        "regression_pass",
+        "rollback_proven",
+        "current_lin_authority_head_match",
+        "user_review_still_required"
+      ],
+      "production_3d_mutation_allowed": true,
+      "canon_promotion_allowed": false
+    }
+  },
+  "block_codes": [
+    "BLOCKED_REGISTRY_INVALID",
+    "BLOCKED_CAPABILITY_UNKNOWN",
+    "BLOCKED_CAPABILITY_STATUS",
+    "BLOCKED_CAPABILITY_SCOPE",
+    "BLOCKED_VERSION_MISMATCH",
+    "BLOCKED_STALE_LIN_AUTHORITY",
+    "BLOCKED_CAPABILITY_NOT_VERIFIED_FOR_LIN_3D",
+    "BLOCKED_VALIDATION_ISOLATION_REQUIRED",
+    "BLOCKED_SAME_PATH_EVIDENCE_MISSING",
+    "BLOCKED_ROLLBACK_OR_REGRESSION_EVIDENCE_MISSING"
+  ],
+  "invariants": {
+    "verified_for_lin_3d_count_at_creation": 0,
+    "unknown_or_unverified_final_use": "DENY",
+    "validation_may_change_production_asset": false,
+    "validation_may_change_canon": false,
+    "green_ci_equals_canon": false,
+    "final_lock_authority": "USER_ONLY",
+    "automatic_merge": false,
+    "automatic_canon_promotion": false
+  }
+}

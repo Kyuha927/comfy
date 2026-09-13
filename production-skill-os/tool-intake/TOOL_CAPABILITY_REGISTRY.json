@@ -1,0 +1,2461 @@
+{
+  "schema_version": "1.0.0",
+  "registry_id": "GLOBAL_TOOL_CAPABILITY_REGISTRY_20260914",
+  "status": "CANDIDATE_INTEGRATED_NOT_MERGED",
+  "generated_at_kst": "2026-09-14",
+  "candidate_branch": "candidate/tool-capability-lin3d-gate-v2-20260914",
+  "candidate_base_head": "7f9c5701a77d341bd7ca680b06242980600000dd",
+  "allowed_statuses": [
+    "DISCOVERED",
+    "REVIEWED",
+    "TEST_REQUIRED",
+    "ISOLATED_PASS",
+    "ISOLATED_FAIL",
+    "WATCH",
+    "REJECTED",
+    "ABSORBED_GENERIC",
+    "LIN_3D_TEST_REQUIRED",
+    "VERIFIED_FOR_LIN_3D",
+    "SUPERSEDED",
+    "BLOCKED"
+  ],
+  "evidence_ladder": {
+    "L0": "DISCOVERED_ONLY",
+    "L1": "OFFICIAL_SOURCE_IDENTITY_REVIEWED",
+    "L2": "CODE_OR_ARCHITECTURE_REVIEWED",
+    "L3": "UNIT_OR_STATIC_TEST_PASS",
+    "L4": "ISOLATED_REPRESENTATIVE_SMOKE_OR_INTEGRATION",
+    "L5": "SAME_ENVIRONMENT_OR_TRANSPORT_PATH",
+    "L6": "REAL_ASSET_OR_USER_VISIBLE_OUTPUT",
+    "L7": "REGRESSION_AND_ROLLBACK_EVIDENCE",
+    "L8": "SAME_PATH_LIN_3D_ACCEPTANCE_WITH_USER_REVIEW_BOUNDARY"
+  },
+  "required_record_fields": [
+    "capability_id",
+    "tool_or_system",
+    "capability_name",
+    "source_type",
+    "official_source_urls",
+    "repository_url",
+    "exact_version_or_commit",
+    "license_or_commercial_constraints",
+    "reviewed_at",
+    "review_evidence",
+    "claimed_benefit",
+    "current_stack_equivalent",
+    "target_subsystem",
+    "status",
+    "isolated_test_environment",
+    "isolated_test_evidence",
+    "quality_delta",
+    "latency_delta",
+    "cost_delta",
+    "memory_or_vram_delta",
+    "failure_modes",
+    "recovery_behavior",
+    "rollback_behavior",
+    "security_or_privacy_notes",
+    "known_incompatibilities",
+    "supersedes",
+    "superseded_by",
+    "lin_3d_relevance",
+    "lin_3d_same_path_test",
+    "lin_3d_evidence",
+    "regression_tests",
+    "owner_or_executor",
+    "next_gate",
+    "last_verified_at"
+  ],
+  "lin_3d_authority": {
+    "repository": "Kyuha927/lastline-echoes",
+    "branch": "lin-aster-tripo-r01-20260913",
+    "branch_head_at_reconciliation": "e1b02b1773366677a543d764bd68638e13da1a27",
+    "ssot_path": "work/handovers/2026-09-13/00_READ_FIRST_LIN_ASTER_3D_ROUTE.md",
+    "ssot_blob_sha": "612fd6347f7d203f9b6d8a3737a72bbaf7a6f0fe",
+    "live_state_path": "work/handovers/2026-09-13/LIN_ASTER_3D_LIVE_STATE.json",
+    "live_state_blob_sha": "f44c283bd5c02a1a8e8b3adf7785c867d78b0c2f",
+    "production_control_path": "work/handovers/2026-09-13/LIN_ASTER_3D_PRODUCTION_CONTROL_CURRENT.md",
+    "production_control_policy_id": "LIN_ASTER_3D_PRODUCTION_CONTROL_V1_2",
+    "final_lock_authority": "USER_ONLY",
+    "auto_merge": false,
+    "auto_canon": false
+  },
+  "summary": {
+    "records": 40,
+    "verified_for_lin_3d": 0,
+    "absorbed_generic": 2,
+    "lin_3d_test_required": 8,
+    "blocked": 3,
+    "superseded": 1
+  },
+  "records": [
+    {
+      "capability_id": "cap.production_skill_os.registry_validation",
+      "tool_or_system": "Production Skill OS",
+      "capability_name": "Capability registry structural and evidence validation",
+      "source_type": "INTERNAL_IMPLEMENTATION",
+      "official_source_urls": [
+        "gh:Kyuha927/comfy@work-handoffs-v4-20260912/releases/work-handoffs/20…"
+      ],
+      "repository_url": "gh:Kyuha927/comfy",
+      "exact_version_or_commit": "1.0.0-candidate.20260914",
+      "license_or_commercial_constraints": "INHERITS_REPOSITORY_TERMS; CANDIDATE_…",
+      "reviewed_at": "2026-09-14",
+      "review_evidence": [
+        "gh:Kyuha927/comfy@work-handoffs-v4-20260912/releases/work-handoffs/20…"
+      ],
+      "claimed_benefit": "Reject malformed, duplicate, unpinned, or evidenc…",
+      "current_stack_equivalent": "No equivalent fail-closed registry…",
+      "target_subsystem": "PRODUCTION_SKILL_OS_ROUTER",
+      "status": "ABSORBED_GENERIC",
+      "evidence_level": "L7",
+      "isolated_test_environment": "PYTHON_3_STANDARD_LIBRARY_TEM…",
+      "isolated_test_evidence": [
+        "production-skill-os/tests/test_tool_capability_guard.py"
+      ],
+      "quality_delta": "PREVENTS_UNEVIDENCED_PROMOT…",
+      "latency_delta": "LOCAL_JSON_VALIDATION; EXAC…",
+      "cost_delta": "NO_EXTERNAL_API_COST",
+      "memory_or_vram_delta": "SMALL_JSON_IN_MEMORY; EXACT…",
+      "failure_modes": [
+        "MALFORMED_JSON",
+        "MISSING_REQUIRED_FIELD"
+      ],
+      "recovery_behavior": [
+        "Fix the rejected record on an isolated candidate …"
+      ],
+      "rollback_behavior": [
+        "Revert candidate branch commits; no production or…"
+      ],
+      "security_or_privacy_notes": [
+        "Read-only registry validation; no credentials; no…"
+      ],
+      "known_incompatibilities": [],
+      "supersedes": [],
+      "superseded_by": [],
+      "lin_3d_relevance": "INDIRECT",
+      "lin_3d_same_path_test": {
+        "status": "NOT_APPLICABLE",
+        "execution_path": "NOT_APPLICABLE",
+        "environment": "NOT_RUN",
+        "artifact_ids": []
+      },
+      "lin_3d_evidence": [],
+      "regression_tests": [
+        {
+          "name": "production_skill_os_capability_gat…",
+          "status": "PASS",
+          "evidence": "production-skill-os/tool-intake/LOCAL_TEST_RECEIP…"
+        }
+      ],
+      "owner_or_executor": "GPT-5.6 Sol Pro / deterministic Py…",
+      "next_gate": "CI_ON_CANDIDATE_BRANCH_THEN_USER_REVIEW",
+      "last_verified_at": "2026-09-14T01:15:31+09:00",
+      "mutates_3d_state": false,
+      "authorized_scopes": [
+        "GENERIC_PRODUCTION"
+      ]
+    },
+    {
+      "capability_id": "cap.production_skill_os.fail_closed_selection",
+      "tool_or_system": "Production Skill OS",
+      "capability_name": "Fail-closed capability authorization by scope and exac…",
+      "source_type": "INTERNAL_IMPLEMENTATION",
+      "official_source_urls": [
+        "gh:Kyuha927/comfy@work-handoffs-v4-20260912/releases/work-handoffs/20…"
+      ],
+      "repository_url": "gh:Kyuha927/comfy",
+      "exact_version_or_commit": "1.0.0-candidate.20260914",
+      "license_or_commercial_constraints": "INHERITS_REPOSITORY_TERMS; CANDIDATE_…",
+      "reviewed_at": "2026-09-14",
+      "review_evidence": [
+        "gh:Kyuha927/comfy@work-handoffs-v4-20260912/releases/work-handoffs/20…"
+      ],
+      "claimed_benefit": "Permit only the exact capability/version/evidence…",
+      "current_stack_equivalent": "Previously the route was prose-bou…",
+      "target_subsystem": "PRODUCTION_SKILL_OS_ROUTER",
+      "status": "ABSORBED_GENERIC",
+      "evidence_level": "L7",
+      "isolated_test_environment": "PYTHON_3_STANDARD_LIBRARY_TEM…",
+      "isolated_test_evidence": [
+        "production-skill-os/tests/test_tool_capability_guard.py"
+      ],
+      "quality_delta": "BLOCKS_REVIEWED_AS_ACCEPTED…",
+      "latency_delta": "LOCAL_LOOKUP; EXACT_DELTA_M…",
+      "cost_delta": "NO_EXTERNAL_API_COST",
+      "memory_or_vram_delta": "SMALL_JSON_IN_MEMORY; EXACT…",
+      "failure_modes": [
+        "UNKNOWN_CAPABILITY",
+        "VERSION_MISMATCH"
+      ],
+      "recovery_behavior": [
+        "Select a registry capability with exact pinned id…"
+      ],
+      "rollback_behavior": [
+        "Revert candidate branch commits; existing Product…"
+      ],
+      "security_or_privacy_notes": [
+        "Fail closed; does not execute external tools; use…"
+      ],
+      "known_incompatibilities": [],
+      "supersedes": [],
+      "superseded_by": [],
+      "lin_3d_relevance": "DIRECT_CONTROL_PLANE",
+      "lin_3d_same_path_test": {
+        "status": "NOT_APPLICABLE",
+        "execution_path": "NOT_APPLICABLE",
+        "environment": "NOT_RUN",
+        "artifact_ids": []
+      },
+      "lin_3d_evidence": [],
+      "regression_tests": [
+        {
+          "name": "production_skill_os_capability_gat…",
+          "status": "PASS",
+          "evidence": "production-skill-os/tool-intake/LOCAL_TEST_RECEIP…"
+        }
+      ],
+      "owner_or_executor": "GPT-5.6 Sol Pro / deterministic Py…",
+      "next_gate": "CI_ON_CANDIDATE_BRANCH_THEN_USER_REVIEW",
+      "last_verified_at": "2026-09-14T01:15:31+09:00",
+      "mutates_3d_state": false,
+      "authorized_scopes": [
+        "GENERIC_PRODUCTION"
+      ]
+    },
+    {
+      "capability_id": "cap.tripo.h31.head_component_ultra",
+      "tool_or_system": "Tripo H3.1",
+      "capability_name": "H3.1 Ultra head/face/neck component generation",
+      "source_type": "OFFICIAL_PROVIDER_DOCUMENTA…",
+      "official_source_urls": [
+        "tripo-dev:en/models/v3-1"
+      ],
+      "repository_url": "tripo-dev:en/models/v3-1",
+      "exact_version_or_commit": "v3.1-20260211",
+      "license_or_commercial_constraints": "LIVE_TRIPO_PLAN_TERMS_PRIVACY_EXPORT_…",
+      "reviewed_at": "2026-09-14",
+      "review_evidence": [
+        "gh:Kyuha927/lastline-echoes@e1b02b1773366677a543d764bd68638e13da1a27/…"
+      ],
+      "claimed_benefit": "Higher-fidelity component source for the R04 hero…",
+      "current_stack_equivalent": "R03 full-body A/B candidates are p…",
+      "target_subsystem": "LIN_R04_TRIPO_COMPONENT_GENER…",
+      "status": "LIN_3D_TEST_REQUIRED",
+      "evidence_level": "L1",
+      "isolated_test_environment": "NOT_RUN_FOR_R04_COMPONENT",
+      "isolated_test_evidence": [],
+      "quality_delta": "UNKNOWN_NOT_MEASURED",
+      "latency_delta": "UNKNOWN_NOT_MEASURED",
+      "cost_delta": "UNKNOWN_NOT_MEASURED",
+      "memory_or_vram_delta": "UNKNOWN_NOT_MEASURED",
+      "failure_modes": [
+        "REFERENCE_DESIGN_DRIFT",
+        "FUSED_COMPONENTS"
+      ],
+      "recovery_behavior": [
+        "Preserve job/input/output identities; redesign th…"
+      ],
+      "rollback_behavior": [
+        "Reject the candidate and retain immutable canon p…"
+      ],
+      "security_or_privacy_notes": [
+        "Private generation required; do not expose locked…"
+      ],
+      "known_incompatibilities": [
+        "Do not infer production acceptance from prov…"
+      ],
+      "supersedes": [],
+      "superseded_by": [],
+      "lin_3d_relevance": "DIRECT",
+      "lin_3d_same_path_test": {
+        "status": "NOT_RUN",
+        "execution_path": "LOCKED_CANON->LINEAGE_TRACKED_DERIVED_REFERE…",
+        "environment": "CURRENT_LIN_AUTHORITY",
+        "artifact_ids": []
+      },
+      "lin_3d_evidence": [],
+      "regression_tests": [],
+      "owner_or_executor": "GPT-6 Astra XHigh judgment / brows…",
+      "next_gate": "RUN_R04_HEAD_AFTER_LINEAGE_REFERENCE_PREP",
+      "last_verified_at": "2026-09-14",
+      "mutates_3d_state": false,
+      "authorized_scopes": [
+        "LIN_3D_VALIDATION"
+      ]
+    },
+    {
+      "capability_id": "cap.tripo.h31.hair_component_ultra",
+      "tool_or_system": "Tripo H3.1",
+      "capability_name": "H3.1 Ultra hair/braid/silhouette component generation",
+      "source_type": "OFFICIAL_PROVIDER_DOCUMENTA…",
+      "official_source_urls": [
+        "tripo-dev:en/models/v3-1"
+      ],
+      "repository_url": "tripo-dev:en/models/v3-1",
+      "exact_version_or_commit": "v3.1-20260211",
+      "license_or_commercial_constraints": "LIVE_TRIPO_PLAN_TERMS_PRIVACY_EXPORT_…",
+      "reviewed_at": "2026-09-14",
+      "review_evidence": [
+        "gh:Kyuha927/lastline-echoes@e1b02b1773366677a543d764bd68638e13da1a27/…"
+      ],
+      "claimed_benefit": "Higher-fidelity component source for the R04 hero…",
+      "current_stack_equivalent": "R03 full-body A/B candidates are p…",
+      "target_subsystem": "LIN_R04_TRIPO_COMPONENT_GENER…",
+      "status": "LIN_3D_TEST_REQUIRED",
+      "evidence_level": "L1",
+      "isolated_test_environment": "NOT_RUN_FOR_R04_COMPONENT",
+      "isolated_test_evidence": [],
+      "quality_delta": "UNKNOWN_NOT_MEASURED",
+      "latency_delta": "UNKNOWN_NOT_MEASURED",
+      "cost_delta": "UNKNOWN_NOT_MEASURED",
+      "memory_or_vram_delta": "UNKNOWN_NOT_MEASURED",
+      "failure_modes": [
+        "REFERENCE_DESIGN_DRIFT",
+        "FUSED_COMPONENTS"
+      ],
+      "recovery_behavior": [
+        "Preserve job/input/output identities; redesign th…"
+      ],
+      "rollback_behavior": [
+        "Reject the candidate and retain immutable canon p…"
+      ],
+      "security_or_privacy_notes": [
+        "Private generation required; do not expose locked…"
+      ],
+      "known_incompatibilities": [
+        "Do not infer production acceptance from prov…"
+      ],
+      "supersedes": [],
+      "superseded_by": [],
+      "lin_3d_relevance": "DIRECT",
+      "lin_3d_same_path_test": {
+        "status": "NOT_RUN",
+        "execution_path": "LOCKED_CANON->LINEAGE_TRACKED_DERIVED_REFERE…",
+        "environment": "CURRENT_LIN_AUTHORITY",
+        "artifact_ids": []
+      },
+      "lin_3d_evidence": [],
+      "regression_tests": [],
+      "owner_or_executor": "GPT-6 Astra XHigh judgment / brows…",
+      "next_gate": "RUN_R04_HAIR_AFTER_LINEAGE_REFERENCE_PREP",
+      "last_verified_at": "2026-09-14",
+      "mutates_3d_state": false,
+      "authorized_scopes": [
+        "LIN_3D_VALIDATION"
+      ]
+    },
+    {
+      "capability_id": "cap.tripo.h31.body_outfit_component_ultra",
+      "tool_or_system": "Tripo H3.1",
+      "capability_name": "H3.1 Ultra body/outfit component generation",
+      "source_type": "OFFICIAL_PROVIDER_DOCUMENTA…",
+      "official_source_urls": [
+        "tripo-dev:en/models/v3-1"
+      ],
+      "repository_url": "tripo-dev:en/models/v3-1",
+      "exact_version_or_commit": "v3.1-20260211",
+      "license_or_commercial_constraints": "LIVE_TRIPO_PLAN_TERMS_PRIVACY_EXPORT_…",
+      "reviewed_at": "2026-09-14",
+      "review_evidence": [
+        "gh:Kyuha927/lastline-echoes@e1b02b1773366677a543d764bd68638e13da1a27/…"
+      ],
+      "claimed_benefit": "Higher-fidelity component source for the R04 hero…",
+      "current_stack_equivalent": "R03 full-body A/B candidates are p…",
+      "target_subsystem": "LIN_R04_TRIPO_COMPONENT_GENER…",
+      "status": "LIN_3D_TEST_REQUIRED",
+      "evidence_level": "L1",
+      "isolated_test_environment": "NOT_RUN_FOR_R04_COMPONENT",
+      "isolated_test_evidence": [],
+      "quality_delta": "UNKNOWN_NOT_MEASURED",
+      "latency_delta": "UNKNOWN_NOT_MEASURED",
+      "cost_delta": "UNKNOWN_NOT_MEASURED",
+      "memory_or_vram_delta": "UNKNOWN_NOT_MEASURED",
+      "failure_modes": [
+        "REFERENCE_DESIGN_DRIFT",
+        "FUSED_COMPONENTS"
+      ],
+      "recovery_behavior": [
+        "Preserve job/input/output identities; redesign th…"
+      ],
+      "rollback_behavior": [
+        "Reject the candidate and retain immutable canon p…"
+      ],
+      "security_or_privacy_notes": [
+        "Private generation required; do not expose locked…"
+      ],
+      "known_incompatibilities": [
+        "Do not infer production acceptance from prov…"
+      ],
+      "supersedes": [],
+      "superseded_by": [],
+      "lin_3d_relevance": "DIRECT",
+      "lin_3d_same_path_test": {
+        "status": "NOT_RUN",
+        "execution_path": "LOCKED_CANON->LINEAGE_TRACKED_DERIVED_REFERE…",
+        "environment": "CURRENT_LIN_AUTHORITY",
+        "artifact_ids": []
+      },
+      "lin_3d_evidence": [],
+      "regression_tests": [],
+      "owner_or_executor": "GPT-6 Astra XHigh judgment / brows…",
+      "next_gate": "RUN_R04_BODY_AFTER_LINEAGE_REFERENCE_PREP",
+      "last_verified_at": "2026-09-14",
+      "mutates_3d_state": false,
+      "authorized_scopes": [
+        "LIN_3D_VALIDATION"
+      ]
+    },
+    {
+      "capability_id": "cap.tripo.h31.coat_component_ultra",
+      "tool_or_system": "Tripo H3.1",
+      "capability_name": "H3.1 Ultra coat/major-garment donor generation",
+      "source_type": "OFFICIAL_PROVIDER_DOCUMENTA…",
+      "official_source_urls": [
+        "tripo-dev:en/models/v3-1"
+      ],
+      "repository_url": "tripo-dev:en/models/v3-1",
+      "exact_version_or_commit": "v3.1-20260211",
+      "license_or_commercial_constraints": "LIVE_TRIPO_PLAN_TERMS_PRIVACY_EXPORT_…",
+      "reviewed_at": "2026-09-14",
+      "review_evidence": [
+        "gh:Kyuha927/lastline-echoes@e1b02b1773366677a543d764bd68638e13da1a27/…"
+      ],
+      "claimed_benefit": "Higher-fidelity component source for the R04 hero…",
+      "current_stack_equivalent": "R03 full-body A/B candidates are p…",
+      "target_subsystem": "LIN_R04_TRIPO_COMPONENT_GENER…",
+      "status": "LIN_3D_TEST_REQUIRED",
+      "evidence_level": "L1",
+      "isolated_test_environment": "NOT_RUN_FOR_R04_COMPONENT",
+      "isolated_test_evidence": [],
+      "quality_delta": "UNKNOWN_NOT_MEASURED",
+      "latency_delta": "UNKNOWN_NOT_MEASURED",
+      "cost_delta": "UNKNOWN_NOT_MEASURED",
+      "memory_or_vram_delta": "UNKNOWN_NOT_MEASURED",
+      "failure_modes": [
+        "REFERENCE_DESIGN_DRIFT",
+        "FUSED_COMPONENTS"
+      ],
+      "recovery_behavior": [
+        "Preserve job/input/output identities; redesign th…"
+      ],
+      "rollback_behavior": [
+        "Reject the candidate and retain immutable canon p…"
+      ],
+      "security_or_privacy_notes": [
+        "Private generation required; do not expose locked…"
+      ],
+      "known_incompatibilities": [
+        "Do not infer production acceptance from prov…"
+      ],
+      "supersedes": [],
+      "superseded_by": [],
+      "lin_3d_relevance": "DIRECT",
+      "lin_3d_same_path_test": {
+        "status": "NOT_RUN",
+        "execution_path": "LOCKED_CANON->LINEAGE_TRACKED_DERIVED_REFERE…",
+        "environment": "CURRENT_LIN_AUTHORITY",
+        "artifact_ids": []
+      },
+      "lin_3d_evidence": [],
+      "regression_tests": [],
+      "owner_or_executor": "GPT-6 Astra XHigh judgment / brows…",
+      "next_gate": "RUN_R04_COAT_IF_COHERENT_REFERENCE_EXISTS",
+      "last_verified_at": "2026-09-14",
+      "mutates_3d_state": false,
+      "authorized_scopes": [
+        "LIN_3D_VALIDATION"
+      ]
+    },
+    {
+      "capability_id": "cap.tripo.h31.multiview_input_contract",
+      "tool_or_system": "Tripo H3.1",
+      "capability_name": "Four-direction multiview ordering and consistency cont…",
+      "source_type": "OFFICIAL_PROVIDER_DOCUMENTA…",
+      "official_source_urls": [
+        "tripo-docs:model-generation/multiview-to-model-v3-0-v3-1.html"
+      ],
+      "repository_url": "tripo-docs:model-generation/multiview-to-model-v3-0-v3…",
+      "exact_version_or_commit": "v3.1-20260211",
+      "license_or_commercial_constraints": "PROVIDER_TERMS_APPLY",
+      "reviewed_at": "2026-09-14",
+      "review_evidence": [
+        "tripo-docs:model-generation/multiview-to-model-v3-0-v3-1.html"
+      ],
+      "claimed_benefit": "Native multiview consistency when reliable direct…",
+      "current_stack_equivalent": "Single-image component generation …",
+      "target_subsystem": "LIN_R04_REFERENCE_ROUTING",
+      "status": "TEST_REQUIRED",
+      "evidence_level": "L1",
+      "isolated_test_environment": "NOT_RUN",
+      "isolated_test_evidence": [],
+      "quality_delta": "UNKNOWN_NOT_MEASURED",
+      "latency_delta": "UNKNOWN_NOT_MEASURED",
+      "cost_delta": "UNKNOWN_NOT_MEASURED",
+      "memory_or_vram_delta": "UNKNOWN_NOT_MEASURED",
+      "failure_modes": [
+        "PART_VIEW_INCONSISTENCY",
+        "FABRICATED_MISSING_VIEW"
+      ],
+      "recovery_behavior": [
+        "Use single-image generation or improve real linea…"
+      ],
+      "rollback_behavior": [
+        "Discard derived input packet; locked canon unchan…"
+      ],
+      "security_or_privacy_notes": [
+        "Canon bytes immutable; derived reference lineage …"
+      ],
+      "known_incompatibilities": [],
+      "supersedes": [],
+      "superseded_by": [],
+      "lin_3d_relevance": "DIRECT",
+      "lin_3d_same_path_test": {
+        "status": "NOT_RUN",
+        "execution_path": "R04_PART_REFERENCE_MULTIVIEW_ONLY_WHEN_RELIA…",
+        "environment": "CURRENT_LIN_AUTHORITY",
+        "artifact_ids": []
+      },
+      "lin_3d_evidence": [],
+      "regression_tests": [],
+      "owner_or_executor": "Sol Pro preflight / Astra judgment",
+      "next_gate": "PART_SPECIFIC_REFERENCE_CONSISTENCY_CHECK",
+      "last_verified_at": "2026-09-14",
+      "mutates_3d_state": false,
+      "authorized_scopes": [
+        "LIN_3D_VALIDATION"
+      ]
+    },
+    {
+      "capability_id": "cap.tripo.p2.full_body_primary_hero_base",
+      "tool_or_system": "Tripo Smart Mesh P2.0",
+      "capability_name": "Full-body Native Quad as LIN hero production base",
+      "source_type": "PROJECT_EVIDENCE_AND_CORREC…",
+      "official_source_urls": [
+        "tripo-dev:en/models/v3-1"
+      ],
+      "repository_url": "gh:Kyuha927/lastline-echoes",
+      "exact_version_or_commit": "LIN_R03_P20_4VIEW_QUAD_BASE_A",
+      "license_or_commercial_constraints": "PROVIDER_TERMS_APPLY; EXISTING_ARTIFA…",
+      "reviewed_at": "2026-09-14",
+      "review_evidence": [
+        "gh:Kyuha927/lastline-echoes@e1b02b1773366677a543d764bd68638e13da1a27/…"
+      ],
+      "claimed_benefit": "Clean lower-poly topology for an editable base.",
+      "current_stack_equivalent": "R04 H3.1 component fidelity source…",
+      "target_subsystem": "LIN_TRIPO_BASE_SELECTION",
+      "status": "SUPERSEDED",
+      "evidence_level": "L6",
+      "isolated_test_environment": "REAL_R03_TRIPO_EXPORT_AND_LOC…",
+      "isolated_test_evidence": [
+        "gh:Kyuha927/lastline-echoes@97a5615aef715028aa940094bc7a2c6…"
+      ],
+      "quality_delta": "51/75; HOLD_NOT_PRODUCTION_…",
+      "latency_delta": "EXISTING_ARTIFACT",
+      "cost_delta": "0 credits in R03",
+      "memory_or_vram_delta": "27,609 faces",
+      "failure_modes": [
+        "HERO_IDENTITY_AND_COMPONENT…",
+        "DESIGN_ARCHITECTURE_MISMATCH"
+      ],
+      "recovery_behavior": [
+        "Use only as topology scaffold evidence; do not re…"
+      ],
+      "rollback_behavior": [
+        "No new action; artifact preserved as historical e…"
+      ],
+      "security_or_privacy_notes": [
+        "Existing private project artifact."
+      ],
+      "known_incompatibilities": [
+        "Forbidden as current LIN primary hero base."
+      ],
+      "supersedes": [],
+      "superseded_by": [
+        "cap.tripo.h31.head_component_ultra",
+        "cap.tripo.h31.hair_component_ultra",
+        "cap.tripo.h31.body_outfit_component_ultra",
+        "cap.tripo.h31.coat_component_ultra"
+      ],
+      "lin_3d_relevance": "DIRECT",
+      "lin_3d_same_path_test": {
+        "status": "FAIL",
+        "execution_path": "R03_FULL_BODY_P2->QA",
+        "environment": "CURRENT_LIN_AUTHORITY",
+        "artifact_ids": []
+      },
+      "lin_3d_evidence": [
+        "gh:Kyuha927/lastline-echoes@97a5615aef715028aa940094bc7a2c6…"
+      ],
+      "regression_tests": [
+        {
+          "name": "ssot_p2_primary_false",
+          "status": "PASS",
+          "evidence": "gh:Kyuha927/lastline-echoes@97a5615aef715028aa940…"
+        }
+      ],
+      "owner_or_executor": "Project SSOT",
+      "next_gate": "DO_NOT_SELECT_FOR_LIN_3D_FINAL",
+      "last_verified_at": "2026-09-14",
+      "mutates_3d_state": false,
+      "authorized_scopes": []
+    },
+    {
+      "capability_id": "cap.tripo.r03.h31_full_body_detail_donor",
+      "tool_or_system": "Tripo H3.1",
+      "capability_name": "R03 full-body high-detail donor",
+      "source_type": "REAL_PROJECT_ARTIFACT",
+      "official_source_urls": [
+        "tripo-dev:en/models/v3-1"
+      ],
+      "repository_url": "gh:Kyuha927/lastline-echoes",
+      "exact_version_or_commit": "LIN_R03_H31_4VIEW_DETAIL_B",
+      "license_or_commercial_constraints": "PROVIDER_TERMS_APPLY; EXISTING_ARTIFA…",
+      "reviewed_at": "2026-09-14",
+      "review_evidence": [
+        "gh:Kyuha927/lastline-echoes@e1b02b1773366677a543d764bd68638e13da1a27/…"
+      ],
+      "claimed_benefit": "Whole-character detail donor and comparison basel…",
+      "current_stack_equivalent": "No accepted final base; use only a…",
+      "target_subsystem": "LIN_R03_DONOR",
+      "status": "REVIEWED",
+      "evidence_level": "L6",
+      "isolated_test_environment": "REAL_R03_TRIPO_EXPORT_AND_LOC…",
+      "isolated_test_evidence": [
+        "gh:Kyuha927/lastline-echoes@97a5615aef715028aa940094bc7a2c6…"
+      ],
+      "quality_delta": "58/75; PROVISIONAL DONOR ON…",
+      "latency_delta": "UNKNOWN_NOT_MEASURED",
+      "cost_delta": "30 credits in R03",
+      "memory_or_vram_delta": "1,962,593 triangles / 980,9…",
+      "failure_modes": [
+        "WHOLE_BODY_DENSITY_DID_NOT_…"
+      ],
+      "recovery_behavior": [
+        "Keep donor; compare against selected R04 componen…"
+      ],
+      "rollback_behavior": [
+        "Do not mutate donor; use copies in private Blende…"
+      ],
+      "security_or_privacy_notes": [
+        "Existing private project artifact."
+      ],
+      "known_incompatibilities": [
+        "Not an accepted production base; no texture/…"
+      ],
+      "supersedes": [],
+      "superseded_by": [],
+      "lin_3d_relevance": "DIRECT",
+      "lin_3d_same_path_test": {
+        "status": "FAIL",
+        "execution_path": "R03_H31_FULL_BODY->QA",
+        "environment": "CURRENT_LIN_AUTHORITY",
+        "artifact_ids": []
+      },
+      "lin_3d_evidence": [
+        "gh:Kyuha927/lastline-echoes@97a5615aef715028aa940094bc7a2c6…"
+      ],
+      "regression_tests": [],
+      "owner_or_executor": "Project SSOT",
+      "next_gate": "COMPARE_AS_DONOR_AFTER_R04_COMPONENT_SET_EXISTS",
+      "last_verified_at": "2026-09-14",
+      "mutates_3d_state": false,
+      "authorized_scopes": [
+        "LIN_3D_VALIDATION"
+      ]
+    },
+    {
+      "capability_id": "cap.blender_bridge.offline_packaged_core",
+      "tool_or_system": "Blender Pro Bridge 0.5.0a2",
+      "capability_name": "Packaged deterministic bridge core and offline regress…",
+      "source_type": "INTERNAL_CANDIDATE_REPOSITO…",
+      "official_source_urls": [
+        "gh:Kyuha927/angrydino-visual-handoff@e8095fea25cb2f8a1eb56dcb2b7be442…"
+      ],
+      "repository_url": "gh:Kyuha927/angrydino-visual-handoff",
+      "exact_version_or_commit": "e8095fea25cb2f8a1eb56dcb2b7be442d5ffa854 / 0.5.0a2",
+      "license_or_commercial_constraints": "INTERNAL_CANDIDATE; PRODUCTION_REPLAC…",
+      "reviewed_at": "2026-09-14",
+      "review_evidence": [
+        "gh:Kyuha927/angrydino-visual-handoff@e8095fea25cb2f8a1eb56dcb2b7be442…"
+      ],
+      "claimed_benefit": "Typed deterministic scene operations, jobs, recei…",
+      "current_stack_equivalent": "Reviewed bpy/headless for bounded …",
+      "target_subsystem": "BLENDER_DETERMINISTIC_CONTROL",
+      "status": "ISOLATED_PASS",
+      "evidence_level": "L4",
+      "isolated_test_environment": "PACKAGED_SOURCE_AND_TEST_DOUB…",
+      "isolated_test_evidence": [
+        "gh:Kyuha927/angrydino-visual-handoff@e8095fea25cb2f8a1eb56d…"
+      ],
+      "quality_delta": "NO_LIN_VISUAL_QUALITY_CLAIM",
+      "latency_delta": "OFFLINE_TEST_TIMINGS_RECORD…",
+      "cost_delta": "NO_EXTERNAL_MODEL_COST",
+      "memory_or_vram_delta": "UNKNOWN_NOT_MEASURED",
+      "failure_modes": [
+        "TEST_DOUBLE_BOUNDARY",
+        "NATIVE_AND_WEB_PATH_NOT_PRO…"
+      ],
+      "recovery_behavior": [
+        "Run exact unchanged native acceptance, then same-…"
+      ],
+      "rollback_behavior": [
+        "Candidate package is isolated; production plugin …"
+      ],
+      "security_or_privacy_notes": [
+        "No arbitrary remote Python; exact workspace/write…"
+      ],
+      "known_incompatibilities": [
+        "Published durable record does not prove Web …"
+      ],
+      "supersedes": [],
+      "superseded_by": [],
+      "lin_3d_relevance": "DIRECT",
+      "lin_3d_same_path_test": {
+        "status": "NOT_RUN",
+        "execution_path": "SELECTED_R04_COMPONENTS->BLENDER->BRIDGE_EXA…",
+        "environment": "CURRENT_LIN_AUTHORITY",
+        "artifact_ids": []
+      },
+      "lin_3d_evidence": [],
+      "regression_tests": [],
+      "owner_or_executor": "Bridge candidate owner / independe…",
+      "next_gate": "RESTORE_CURRENT_BRIDGE_CONNECTIVITY_AND_RUN_SAME_SCENE…",
+      "last_verified_at": "2026-09-14",
+      "mutates_3d_state": false,
+      "authorized_scopes": [
+        "LIN_3D_VALIDATION"
+      ]
+    },
+    {
+      "capability_id": "cap.blender_bridge.current_tunnel_transport",
+      "tool_or_system": "Blender Pro Bridge Local",
+      "capability_name": "Current WebGPT-to-local bridge transport",
+      "source_type": "LIVE_READ_ONLY_PROBE",
+      "official_source_urls": [
+        "gh:Kyuha927/angrydino-visual-handoff@e8095fea25cb2f8a1eb56dcb2b7be442…"
+      ],
+      "repository_url": "gh:Kyuha927/angrydino-visual-handoff",
+      "exact_version_or_commit": "EXPECTED_0.5.0a2_BUT_LIVE_IDENTITY_UNREADABLE",
+      "license_or_commercial_constraints": "INTERNAL_CANDIDATE; AUTH/TUNNEL_CONFI…",
+      "reviewed_at": "2026-09-14",
+      "review_evidence": [
+        "gh:Kyuha927/angrydino-visual-handoff@e8095fea25cb2f8a1eb56dcb2b7be442…"
+      ],
+      "claimed_benefit": "Expose deterministic Blender control to the conne…",
+      "current_stack_equivalent": "None for the current same-path bri…",
+      "target_subsystem": "BLENDER_BRIDGE_TRANSPORT",
+      "status": "BLOCKED",
+      "evidence_level": "L5",
+      "isolated_test_environment": "LIVE_READ_ONLY_BRIDGE_HEALTH",
+      "isolated_test_evidence": [
+        "bridge_health failed before identity could be read"
+      ],
+      "quality_delta": "NO_QUALITY_TEST_POSSIBLE",
+      "latency_delta": "REQUEST_FAILED_AT_TRANSPORT",
+      "cost_delta": "NO_MUTATION",
+      "memory_or_vram_delta": "NOT_APPLICABLE",
+      "failure_modes": [
+        "GATEWAY_OR_SSE_404",
+        "LIVE_BUILD_IDENTITY_UNREADA…"
+      ],
+      "recovery_behavior": [
+        "Repair the existing authorized tunnel/connection …"
+      ],
+      "rollback_behavior": [
+        "No settings were changed by this task."
+      ],
+      "security_or_privacy_notes": [
+        "Do not rotate credentials, change accounts, or we…"
+      ],
+      "known_incompatibilities": [
+        "Blocks every live Bridge capability and same…"
+      ],
+      "supersedes": [],
+      "superseded_by": [],
+      "lin_3d_relevance": "DIRECT",
+      "lin_3d_same_path_test": {
+        "status": "BLOCKED",
+        "execution_path": "WEBGPT->SECURE_TUNNEL->BRIDGE_HEALTH",
+        "environment": "CURRENT_LIN_AUTHORITY",
+        "artifact_ids": []
+      },
+      "lin_3d_evidence": [],
+      "regression_tests": [],
+      "owner_or_executor": "Local bridge operator",
+      "next_gate": "READ_ONLY_BRIDGE_HEALTH_MUST_RETURN_EXACT_BUILD_AND_WO…",
+      "last_verified_at": "2026-09-14",
+      "mutates_3d_state": false,
+      "authorized_scopes": []
+    },
+    {
+      "capability_id": "cap.blender_bridge.transactional_edit_render_reopen_rollback",
+      "tool_or_system": "Blender Pro Bridge 0.5.0a2",
+      "capability_name": "Transactional edit, rendered pixels, checkpoint, fresh…",
+      "source_type": "CANDIDATE_CONTRACT",
+      "official_source_urls": [
+        "gh:Kyuha927/angrydino-visual-handoff@e8095fea25cb2f8a1eb56dcb2b7be442…"
+      ],
+      "repository_url": "gh:Kyuha927/angrydino-visual-handoff",
+      "exact_version_or_commit": "e8095fea25cb2f8a1eb56dcb2b7be442d5ffa854 / 0.5.0a2",
+      "license_or_commercial_constraints": "INTERNAL_CANDIDATE; PRODUCTION_REPLAC…",
+      "reviewed_at": "2026-09-14",
+      "review_evidence": [
+        "gh:Kyuha927/angrydino-visual-handoff@e8095fea25cb2f8a1eb56dcb2b7be442…"
+      ],
+      "claimed_benefit": "Exact state mutation with durable receipts and re…",
+      "current_stack_equivalent": "Reviewed bpy/headless can cover bo…",
+      "target_subsystem": "LIN_BLENDER_ASSEMBLY_QA",
+      "status": "LIN_3D_TEST_REQUIRED",
+      "evidence_level": "L4",
+      "isolated_test_environment": "OFFLINE_PACKAGED_ACCEPTANCE_O…",
+      "isolated_test_evidence": [
+        "gh:Kyuha927/angrydino-visual-handoff@e8095fea25cb2f8a1eb56d…"
+      ],
+      "quality_delta": "UNKNOWN_NOT_MEASURED",
+      "latency_delta": "UNKNOWN_NOT_MEASURED",
+      "cost_delta": "UNKNOWN_NOT_MEASURED",
+      "memory_or_vram_delta": "UNKNOWN_NOT_MEASURED",
+      "failure_modes": [
+        "CURRENT_TRANSPORT_BLOCKED",
+        "NO_SELECTED_R04_COMPONENT_S…"
+      ],
+      "recovery_behavior": [
+        "Restore read-only health, preserve exact candidat…"
+      ],
+      "rollback_behavior": [
+        "Candidate scene copy; checkpoint and restore-as-n…"
+      ],
+      "security_or_privacy_notes": [
+        "Scoped writes only; no arbitrary Python; no origi…"
+      ],
+      "known_incompatibilities": [
+        "Cannot be selected for LIN_3D_FINAL while tr…"
+      ],
+      "supersedes": [],
+      "superseded_by": [],
+      "lin_3d_relevance": "DIRECT",
+      "lin_3d_same_path_test": {
+        "status": "NOT_RUN",
+        "execution_path": "R04_PRIVATE_BLEND->EDIT->RENDER_BYTES->SAVE-…",
+        "environment": "CURRENT_LIN_AUTHORITY",
+        "artifact_ids": []
+      },
+      "lin_3d_evidence": [],
+      "regression_tests": [],
+      "owner_or_executor": "Bridge operator / Sol QA / Astra v…",
+      "next_gate": "SAME_SCENE_LIN_E2E_AFTER_SELECTED_R04_PARTS",
+      "last_verified_at": "2026-09-14",
+      "mutates_3d_state": true,
+      "authorized_scopes": [
+        "LIN_3D_VALIDATION"
+      ]
+    },
+    {
+      "capability_id": "cap.astra.computer_use.visual_blender_assembly",
+      "tool_or_system": "GPT-6 Astra Computer Use",
+      "capability_name": "Supervised visual/spatial Blender assembly and high-co…",
+      "source_type": "OFFICIAL_TRIPO_WORKFLOW_AND…",
+      "official_source_urls": [
+        "tripo:blog/gpt-6-astra-3d-character-workflow"
+      ],
+      "repository_url": "NOT_APPLICABLE",
+      "exact_version_or_commit": "CURRENT_ACCOUNT_ROUTE_UNKNOWN_UNTIL_RUN",
+      "license_or_commercial_constraints": "ACCOUNT_SUBSCRIPTION_AND_USAGE_LIMITS…",
+      "reviewed_at": "2026-09-14",
+      "review_evidence": [
+        "gh:Kyuha927/lastline-echoes@e1b02b1773366677a543d764bd68638e13da1a27/…"
+      ],
+      "claimed_benefit": "Visual alignment, scale, orientation, component f…",
+      "current_stack_equivalent": "Recorded human correction for boun…",
+      "target_subsystem": "LIN_BLENDER_VISUAL_ASSEMBLY",
+      "status": "LIN_3D_TEST_REQUIRED",
+      "evidence_level": "L1",
+      "isolated_test_environment": "NOT_RUN_ON_SELECTED_R04_COMPO…",
+      "isolated_test_evidence": [],
+      "quality_delta": "UNKNOWN_NOT_MEASURED",
+      "latency_delta": "UNKNOWN_NOT_MEASURED",
+      "cost_delta": "UNKNOWN_NOT_MEASURED",
+      "memory_or_vram_delta": "UNKNOWN_NOT_MEASURED",
+      "failure_modes": [
+        "NO_SELECTED_R04_COMPONENTS",
+        "COMPUTER_USE_UNAVAILABLE"
+      ],
+      "recovery_behavior": [
+        "Use bounded manual correction when faster/safer a…"
+      ],
+      "rollback_behavior": [
+        "Private scene checkpoint before each high-consequ…"
+      ],
+      "security_or_privacy_notes": [
+        "No account or permission changes; explicit curren…"
+      ],
+      "known_incompatibilities": [
+        "No zero-base character modeling; user remain…"
+      ],
+      "supersedes": [],
+      "superseded_by": [],
+      "lin_3d_relevance": "DIRECT",
+      "lin_3d_same_path_test": {
+        "status": "NOT_RUN",
+        "execution_path": "SELECTED_R04_PARTS->ASTRA_COMPUTER_USE->VISI…",
+        "environment": "CURRENT_LIN_AUTHORITY",
+        "artifact_ids": []
+      },
+      "lin_3d_evidence": [],
+      "regression_tests": [],
+      "owner_or_executor": "GPT-6 Astra XHigh when available /…",
+      "next_gate": "RUN_AFTER_SELECTED_R04_COMPONENT_SET_AND_PRIVATE_IMPOR…",
+      "last_verified_at": "2026-09-14",
+      "mutates_3d_state": true,
+      "authorized_scopes": [
+        "LIN_3D_VALIDATION"
+      ]
+    },
+    {
+      "capability_id": "cap.blender.headless_reviewed_bpy",
+      "tool_or_system": "Blender / reviewed bpy",
+      "capability_name": "Bounded deterministic inspection, conversion, batch re…",
+      "source_type": "PROJECT_CONTROL_POLICY",
+      "official_source_urls": [
+        "https://docs.blender.org/manual/en/latest/advanced/command_line/argum…"
+      ],
+      "repository_url": "https://www.blender.org/",
+      "exact_version_or_commit": "BLENDER_4.5.4_LTS_EXPECTED; EXACT_SCRIPT_HASH_REQUIRED_PER_RUN",
+      "license_or_commercial_constraints": "BLENDER_GPL; CUSTOM_SCRIPT_LICENSE_AN…",
+      "reviewed_at": "2026-09-14",
+      "review_evidence": [
+        "gh:Kyuha927/lastline-echoes@e1b02b1773366677a543d764bd68638e13da1a27/…"
+      ],
+      "claimed_benefit": "Reproducible non-visual batch work without intera…",
+      "current_stack_equivalent": "Bridge typed operations where supp…",
+      "target_subsystem": "LIN_DETERMINISTIC_BATCH",
+      "status": "TEST_REQUIRED",
+      "evidence_level": "L2",
+      "isolated_test_environment": "NO_R04_SCRIPT_SELECTED_OR_TES…",
+      "isolated_test_evidence": [],
+      "quality_delta": "UNKNOWN_NOT_MEASURED",
+      "latency_delta": "UNKNOWN_NOT_MEASURED",
+      "cost_delta": "UNKNOWN_NOT_MEASURED",
+      "memory_or_vram_delta": "UNKNOWN_NOT_MEASURED",
+      "failure_modes": [
+        "UNREVIEWED_SCRIPT",
+        "HIDDEN_SCENE_MUTATION"
+      ],
+      "recovery_behavior": [
+        "Pin script hash and Blender build; test on dispos…"
+      ],
+      "rollback_behavior": [
+        "Private copy and content-addressed outputs; no in…"
+      ],
+      "security_or_privacy_notes": [
+        "Scripts are executable code; review before run; n…"
+      ],
+      "known_incompatibilities": [
+        "Not a substitute for visual judgment or user…"
+      ],
+      "supersedes": [],
+      "superseded_by": [],
+      "lin_3d_relevance": "DIRECT",
+      "lin_3d_same_path_test": {
+        "status": "NOT_RUN",
+        "execution_path": "PRIVATE_R04_BLEND->PINNED_BPY->DETERMINISTIC…",
+        "environment": "CURRENT_LIN_AUTHORITY",
+        "artifact_ids": []
+      },
+      "lin_3d_evidence": [],
+      "regression_tests": [],
+      "owner_or_executor": "GPT-5.6 Sol Pro / deterministic va…",
+      "next_gate": "DECLARE_EXACT_SCRIPT_AND_RUN_DISPOSABLE_FIXTURE_SMOKE",
+      "last_verified_at": "2026-09-14",
+      "mutates_3d_state": true,
+      "authorized_scopes": [
+        "LIN_3D_VALIDATION"
+      ]
+    },
+    {
+      "capability_id": "cap.lin.controlled_manual_retopology",
+      "tool_or_system": "Blender manual/reviewed retopology",
+      "capability_name": "Controlled/manual retopology and reconstruction for fi…",
+      "source_type": "PROJECT_SSOT_AND_OFFICIAL_R…",
+      "official_source_urls": [
+        "tripo-dev:en/models/v3-1"
+      ],
+      "repository_url": "gh:Kyuha927/lastline-echoes",
+      "exact_version_or_commit": "R04_POLICY_AT_e1b02b1773366677a543d764bd68638e13da1a27",
+      "license_or_commercial_constraints": "BLENDER_AND_ANY_ADDON_LICENSES_MUST_B…",
+      "reviewed_at": "2026-09-14",
+      "review_evidence": [
+        "gh:Kyuha927/lastline-echoes@e1b02b1773366677a543d764bd68638e13da1a27/…"
+      ],
+      "claimed_benefit": "Preserve H3.1 fidelity while producing deformable…",
+      "current_stack_equivalent": "Smart Mesh only as a topology expe…",
+      "target_subsystem": "LIN_RECONSTRUCTION",
+      "status": "LIN_3D_TEST_REQUIRED",
+      "evidence_level": "L2",
+      "isolated_test_environment": "NOT_RUN_BECAUSE_SELECTED_R04_…",
+      "isolated_test_evidence": [],
+      "quality_delta": "UNKNOWN_NOT_MEASURED",
+      "latency_delta": "UNKNOWN_NOT_MEASURED",
+      "cost_delta": "UNKNOWN_NOT_MEASURED",
+      "memory_or_vram_delta": "UNKNOWN_NOT_MEASURED",
+      "failure_modes": [
+        "IDENTITY_LOSS",
+        "HAIR_OR_GARMENT_SILHOUETTE_…"
+      ],
+      "recovery_behavior": [
+        "Checkpoint source and retopo separately; compare …"
+      ],
+      "rollback_behavior": [
+        "Keep immutable raw H3.1 exports and versioned Ble…"
+      ],
+      "security_or_privacy_notes": [
+        "Declare all add-ons, scripts, versions, hashes, a…"
+      ],
+      "known_incompatibilities": [
+        "Cannot be universalized before actual select…"
+      ],
+      "supersedes": [],
+      "superseded_by": [],
+      "lin_3d_relevance": "DIRECT",
+      "lin_3d_same_path_test": {
+        "status": "NOT_RUN",
+        "execution_path": "SELECTED_R04_PARTS->RECONSTRUCTION->DEFORMAT…",
+        "environment": "CURRENT_LIN_AUTHORITY",
+        "artifact_ids": []
+      },
+      "lin_3d_evidence": [],
+      "regression_tests": [],
+      "owner_or_executor": "Human/Blender specialist with Sol …",
+      "next_gate": "OBSERVE_SELECTED_R04_PARTS_THEN_DEFINE_PART_SPECIFIC_R…",
+      "last_verified_at": "2026-09-14",
+      "mutates_3d_state": true,
+      "authorized_scopes": [
+        "LIN_3D_VALIDATION"
+      ]
+    },
+    {
+      "capability_id": "cap.lin.mobile_hero_real_device_validation",
+      "tool_or_system": "LIN Mobile Hero validation",
+      "capability_name": "Real-device character microbench plus sustained traver…",
+      "source_type": "PROJECT_PRODUCTION_CONTROL",
+      "official_source_urls": [
+        "gh:Kyuha927/lastline-echoes@e1b02b1773366677a543d764bd68638e13da1a27/…"
+      ],
+      "repository_url": "gh:Kyuha927/lastline-echoes",
+      "exact_version_or_commit": "LIN_ASTER_3D_PRODUCTION_CONTROL_V1_2",
+      "license_or_commercial_constraints": "TARGET_DEVICE_AND_ENGINE_DEPENDENCIES…",
+      "reviewed_at": "2026-09-14",
+      "review_evidence": [
+        "gh:Kyuha927/lastline-echoes@e1b02b1773366677a543d764bd68638e13da1a27/…"
+      ],
+      "claimed_benefit": "Prevent visually degraded or thermally unstable m…",
+      "current_stack_equivalent": "None; desktop renders and estimate…",
+      "target_subsystem": "LIN_MOBILE_HERO",
+      "status": "LIN_3D_TEST_REQUIRED",
+      "evidence_level": "L2",
+      "isolated_test_environment": "NOT_RUN; ART_MASTER_DOES_NOT_…",
+      "isolated_test_evidence": [],
+      "quality_delta": "UNKNOWN_NOT_MEASURED",
+      "latency_delta": "UNKNOWN_NOT_MEASURED",
+      "cost_delta": "UNKNOWN_NOT_MEASURED",
+      "memory_or_vram_delta": "UNKNOWN_NOT_MEASURED",
+      "failure_modes": [
+        "NO_ART_MASTER",
+        "NO_TARGET_DEVICE"
+      ],
+      "recovery_behavior": [
+        "Create ART_MASTER first, then derive and measure …"
+      ],
+      "rollback_behavior": [
+        "Return to prior LOD/material/physics checkpoint."
+      ],
+      "security_or_privacy_notes": [
+        "No production telemetry collection without explic…"
+      ],
+      "known_incompatibilities": [
+        "Cannot freeze budgets before actual-device e…"
+      ],
+      "supersedes": [],
+      "superseded_by": [],
+      "lin_3d_relevance": "DIRECT",
+      "lin_3d_same_path_test": {
+        "status": "NOT_RUN",
+        "execution_path": "ART_MASTER->MOBILE_HERO->DEVICE_MICROBENCH->…",
+        "environment": "CURRENT_LIN_AUTHORITY",
+        "artifact_ids": []
+      },
+      "lin_3d_evidence": [],
+      "regression_tests": [],
+      "owner_or_executor": "Mobile performance lane / user app…",
+      "next_gate": "WAIT_FOR_ART_MASTER_CANDIDATE",
+      "last_verified_at": "2026-09-14",
+      "mutates_3d_state": false,
+      "authorized_scopes": [
+        "LIN_3D_VALIDATION"
+      ]
+    },
+    {
+      "capability_id": "cap.work01.blender_bridge_mcp_plus",
+      "tool_or_system": "Recovered Work lane 01",
+      "capability_name": "Blender Bridge MCP Plus",
+      "source_type": "RECOVERED_CORRECTED_AUDIT",
+      "official_source_urls": [],
+      "repository_url": "gh:Kyuha927/comfy",
+      "exact_version_or_commit": "UNKNOWN_LOCAL_ARTIFACT_IDENTITY_NOT_FULLY_RECOVERED",
+      "license_or_commercial_constraints": "UNKNOWN_OR_PROJECT_INTERNAL; MUST_BE_…",
+      "reviewed_at": "2026-09-14",
+      "review_evidence": [
+        "gh:Kyuha927/comfy@work-handoffs-v4-20260912/releases/work-handoffs/20…"
+      ],
+      "claimed_benefit": "Blender Bridge MCP Plus",
+      "current_stack_equivalent": "See current stack mapping in PORTF…",
+      "target_subsystem": "RECOVERED_PORTFOLIO",
+      "status": "BLOCKED",
+      "evidence_level": "L4",
+      "isolated_test_environment": "Missing durable live endpoint…",
+      "isolated_test_evidence": [
+        "gh:Kyuha927/comfy@work-handoffs-v4-20260912/releases/work-h…"
+      ],
+      "quality_delta": "SCOPED_RESULT_ONLY; NO_GLOB…",
+      "latency_delta": "UNKNOWN_NOT_MEASURED",
+      "cost_delta": "UNKNOWN_NOT_MEASURED",
+      "memory_or_vram_delta": "UNKNOWN_NOT_MEASURED",
+      "failure_modes": [
+        "Missing durable live endpoi…"
+      ],
+      "recovery_behavior": [
+        "Restore exact authorized endpoint and run live en…"
+      ],
+      "rollback_behavior": [
+        "No production integration performed by registry i…"
+      ],
+      "security_or_privacy_notes": [
+        "Do not execute recovered artifacts until exact ve…"
+      ],
+      "known_incompatibilities": [],
+      "supersedes": [],
+      "superseded_by": [],
+      "lin_3d_relevance": "DIRECT",
+      "lin_3d_same_path_test": {
+        "status": "NOT_RUN",
+        "execution_path": "NO_CURRENT_LIN_SAME_PATH_EVIDENCE",
+        "environment": "CURRENT_LIN_AUTHORITY",
+        "artifact_ids": []
+      },
+      "lin_3d_evidence": [],
+      "regression_tests": [],
+      "owner_or_executor": "Original lane owner / new bounded …",
+      "next_gate": "Restore exact authorized endpoint and run live end-to-…",
+      "last_verified_at": "2026-09-14",
+      "mutates_3d_state": false,
+      "authorized_scopes": []
+    },
+    {
+      "capability_id": "cap.work02.opencode_to_webgpt_plugin",
+      "tool_or_system": "Recovered Work lane 02",
+      "capability_name": "OpenCode to WebGPT plugin",
+      "source_type": "RECOVERED_CORRECTED_AUDIT",
+      "official_source_urls": [],
+      "repository_url": "gh:Kyuha927/comfy",
+      "exact_version_or_commit": "UNKNOWN_LOCAL_ARTIFACT_IDENTITY_NOT_FULLY_RECOVERED",
+      "license_or_commercial_constraints": "UNKNOWN_OR_PROJECT_INTERNAL; MUST_BE_…",
+      "reviewed_at": "2026-09-14",
+      "review_evidence": [
+        "gh:Kyuha927/comfy@work-handoffs-v4-20260912/releases/work-handoffs/20…"
+      ],
+      "claimed_benefit": "OpenCode to WebGPT plugin",
+      "current_stack_equivalent": "See current stack mapping in PORTF…",
+      "target_subsystem": "RECOVERED_PORTFOLIO",
+      "status": "BLOCKED",
+      "evidence_level": "L2",
+      "isolated_test_environment": "Attachment URL found but ZIP …",
+      "isolated_test_evidence": [
+        "gh:Kyuha927/comfy@work-handoffs-v4-20260912/releases/work-h…"
+      ],
+      "quality_delta": "SCOPED_RESULT_ONLY; NO_GLOB…",
+      "latency_delta": "UNKNOWN_NOT_MEASURED",
+      "cost_delta": "UNKNOWN_NOT_MEASURED",
+      "memory_or_vram_delta": "UNKNOWN_NOT_MEASURED",
+      "failure_modes": [
+        "Attachment URL found but ZI…"
+      ],
+      "recovery_behavior": [
+        "Recover exact artifact and test in an isolated ch…"
+      ],
+      "rollback_behavior": [
+        "No production integration performed by registry i…"
+      ],
+      "security_or_privacy_notes": [
+        "Do not execute recovered artifacts until exact ve…"
+      ],
+      "known_incompatibilities": [],
+      "supersedes": [],
+      "superseded_by": [],
+      "lin_3d_relevance": "INDIRECT",
+      "lin_3d_same_path_test": {
+        "status": "NOT_RUN",
+        "execution_path": "NO_CURRENT_LIN_SAME_PATH_EVIDENCE",
+        "environment": "CURRENT_LIN_AUTHORITY",
+        "artifact_ids": []
+      },
+      "lin_3d_evidence": [],
+      "regression_tests": [],
+      "owner_or_executor": "Original lane owner / new bounded …",
+      "next_gate": "Recover exact artifact and test in an isolated checkou…",
+      "last_verified_at": "2026-09-14",
+      "mutates_3d_state": false,
+      "authorized_scopes": []
+    },
+    {
+      "capability_id": "cap.work03.unity_agent_plugin_scene_compile_play_capture",
+      "tool_or_system": "Recovered Work lane 03",
+      "capability_name": "Unity Agent plugin scene/compile/play/capture",
+      "source_type": "RECOVERED_CORRECTED_AUDIT",
+      "official_source_urls": [],
+      "repository_url": "gh:Kyuha927/comfy",
+      "exact_version_or_commit": "UNKNOWN_LOCAL_ARTIFACT_IDENTITY_NOT_FULLY_RECOVERED",
+      "license_or_commercial_constraints": "UNKNOWN_OR_PROJECT_INTERNAL; MUST_BE_…",
+      "reviewed_at": "2026-09-14",
+      "review_evidence": [
+        "gh:Kyuha927/comfy@work-handoffs-v4-20260912/releases/work-handoffs/20…"
+      ],
+      "claimed_benefit": "Unity Agent plugin scene/compile/play/capture",
+      "current_stack_equivalent": "See current stack mapping in PORTF…",
+      "target_subsystem": "RECOVERED_PORTFOLIO",
+      "status": "REVIEWED",
+      "evidence_level": "L4",
+      "isolated_test_environment": "Scene/prefab/compile/play/cap…",
+      "isolated_test_evidence": [
+        "gh:Kyuha927/comfy@work-handoffs-v4-20260912/releases/work-h…"
+      ],
+      "quality_delta": "SCOPED_RESULT_ONLY; NO_GLOB…",
+      "latency_delta": "UNKNOWN_NOT_MEASURED",
+      "cost_delta": "UNKNOWN_NOT_MEASURED",
+      "memory_or_vram_delta": "UNKNOWN_NOT_MEASURED",
+      "failure_modes": [
+        "Scene/prefab/compile/play/c…"
+      ],
+      "recovery_behavior": [
+        "Reproduce with current official Unity Agent versi…"
+      ],
+      "rollback_behavior": [
+        "No production integration performed by registry i…"
+      ],
+      "security_or_privacy_notes": [
+        "Do not execute recovered artifacts until exact ve…"
+      ],
+      "known_incompatibilities": [],
+      "supersedes": [],
+      "superseded_by": [],
+      "lin_3d_relevance": "INDIRECT",
+      "lin_3d_same_path_test": {
+        "status": "NOT_RUN",
+        "execution_path": "NO_CURRENT_LIN_SAME_PATH_EVIDENCE",
+        "environment": "CURRENT_LIN_AUTHORITY",
+        "artifact_ids": []
+      },
+      "lin_3d_evidence": [],
+      "regression_tests": [],
+      "owner_or_executor": "Original lane owner / new bounded …",
+      "next_gate": "Reproduce with current official Unity Agent version an…",
+      "last_verified_at": "2026-09-14",
+      "mutates_3d_state": false,
+      "authorized_scopes": []
+    },
+    {
+      "capability_id": "cap.work04.three_js_relay_grid_vertical_slice",
+      "tool_or_system": "Recovered Work lane 04",
+      "capability_name": "Three.js Relay Grid vertical slice",
+      "source_type": "RECOVERED_CORRECTED_AUDIT",
+      "official_source_urls": [],
+      "repository_url": "gh:Kyuha927/comfy",
+      "exact_version_or_commit": "UNKNOWN_LOCAL_ARTIFACT_IDENTITY_NOT_FULLY_RECOVERED",
+      "license_or_commercial_constraints": "UNKNOWN_OR_PROJECT_INTERNAL; MUST_BE_…",
+      "reviewed_at": "2026-09-14",
+      "review_evidence": [
+        "gh:Kyuha927/comfy@work-handoffs-v4-20260912/releases/work-handoffs/20…"
+      ],
+      "claimed_benefit": "Three.js Relay Grid vertical slice",
+      "current_stack_equivalent": "See current stack mapping in PORTF…",
+      "target_subsystem": "RECOVERED_PORTFOLIO",
+      "status": "ISOLATED_PASS",
+      "evidence_level": "L4",
+      "isolated_test_environment": "Collectible/fail-retry/save-r…",
+      "isolated_test_evidence": [
+        "gh:Kyuha927/comfy@work-handoffs-v4-20260912/releases/work-h…"
+      ],
+      "quality_delta": "SCOPED_RESULT_ONLY; NO_GLOB…",
+      "latency_delta": "UNKNOWN_NOT_MEASURED",
+      "cost_delta": "UNKNOWN_NOT_MEASURED",
+      "memory_or_vram_delta": "UNKNOWN_NOT_MEASURED",
+      "failure_modes": [
+        "Collectible/fail-retry/save…"
+      ],
+      "recovery_behavior": [
+        "Keep generic; do not infer LIN or engine-wide rea…"
+      ],
+      "rollback_behavior": [
+        "No production integration performed by registry i…"
+      ],
+      "security_or_privacy_notes": [
+        "Do not execute recovered artifacts until exact ve…"
+      ],
+      "known_incompatibilities": [],
+      "supersedes": [],
+      "superseded_by": [],
+      "lin_3d_relevance": "NONE",
+      "lin_3d_same_path_test": {
+        "status": "NOT_APPLICABLE",
+        "execution_path": "NOT_APPLICABLE",
+        "environment": "NOT_RUN",
+        "artifact_ids": []
+      },
+      "lin_3d_evidence": [],
+      "regression_tests": [],
+      "owner_or_executor": "Original lane owner / new bounded …",
+      "next_gate": "Keep generic; do not infer LIN or engine-wide readines…",
+      "last_verified_at": "2026-09-14",
+      "mutates_3d_state": false,
+      "authorized_scopes": []
+    },
+    {
+      "capability_id": "cap.work05.canonflow_pinframe_roundtrip",
+      "tool_or_system": "Recovered Work lane 05",
+      "capability_name": "CANONFLOW/PINFRAME roundtrip",
+      "source_type": "RECOVERED_CORRECTED_AUDIT",
+      "official_source_urls": [],
+      "repository_url": "gh:Kyuha927/comfy",
+      "exact_version_or_commit": "UNKNOWN_LOCAL_ARTIFACT_IDENTITY_NOT_FULLY_RECOVERED",
+      "license_or_commercial_constraints": "UNKNOWN_OR_PROJECT_INTERNAL; MUST_BE_…",
+      "reviewed_at": "2026-09-14",
+      "review_evidence": [
+        "gh:Kyuha927/comfy@work-handoffs-v4-20260912/releases/work-handoffs/20…"
+      ],
+      "claimed_benefit": "CANONFLOW/PINFRAME roundtrip",
+      "current_stack_equivalent": "See current stack mapping in PORTF…",
+      "target_subsystem": "RECOVERED_PORTFOLIO",
+      "status": "ISOLATED_FAIL",
+      "evidence_level": "L4",
+      "isolated_test_environment": "Long-input reopen/backup, sco…",
+      "isolated_test_evidence": [
+        "gh:Kyuha927/comfy@work-handoffs-v4-20260912/releases/work-h…"
+      ],
+      "quality_delta": "SCOPED_RESULT_ONLY; NO_GLOB…",
+      "latency_delta": "UNKNOWN_NOT_MEASURED",
+      "cost_delta": "UNKNOWN_NOT_MEASURED",
+      "memory_or_vram_delta": "UNKNOWN_NOT_MEASURED",
+      "failure_modes": [
+        "Long-input reopen/backup, s…"
+      ],
+      "recovery_behavior": [
+        "Repair roundtrip and mobile defects before adopti…"
+      ],
+      "rollback_behavior": [
+        "No production integration performed by registry i…"
+      ],
+      "security_or_privacy_notes": [
+        "Do not execute recovered artifacts until exact ve…"
+      ],
+      "known_incompatibilities": [],
+      "supersedes": [],
+      "superseded_by": [],
+      "lin_3d_relevance": "NONE",
+      "lin_3d_same_path_test": {
+        "status": "NOT_APPLICABLE",
+        "execution_path": "NOT_APPLICABLE",
+        "environment": "NOT_RUN",
+        "artifact_ids": []
+      },
+      "lin_3d_evidence": [],
+      "regression_tests": [],
+      "owner_or_executor": "Original lane owner / new bounded …",
+      "next_gate": "Repair roundtrip and mobile defects before adoption.",
+      "last_verified_at": "2026-09-14",
+      "mutates_3d_state": false,
+      "authorized_scopes": []
+    },
+    {
+      "capability_id": "cap.work06.lin_r19_visual_candidate",
+      "tool_or_system": "Recovered Work lane 06",
+      "capability_name": "LIN R19 visual candidate",
+      "source_type": "RECOVERED_CORRECTED_AUDIT",
+      "official_source_urls": [],
+      "repository_url": "gh:Kyuha927/comfy",
+      "exact_version_or_commit": "UNKNOWN_LOCAL_ARTIFACT_IDENTITY_NOT_FULLY_RECOVERED",
+      "license_or_commercial_constraints": "UNKNOWN_OR_PROJECT_INTERNAL; MUST_BE_…",
+      "reviewed_at": "2026-09-14",
+      "review_evidence": [
+        "gh:Kyuha927/comfy@work-handoffs-v4-20260912/releases/work-handoffs/20…"
+      ],
+      "claimed_benefit": "LIN R19 visual candidate",
+      "current_stack_equivalent": "See current stack mapping in PORTF…",
+      "target_subsystem": "RECOVERED_PORTFOLIO",
+      "status": "ISOLATED_FAIL",
+      "evidence_level": "L6",
+      "isolated_test_environment": "Saved candidate and nine rend…",
+      "isolated_test_evidence": [
+        "gh:Kyuha927/comfy@work-handoffs-v4-20260912/releases/work-h…"
+      ],
+      "quality_delta": "SCOPED_RESULT_ONLY; NO_GLOB…",
+      "latency_delta": "UNKNOWN_NOT_MEASURED",
+      "cost_delta": "UNKNOWN_NOT_MEASURED",
+      "memory_or_vram_delta": "UNKNOWN_NOT_MEASURED",
+      "failure_modes": [
+        "Saved candidate and nine re…"
+      ],
+      "recovery_behavior": [
+        "Do not promote; use as failure evidence only."
+      ],
+      "rollback_behavior": [
+        "No production integration performed by registry i…"
+      ],
+      "security_or_privacy_notes": [
+        "Do not execute recovered artifacts until exact ve…"
+      ],
+      "known_incompatibilities": [],
+      "supersedes": [],
+      "superseded_by": [],
+      "lin_3d_relevance": "DIRECT",
+      "lin_3d_same_path_test": {
+        "status": "NOT_RUN",
+        "execution_path": "NO_CURRENT_LIN_SAME_PATH_EVIDENCE",
+        "environment": "CURRENT_LIN_AUTHORITY",
+        "artifact_ids": []
+      },
+      "lin_3d_evidence": [],
+      "regression_tests": [],
+      "owner_or_executor": "Original lane owner / new bounded …",
+      "next_gate": "Do not promote; use as failure evidence only.",
+      "last_verified_at": "2026-09-14",
+      "mutates_3d_state": false,
+      "authorized_scopes": []
+    },
+    {
+      "capability_id": "cap.work07.noin_continuity_quantitative_checks",
+      "tool_or_system": "Recovered Work lane 07",
+      "capability_name": "NOIN continuity quantitative checks",
+      "source_type": "RECOVERED_CORRECTED_AUDIT",
+      "official_source_urls": [],
+      "repository_url": "gh:Kyuha927/comfy",
+      "exact_version_or_commit": "UNKNOWN_LOCAL_ARTIFACT_IDENTITY_NOT_FULLY_RECOVERED",
+      "license_or_commercial_constraints": "UNKNOWN_OR_PROJECT_INTERNAL; MUST_BE_…",
+      "reviewed_at": "2026-09-14",
+      "review_evidence": [
+        "gh:Kyuha927/comfy@work-handoffs-v4-20260912/releases/work-handoffs/20…"
+      ],
+      "claimed_benefit": "NOIN continuity quantitative checks",
+      "current_stack_equivalent": "See current stack mapping in PORTF…",
+      "target_subsystem": "RECOVERED_PORTFOLIO",
+      "status": "ISOLATED_PASS",
+      "evidence_level": "L4",
+      "isolated_test_environment": "15 slots/90 fields, adjacent …",
+      "isolated_test_evidence": [
+        "gh:Kyuha927/comfy@work-handoffs-v4-20260912/releases/work-h…"
+      ],
+      "quality_delta": "SCOPED_RESULT_ONLY; NO_GLOB…",
+      "latency_delta": "UNKNOWN_NOT_MEASURED",
+      "cost_delta": "UNKNOWN_NOT_MEASURED",
+      "memory_or_vram_delta": "UNKNOWN_NOT_MEASURED",
+      "failure_modes": [
+        "15 slots/90 fields, adjacen…"
+      ],
+      "recovery_behavior": [
+        "Retain as story-domain isolated evidence only."
+      ],
+      "rollback_behavior": [
+        "No production integration performed by registry i…"
+      ],
+      "security_or_privacy_notes": [
+        "Do not execute recovered artifacts until exact ve…"
+      ],
+      "known_incompatibilities": [],
+      "supersedes": [],
+      "superseded_by": [],
+      "lin_3d_relevance": "NONE",
+      "lin_3d_same_path_test": {
+        "status": "NOT_APPLICABLE",
+        "execution_path": "NOT_APPLICABLE",
+        "environment": "NOT_RUN",
+        "artifact_ids": []
+      },
+      "lin_3d_evidence": [],
+      "regression_tests": [],
+      "owner_or_executor": "Original lane owner / new bounded …",
+      "next_gate": "Retain as story-domain isolated evidence only.",
+      "last_verified_at": "2026-09-14",
+      "mutates_3d_state": false,
+      "authorized_scopes": []
+    },
+    {
+      "capability_id": "cap.work08.ai_music_candidate_recovery",
+      "tool_or_system": "Recovered Work lane 08",
+      "capability_name": "AI music candidate recovery",
+      "source_type": "RECOVERED_CORRECTED_AUDIT",
+      "official_source_urls": [],
+      "repository_url": "gh:Kyuha927/comfy",
+      "exact_version_or_commit": "UNKNOWN_LOCAL_ARTIFACT_IDENTITY_NOT_FULLY_RECOVERED",
+      "license_or_commercial_constraints": "UNKNOWN_OR_PROJECT_INTERNAL; MUST_BE_…",
+      "reviewed_at": "2026-09-14",
+      "review_evidence": [
+        "gh:Kyuha927/comfy@work-handoffs-v4-20260912/releases/work-handoffs/20…"
+      ],
+      "claimed_benefit": "AI music candidate recovery",
+      "current_stack_equivalent": "See current stack mapping in PORTF…",
+      "target_subsystem": "RECOVERED_PORTFOLIO",
+      "status": "ISOLATED_PASS",
+      "evidence_level": "L4",
+      "isolated_test_environment": "Eight candidates and prompts/…",
+      "isolated_test_evidence": [
+        "gh:Kyuha927/comfy@work-handoffs-v4-20260912/releases/work-h…"
+      ],
+      "quality_delta": "SCOPED_RESULT_ONLY; NO_GLOB…",
+      "latency_delta": "UNKNOWN_NOT_MEASURED",
+      "cost_delta": "UNKNOWN_NOT_MEASURED",
+      "memory_or_vram_delta": "UNKNOWN_NOT_MEASURED",
+      "failure_modes": [
+        "Eight candidates and prompt…"
+      ],
+      "recovery_behavior": [
+        "Run audio review and rights verification before p…"
+      ],
+      "rollback_behavior": [
+        "No production integration performed by registry i…"
+      ],
+      "security_or_privacy_notes": [
+        "Do not execute recovered artifacts until exact ve…"
+      ],
+      "known_incompatibilities": [],
+      "supersedes": [],
+      "superseded_by": [],
+      "lin_3d_relevance": "NONE",
+      "lin_3d_same_path_test": {
+        "status": "NOT_APPLICABLE",
+        "execution_path": "NOT_APPLICABLE",
+        "environment": "NOT_RUN",
+        "artifact_ids": []
+      },
+      "lin_3d_evidence": [],
+      "regression_tests": [],
+      "owner_or_executor": "Original lane owner / new bounded …",
+      "next_gate": "Run audio review and rights verification before produc…",
+      "last_verified_at": "2026-09-14",
+      "mutates_3d_state": false,
+      "authorized_scopes": []
+    },
+    {
+      "capability_id": "cap.work09.ai_music_video_offline_postprocess",
+      "tool_or_system": "Recovered Work lane 09",
+      "capability_name": "AI music video offline postprocess",
+      "source_type": "RECOVERED_CORRECTED_AUDIT",
+      "official_source_urls": [],
+      "repository_url": "gh:Kyuha927/comfy",
+      "exact_version_or_commit": "UNKNOWN_LOCAL_ARTIFACT_IDENTITY_NOT_FULLY_RECOVERED",
+      "license_or_commercial_constraints": "UNKNOWN_OR_PROJECT_INTERNAL; MUST_BE_…",
+      "reviewed_at": "2026-09-14",
+      "review_evidence": [
+        "gh:Kyuha927/comfy@work-handoffs-v4-20260912/releases/work-handoffs/20…"
+      ],
+      "claimed_benefit": "AI music video offline postprocess",
+      "current_stack_equivalent": "See current stack mapping in PORTF…",
+      "target_subsystem": "RECOVERED_PORTFOLIO",
+      "status": "ISOLATED_PASS",
+      "evidence_level": "L4",
+      "isolated_test_environment": "Offline editor/workflow and f…",
+      "isolated_test_evidence": [
+        "gh:Kyuha927/comfy@work-handoffs-v4-20260912/releases/work-h…"
+      ],
+      "quality_delta": "SCOPED_RESULT_ONLY; NO_GLOB…",
+      "latency_delta": "UNKNOWN_NOT_MEASURED",
+      "cost_delta": "UNKNOWN_NOT_MEASURED",
+      "memory_or_vram_delta": "UNKNOWN_NOT_MEASURED",
+      "failure_modes": [
+        "Offline editor/workflow and…"
+      ],
+      "recovery_behavior": [
+        "Test on final licensed source and full-length ren…"
+      ],
+      "rollback_behavior": [
+        "No production integration performed by registry i…"
+      ],
+      "security_or_privacy_notes": [
+        "Do not execute recovered artifacts until exact ve…"
+      ],
+      "known_incompatibilities": [],
+      "supersedes": [],
+      "superseded_by": [],
+      "lin_3d_relevance": "NONE",
+      "lin_3d_same_path_test": {
+        "status": "NOT_APPLICABLE",
+        "execution_path": "NOT_APPLICABLE",
+        "environment": "NOT_RUN",
+        "artifact_ids": []
+      },
+      "lin_3d_evidence": [],
+      "regression_tests": [],
+      "owner_or_executor": "Original lane owner / new bounded …",
+      "next_gate": "Test on final licensed source and full-length render.",
+      "last_verified_at": "2026-09-14",
+      "mutates_3d_state": false,
+      "authorized_scopes": []
+    },
+    {
+      "capability_id": "cap.work10.life_agent_apk_static_build_evidence",
+      "tool_or_system": "Recovered Work lane 10",
+      "capability_name": "Life-Agent APK static/build evidence",
+      "source_type": "RECOVERED_CORRECTED_AUDIT",
+      "official_source_urls": [],
+      "repository_url": "gh:Kyuha927/comfy",
+      "exact_version_or_commit": "UNKNOWN_LOCAL_ARTIFACT_IDENTITY_NOT_FULLY_RECOVERED",
+      "license_or_commercial_constraints": "UNKNOWN_OR_PROJECT_INTERNAL; MUST_BE_…",
+      "reviewed_at": "2026-09-14",
+      "review_evidence": [
+        "gh:Kyuha927/comfy@work-handoffs-v4-20260912/releases/work-handoffs/20…"
+      ],
+      "claimed_benefit": "Life-Agent APK static/build evidence",
+      "current_stack_equivalent": "See current stack mapping in PORTF…",
+      "target_subsystem": "RECOVERED_PORTFOLIO",
+      "status": "ISOLATED_PASS",
+      "evidence_level": "L4",
+      "isolated_test_environment": "Source/APK/static/build check…",
+      "isolated_test_evidence": [
+        "gh:Kyuha927/comfy@work-handoffs-v4-20260912/releases/work-h…"
+      ],
+      "quality_delta": "SCOPED_RESULT_ONLY; NO_GLOB…",
+      "latency_delta": "UNKNOWN_NOT_MEASURED",
+      "cost_delta": "UNKNOWN_NOT_MEASURED",
+      "memory_or_vram_delta": "UNKNOWN_NOT_MEASURED",
+      "failure_modes": [
+        "Source/APK/static/build che…"
+      ],
+      "recovery_behavior": [
+        "Run device install/startup and representative per…"
+      ],
+      "rollback_behavior": [
+        "No production integration performed by registry i…"
+      ],
+      "security_or_privacy_notes": [
+        "Do not execute recovered artifacts until exact ve…"
+      ],
+      "known_incompatibilities": [],
+      "supersedes": [],
+      "superseded_by": [],
+      "lin_3d_relevance": "NONE",
+      "lin_3d_same_path_test": {
+        "status": "NOT_APPLICABLE",
+        "execution_path": "NOT_APPLICABLE",
+        "environment": "NOT_RUN",
+        "artifact_ids": []
+      },
+      "lin_3d_evidence": [],
+      "regression_tests": [],
+      "owner_or_executor": "Original lane owner / new bounded …",
+      "next_gate": "Run device install/startup and representative permissi…",
+      "last_verified_at": "2026-09-14",
+      "mutates_3d_state": false,
+      "authorized_scopes": []
+    },
+    {
+      "capability_id": "cap.work11.deepseek_design_beta",
+      "tool_or_system": "Recovered Work lane 11",
+      "capability_name": "DeepSeek design beta",
+      "source_type": "RECOVERED_CORRECTED_AUDIT",
+      "official_source_urls": [],
+      "repository_url": "gh:Kyuha927/comfy",
+      "exact_version_or_commit": "UNKNOWN_LOCAL_ARTIFACT_IDENTITY_NOT_FULLY_RECOVERED",
+      "license_or_commercial_constraints": "UNKNOWN_OR_PROJECT_INTERNAL; MUST_BE_…",
+      "reviewed_at": "2026-09-14",
+      "review_evidence": [
+        "gh:Kyuha927/comfy@work-handoffs-v4-20260912/releases/work-handoffs/20…"
+      ],
+      "claimed_benefit": "DeepSeek design beta",
+      "current_stack_equivalent": "See current stack mapping in PORTF…",
+      "target_subsystem": "RECOVERED_PORTFOLIO",
+      "status": "ISOLATED_FAIL",
+      "evidence_level": "L4",
+      "isolated_test_environment": "22 calls/four HTML outputs bu…",
+      "isolated_test_evidence": [
+        "gh:Kyuha927/comfy@work-handoffs-v4-20260912/releases/work-h…"
+      ],
+      "quality_delta": "SCOPED_RESULT_ONLY; NO_GLOB…",
+      "latency_delta": "UNKNOWN_NOT_MEASURED",
+      "cost_delta": "UNKNOWN_NOT_MEASURED",
+      "memory_or_vram_delta": "UNKNOWN_NOT_MEASURED",
+      "failure_modes": [
+        "22 calls/four HTML outputs …"
+      ],
+      "recovery_behavior": [
+        "Build discriminating pairs and complete blind rev…"
+      ],
+      "rollback_behavior": [
+        "No production integration performed by registry i…"
+      ],
+      "security_or_privacy_notes": [
+        "Do not execute recovered artifacts until exact ve…"
+      ],
+      "known_incompatibilities": [],
+      "supersedes": [],
+      "superseded_by": [],
+      "lin_3d_relevance": "NONE",
+      "lin_3d_same_path_test": {
+        "status": "NOT_APPLICABLE",
+        "execution_path": "NOT_APPLICABLE",
+        "environment": "NOT_RUN",
+        "artifact_ids": []
+      },
+      "lin_3d_evidence": [],
+      "regression_tests": [],
+      "owner_or_executor": "Original lane owner / new bounded …",
+      "next_gate": "Build discriminating pairs and complete blind review.",
+      "last_verified_at": "2026-09-14",
+      "mutates_3d_state": false,
+      "authorized_scopes": []
+    },
+    {
+      "capability_id": "cap.work12.atlas_approval_state_absorption",
+      "tool_or_system": "Recovered Work lane 12",
+      "capability_name": "Atlas approval-state absorption",
+      "source_type": "RECOVERED_CORRECTED_AUDIT",
+      "official_source_urls": [],
+      "repository_url": "gh:Kyuha927/comfy",
+      "exact_version_or_commit": "UNKNOWN_LOCAL_ARTIFACT_IDENTITY_NOT_FULLY_RECOVERED",
+      "license_or_commercial_constraints": "UNKNOWN_OR_PROJECT_INTERNAL; MUST_BE_…",
+      "reviewed_at": "2026-09-14",
+      "review_evidence": [
+        "gh:Kyuha927/comfy@work-handoffs-v4-20260912/releases/work-handoffs/20…"
+      ],
+      "claimed_benefit": "Atlas approval-state absorption",
+      "current_stack_equivalent": "See current stack mapping in PORTF…",
+      "target_subsystem": "RECOVERED_PORTFOLIO",
+      "status": "ISOLATED_PASS",
+      "evidence_level": "L4",
+      "isolated_test_environment": "Approval-to-production-ready …",
+      "isolated_test_evidence": [
+        "gh:Kyuha927/comfy@work-handoffs-v4-20260912/releases/work-h…"
+      ],
+      "quality_delta": "SCOPED_RESULT_ONLY; NO_GLOB…",
+      "latency_delta": "UNKNOWN_NOT_MEASURED",
+      "cost_delta": "UNKNOWN_NOT_MEASURED",
+      "memory_or_vram_delta": "UNKNOWN_NOT_MEASURED",
+      "failure_modes": [
+        "Approval-to-production-read…"
+      ],
+      "recovery_behavior": [
+        "Keep only the generic state-machine pattern."
+      ],
+      "rollback_behavior": [
+        "No production integration performed by registry i…"
+      ],
+      "security_or_privacy_notes": [
+        "Do not execute recovered artifacts until exact ve…"
+      ],
+      "known_incompatibilities": [],
+      "supersedes": [],
+      "superseded_by": [],
+      "lin_3d_relevance": "NONE",
+      "lin_3d_same_path_test": {
+        "status": "NOT_APPLICABLE",
+        "execution_path": "NOT_APPLICABLE",
+        "environment": "NOT_RUN",
+        "artifact_ids": []
+      },
+      "lin_3d_evidence": [],
+      "regression_tests": [],
+      "owner_or_executor": "Original lane owner / new bounded …",
+      "next_gate": "Keep only the generic state-machine pattern.",
+      "last_verified_at": "2026-09-14",
+      "mutates_3d_state": false,
+      "authorized_scopes": []
+    },
+    {
+      "capability_id": "cap.work13.local_three_js_toolchain",
+      "tool_or_system": "Recovered Work lane 13",
+      "capability_name": "Local Three.js toolchain",
+      "source_type": "RECOVERED_CORRECTED_AUDIT",
+      "official_source_urls": [],
+      "repository_url": "gh:Kyuha927/comfy",
+      "exact_version_or_commit": "UNKNOWN_LOCAL_ARTIFACT_IDENTITY_NOT_FULLY_RECOVERED",
+      "license_or_commercial_constraints": "UNKNOWN_OR_PROJECT_INTERNAL; MUST_BE_…",
+      "reviewed_at": "2026-09-14",
+      "review_evidence": [
+        "gh:Kyuha927/comfy@work-handoffs-v4-20260912/releases/work-handoffs/20…"
+      ],
+      "claimed_benefit": "Local Three.js toolchain",
+      "current_stack_equivalent": "See current stack mapping in PORTF…",
+      "target_subsystem": "RECOVERED_PORTFOLIO",
+      "status": "ISOLATED_PASS",
+      "evidence_level": "L4",
+      "isolated_test_environment": "Compatibility patch, 27/27 te…",
+      "isolated_test_evidence": [
+        "gh:Kyuha927/comfy@work-handoffs-v4-20260912/releases/work-h…"
+      ],
+      "quality_delta": "SCOPED_RESULT_ONLY; NO_GLOB…",
+      "latency_delta": "UNKNOWN_NOT_MEASURED",
+      "cost_delta": "UNKNOWN_NOT_MEASURED",
+      "memory_or_vram_delta": "UNKNOWN_NOT_MEASURED",
+      "failure_modes": [
+        "Compatibility patch, 27/27 …"
+      ],
+      "recovery_behavior": [
+        "Retain generic bounded adapter evidence."
+      ],
+      "rollback_behavior": [
+        "No production integration performed by registry i…"
+      ],
+      "security_or_privacy_notes": [
+        "Do not execute recovered artifacts until exact ve…"
+      ],
+      "known_incompatibilities": [],
+      "supersedes": [],
+      "superseded_by": [],
+      "lin_3d_relevance": "NONE",
+      "lin_3d_same_path_test": {
+        "status": "NOT_APPLICABLE",
+        "execution_path": "NOT_APPLICABLE",
+        "environment": "NOT_RUN",
+        "artifact_ids": []
+      },
+      "lin_3d_evidence": [],
+      "regression_tests": [],
+      "owner_or_executor": "Original lane owner / new bounded …",
+      "next_gate": "Retain generic bounded adapter evidence.",
+      "last_verified_at": "2026-09-14",
+      "mutates_3d_state": false,
+      "authorized_scopes": []
+    },
+    {
+      "capability_id": "cap.work14.sol_pi_sprite_gen_intake",
+      "tool_or_system": "Recovered Work lane 14",
+      "capability_name": "SoL-Pi / sprite-gen intake",
+      "source_type": "RECOVERED_CORRECTED_AUDIT",
+      "official_source_urls": [],
+      "repository_url": "gh:Kyuha927/comfy",
+      "exact_version_or_commit": "UNKNOWN_LOCAL_ARTIFACT_IDENTITY_NOT_FULLY_RECOVERED",
+      "license_or_commercial_constraints": "UNKNOWN_OR_PROJECT_INTERNAL; MUST_BE_…",
+      "reviewed_at": "2026-09-14",
+      "review_evidence": [
+        "gh:Kyuha927/comfy@work-handoffs-v4-20260912/releases/work-handoffs/20…"
+      ],
+      "claimed_benefit": "SoL-Pi / sprite-gen intake",
+      "current_stack_equivalent": "See current stack mapping in PORTF…",
+      "target_subsystem": "RECOVERED_PORTFOLIO",
+      "status": "ISOLATED_PASS",
+      "evidence_level": "L4",
+      "isolated_test_environment": "Postprocess/extraction/atlas/…",
+      "isolated_test_evidence": [
+        "gh:Kyuha927/comfy@work-handoffs-v4-20260912/releases/work-h…"
+      ],
+      "quality_delta": "SCOPED_RESULT_ONLY; NO_GLOB…",
+      "latency_delta": "UNKNOWN_NOT_MEASURED",
+      "cost_delta": "UNKNOWN_NOT_MEASURED",
+      "memory_or_vram_delta": "UNKNOWN_NOT_MEASURED",
+      "failure_modes": [
+        "Postprocess/extraction/atla…"
+      ],
+      "recovery_behavior": [
+        "Keep in experiment lane."
+      ],
+      "rollback_behavior": [
+        "No production integration performed by registry i…"
+      ],
+      "security_or_privacy_notes": [
+        "Do not execute recovered artifacts until exact ve…"
+      ],
+      "known_incompatibilities": [],
+      "supersedes": [],
+      "superseded_by": [],
+      "lin_3d_relevance": "NONE",
+      "lin_3d_same_path_test": {
+        "status": "NOT_APPLICABLE",
+        "execution_path": "NOT_APPLICABLE",
+        "environment": "NOT_RUN",
+        "artifact_ids": []
+      },
+      "lin_3d_evidence": [],
+      "regression_tests": [],
+      "owner_or_executor": "Original lane owner / new bounded …",
+      "next_gate": "Keep in experiment lane.",
+      "last_verified_at": "2026-09-14",
+      "mutates_3d_state": false,
+      "authorized_scopes": []
+    },
+    {
+      "capability_id": "cap.work15.storage_resume_repair",
+      "tool_or_system": "Recovered Work lane 15",
+      "capability_name": "Storage resume repair",
+      "source_type": "RECOVERED_CORRECTED_AUDIT",
+      "official_source_urls": [],
+      "repository_url": "gh:Kyuha927/comfy",
+      "exact_version_or_commit": "UNKNOWN_LOCAL_ARTIFACT_IDENTITY_NOT_FULLY_RECOVERED",
+      "license_or_commercial_constraints": "UNKNOWN_OR_PROJECT_INTERNAL; MUST_BE_…",
+      "reviewed_at": "2026-09-14",
+      "review_evidence": [
+        "gh:Kyuha927/comfy@work-handoffs-v4-20260912/releases/work-handoffs/20…"
+      ],
+      "claimed_benefit": "Storage resume repair",
+      "current_stack_equivalent": "See current stack mapping in PORTF…",
+      "target_subsystem": "RECOVERED_PORTFOLIO",
+      "status": "ISOLATED_PASS",
+      "evidence_level": "L4",
+      "isolated_test_environment": "Resume extraction bug fixed a…",
+      "isolated_test_evidence": [
+        "gh:Kyuha927/comfy@work-handoffs-v4-20260912/releases/work-h…"
+      ],
+      "quality_delta": "SCOPED_RESULT_ONLY; NO_GLOB…",
+      "latency_delta": "UNKNOWN_NOT_MEASURED",
+      "cost_delta": "UNKNOWN_NOT_MEASURED",
+      "memory_or_vram_delta": "UNKNOWN_NOT_MEASURED",
+      "failure_modes": [
+        "Resume extraction bug fixed…"
+      ],
+      "recovery_behavior": [
+        "Run byte-identical remote restore and measured di…"
+      ],
+      "rollback_behavior": [
+        "No production integration performed by registry i…"
+      ],
+      "security_or_privacy_notes": [
+        "Do not execute recovered artifacts until exact ve…"
+      ],
+      "known_incompatibilities": [],
+      "supersedes": [],
+      "superseded_by": [],
+      "lin_3d_relevance": "NONE",
+      "lin_3d_same_path_test": {
+        "status": "NOT_APPLICABLE",
+        "execution_path": "NOT_APPLICABLE",
+        "environment": "NOT_RUN",
+        "artifact_ids": []
+      },
+      "lin_3d_evidence": [],
+      "regression_tests": [],
+      "owner_or_executor": "Original lane owner / new bounded …",
+      "next_gate": "Run byte-identical remote restore and measured disk be…",
+      "last_verified_at": "2026-09-14",
+      "mutates_3d_state": false,
+      "authorized_scopes": []
+    },
+    {
+      "capability_id": "cap.work16.funding_official_source_table",
+      "tool_or_system": "Recovered Work lane 16",
+      "capability_name": "Funding official-source table",
+      "source_type": "RECOVERED_CORRECTED_AUDIT",
+      "official_source_urls": [],
+      "repository_url": "gh:Kyuha927/comfy",
+      "exact_version_or_commit": "UNKNOWN_LOCAL_ARTIFACT_IDENTITY_NOT_FULLY_RECOVERED",
+      "license_or_commercial_constraints": "UNKNOWN_OR_PROJECT_INTERNAL; MUST_BE_…",
+      "reviewed_at": "2026-09-14",
+      "review_evidence": [
+        "gh:Kyuha927/comfy@work-handoffs-v4-20260912/releases/work-handoffs/20…"
+      ],
+      "claimed_benefit": "Funding official-source table",
+      "current_stack_equivalent": "See current stack mapping in PORTF…",
+      "target_subsystem": "RECOVERED_PORTFOLIO",
+      "status": "REVIEWED",
+      "evidence_level": "L2",
+      "isolated_test_environment": "Draft/script/30-day plan; eli…",
+      "isolated_test_evidence": [
+        "gh:Kyuha927/comfy@work-handoffs-v4-20260912/releases/work-h…"
+      ],
+      "quality_delta": "SCOPED_RESULT_ONLY; NO_GLOB…",
+      "latency_delta": "UNKNOWN_NOT_MEASURED",
+      "cost_delta": "UNKNOWN_NOT_MEASURED",
+      "memory_or_vram_delta": "UNKNOWN_NOT_MEASURED",
+      "failure_modes": [
+        "Draft/script/30-day plan; e…"
+      ],
+      "recovery_behavior": [
+        "Reverify current official program eligibility/dea…"
+      ],
+      "rollback_behavior": [
+        "No production integration performed by registry i…"
+      ],
+      "security_or_privacy_notes": [
+        "Do not execute recovered artifacts until exact ve…"
+      ],
+      "known_incompatibilities": [],
+      "supersedes": [],
+      "superseded_by": [],
+      "lin_3d_relevance": "NONE",
+      "lin_3d_same_path_test": {
+        "status": "NOT_APPLICABLE",
+        "execution_path": "NOT_APPLICABLE",
+        "environment": "NOT_RUN",
+        "artifact_ids": []
+      },
+      "lin_3d_evidence": [],
+      "regression_tests": [],
+      "owner_or_executor": "Original lane owner / new bounded …",
+      "next_gate": "Reverify current official program eligibility/deadline…",
+      "last_verified_at": "2026-09-14",
+      "mutates_3d_state": false,
+      "authorized_scopes": []
+    },
+    {
+      "capability_id": "cap.work17.read_only_email_triage",
+      "tool_or_system": "Recovered Work lane 17",
+      "capability_name": "Read-only email triage",
+      "source_type": "RECOVERED_CORRECTED_AUDIT",
+      "official_source_urls": [],
+      "repository_url": "gh:Kyuha927/comfy",
+      "exact_version_or_commit": "UNKNOWN_LOCAL_ARTIFACT_IDENTITY_NOT_FULLY_RECOVERED",
+      "license_or_commercial_constraints": "UNKNOWN_OR_PROJECT_INTERNAL; MUST_BE_…",
+      "reviewed_at": "2026-09-14",
+      "review_evidence": [
+        "gh:Kyuha927/comfy@work-handoffs-v4-20260912/releases/work-handoffs/20…"
+      ],
+      "claimed_benefit": "Read-only email triage",
+      "current_stack_equivalent": "See current stack mapping in PORTF…",
+      "target_subsystem": "RECOVERED_PORTFOLIO",
+      "status": "ISOLATED_PASS",
+      "evidence_level": "L5",
+      "isolated_test_environment": "Account-suspension mail corre…",
+      "isolated_test_evidence": [
+        "gh:Kyuha927/comfy@work-handoffs-v4-20260912/releases/work-h…"
+      ],
+      "quality_delta": "SCOPED_RESULT_ONLY; NO_GLOB…",
+      "latency_delta": "UNKNOWN_NOT_MEASURED",
+      "cost_delta": "UNKNOWN_NOT_MEASURED",
+      "memory_or_vram_delta": "UNKNOWN_NOT_MEASURED",
+      "failure_modes": [
+        "Account-suspension mail cor…"
+      ],
+      "recovery_behavior": [
+        "Keep read-only and separately authorize any mutat…"
+      ],
+      "rollback_behavior": [
+        "No production integration performed by registry i…"
+      ],
+      "security_or_privacy_notes": [
+        "Do not execute recovered artifacts until exact ve…"
+      ],
+      "known_incompatibilities": [],
+      "supersedes": [],
+      "superseded_by": [],
+      "lin_3d_relevance": "NONE",
+      "lin_3d_same_path_test": {
+        "status": "NOT_APPLICABLE",
+        "execution_path": "NOT_APPLICABLE",
+        "environment": "NOT_RUN",
+        "artifact_ids": []
+      },
+      "lin_3d_evidence": [],
+      "regression_tests": [],
+      "owner_or_executor": "Original lane owner / new bounded …",
+      "next_gate": "Keep read-only and separately authorize any mutation.",
+      "last_verified_at": "2026-09-14",
+      "mutates_3d_state": false,
+      "authorized_scopes": []
+    },
+    {
+      "capability_id": "cap.work18.technology_scouting_decision_log",
+      "tool_or_system": "Recovered Work lane 18",
+      "capability_name": "Technology scouting decision log",
+      "source_type": "RECOVERED_CORRECTED_AUDIT",
+      "official_source_urls": [],
+      "repository_url": "gh:Kyuha927/comfy",
+      "exact_version_or_commit": "UNKNOWN_LOCAL_ARTIFACT_IDENTITY_NOT_FULLY_RECOVERED",
+      "license_or_commercial_constraints": "UNKNOWN_OR_PROJECT_INTERNAL; MUST_BE_…",
+      "reviewed_at": "2026-09-14",
+      "review_evidence": [
+        "gh:Kyuha927/comfy@work-handoffs-v4-20260912/releases/work-handoffs/20…"
+      ],
+      "claimed_benefit": "Technology scouting decision log",
+      "current_stack_equivalent": "See current stack mapping in PORTF…",
+      "target_subsystem": "RECOVERED_PORTFOLIO",
+      "status": "ISOLATED_PASS",
+      "evidence_level": "L4",
+      "isolated_test_environment": "11 candidates classified; fiv…",
+      "isolated_test_evidence": [
+        "gh:Kyuha927/comfy@work-handoffs-v4-20260912/releases/work-h…"
+      ],
+      "quality_delta": "SCOPED_RESULT_ONLY; NO_GLOB…",
+      "latency_delta": "UNKNOWN_NOT_MEASURED",
+      "cost_delta": "UNKNOWN_NOT_MEASURED",
+      "memory_or_vram_delta": "UNKNOWN_NOT_MEASURED",
+      "failure_modes": [
+        "11 candidates classified; f…"
+      ],
+      "recovery_behavior": [
+        "Use only as intake; every ACT NOW item needs its …"
+      ],
+      "rollback_behavior": [
+        "No production integration performed by registry i…"
+      ],
+      "security_or_privacy_notes": [
+        "Do not execute recovered artifacts until exact ve…"
+      ],
+      "known_incompatibilities": [],
+      "supersedes": [],
+      "superseded_by": [],
+      "lin_3d_relevance": "INDIRECT",
+      "lin_3d_same_path_test": {
+        "status": "NOT_RUN",
+        "execution_path": "NO_CURRENT_LIN_SAME_PATH_EVIDENCE",
+        "environment": "CURRENT_LIN_AUTHORITY",
+        "artifact_ids": []
+      },
+      "lin_3d_evidence": [],
+      "regression_tests": [],
+      "owner_or_executor": "Original lane owner / new bounded …",
+      "next_gate": "Use only as intake; every ACT NOW item needs its own c…",
+      "last_verified_at": "2026-09-14",
+      "mutates_3d_state": false,
+      "authorized_scopes": []
+    },
+    {
+      "capability_id": "cap.switchyard.multi_agent_routing",
+      "tool_or_system": "NVIDIA NeMo Switchyard",
+      "capability_name": "Multi-agent routing/orchestration research candidate",
+      "source_type": "CURRENT_OFFICIAL_REPOSITORY…",
+      "official_source_urls": [
+        "gh:NVIDIA-NeMo/Switchyard"
+      ],
+      "repository_url": "gh:NVIDIA-NeMo/Switchyard",
+      "exact_version_or_commit": "9b6efb94cedadca4652e2e4c3e014abed2c44831",
+      "license_or_commercial_constraints": "LICENSE_AND_COMMERCIAL_CONSTRAINTS_NO…",
+      "reviewed_at": "2026-09-14",
+      "review_evidence": [
+        "gh:NVIDIA-NeMo/Switchyard@9b6efb94cedadca4652e2e4c3e014abed2c44831"
+      ],
+      "claimed_benefit": "Multi-agent routing/orchestration research candid…",
+      "current_stack_equivalent": "Existing Production Skill OS / rev…",
+      "target_subsystem": "LATER_TOOL_INTAKE",
+      "status": "REVIEWED",
+      "evidence_level": "L1",
+      "isolated_test_environment": "NOT_RUN_IN_CURRENT_STACK",
+      "isolated_test_evidence": [],
+      "quality_delta": "UNKNOWN_NOT_MEASURED",
+      "latency_delta": "UNKNOWN_NOT_MEASURED",
+      "cost_delta": "UNKNOWN_NOT_MEASURED",
+      "memory_or_vram_delta": "UNKNOWN_NOT_MEASURED",
+      "failure_modes": [
+        "LICENSE_UNRESOLVED",
+        "DUPLICATE_SYSTEM_RISK"
+      ],
+      "recovery_behavior": [
+        "Pin exact commit, read official setup/license, th…"
+      ],
+      "rollback_behavior": [
+        "No integration performed; remove candidate adapte…"
+      ],
+      "security_or_privacy_notes": [
+        "Do not provide credentials or production data dur…"
+      ],
+      "known_incompatibilities": [
+        "Not authorized for LIN_3D_FINAL."
+      ],
+      "supersedes": [],
+      "superseded_by": [],
+      "lin_3d_relevance": "INDIRECT",
+      "lin_3d_same_path_test": {
+        "status": "NOT_RUN",
+        "execution_path": "NO_LIN_SAME_PATH_TEST",
+        "environment": "CURRENT_LIN_AUTHORITY",
+        "artifact_ids": []
+      },
+      "lin_3d_evidence": [],
+      "regression_tests": [],
+      "owner_or_executor": "Tool-intake lane",
+      "next_gate": "Compare bounded routing/observability capabilities aga…",
+      "last_verified_at": "2026-09-14",
+      "mutates_3d_state": false,
+      "authorized_scopes": []
+    },
+    {
+      "capability_id": "cap.microsoft.ai_engineering_coach",
+      "tool_or_system": "Microsoft AI Engineering Coach",
+      "capability_name": "Engineering-coach workflow patterns",
+      "source_type": "CURRENT_OFFICIAL_REPOSITORY…",
+      "official_source_urls": [
+        "gh:microsoft/AI-Engineering-Coach"
+      ],
+      "repository_url": "gh:microsoft/AI-Engineering-Coach",
+      "exact_version_or_commit": "18b1a3d16b586c171426c6a407cc5c2dc073556e",
+      "license_or_commercial_constraints": "LICENSE_AND_COMMERCIAL_CONSTRAINTS_NO…",
+      "reviewed_at": "2026-09-14",
+      "review_evidence": [
+        "gh:microsoft/AI-Engineering-Coach@18b1a3d16b586c171426c6a407cc5c2dc07…"
+      ],
+      "claimed_benefit": "Engineering-coach workflow patterns",
+      "current_stack_equivalent": "Existing Production Skill OS / rev…",
+      "target_subsystem": "LATER_TOOL_INTAKE",
+      "status": "REVIEWED",
+      "evidence_level": "L1",
+      "isolated_test_environment": "NOT_RUN_IN_CURRENT_STACK",
+      "isolated_test_evidence": [],
+      "quality_delta": "UNKNOWN_NOT_MEASURED",
+      "latency_delta": "UNKNOWN_NOT_MEASURED",
+      "cost_delta": "UNKNOWN_NOT_MEASURED",
+      "memory_or_vram_delta": "UNKNOWN_NOT_MEASURED",
+      "failure_modes": [
+        "LICENSE_UNRESOLVED",
+        "DUPLICATE_SYSTEM_RISK"
+      ],
+      "recovery_behavior": [
+        "Pin exact commit, read official setup/license, th…"
+      ],
+      "rollback_behavior": [
+        "No integration performed; remove candidate adapte…"
+      ],
+      "security_or_privacy_notes": [
+        "Do not provide credentials or production data dur…"
+      ],
+      "known_incompatibilities": [
+        "Not authorized for LIN_3D_FINAL."
+      ],
+      "supersedes": [],
+      "superseded_by": [],
+      "lin_3d_relevance": "NONE",
+      "lin_3d_same_path_test": {
+        "status": "NOT_APPLICABLE",
+        "execution_path": "NOT_APPLICABLE",
+        "environment": "NOT_RUN",
+        "artifact_ids": []
+      },
+      "lin_3d_evidence": [],
+      "regression_tests": [],
+      "owner_or_executor": "Tool-intake lane",
+      "next_gate": "Extract useful review/learning patterns only after lic…",
+      "last_verified_at": "2026-09-14",
+      "mutates_3d_state": false,
+      "authorized_scopes": []
+    },
+    {
+      "capability_id": "cap.pencil_creator.unity_blender_knowledge",
+      "tool_or_system": "psmon/pencil-creator",
+      "capability_name": "2D/3D/Unity craft knowledge and failure heuristics",
+      "source_type": "CURRENT_OFFICIAL_REPOSITORY…",
+      "official_source_urls": [
+        "gh:psmon/pencil-creator"
+      ],
+      "repository_url": "gh:psmon/pencil-creator",
+      "exact_version_or_commit": "9984c47c92e4995b0715a515efb2883e80281c92",
+      "license_or_commercial_constraints": "LICENSE_AND_COMMERCIAL_CONSTRAINTS_NO…",
+      "reviewed_at": "2026-09-14",
+      "review_evidence": [
+        "gh:psmon/pencil-creator@9984c47c92e4995b0715a515efb2883e80281c92"
+      ],
+      "claimed_benefit": "2D/3D/Unity craft knowledge and failure heuristics",
+      "current_stack_equivalent": "Existing Production Skill OS / rev…",
+      "target_subsystem": "LATER_TOOL_INTAKE",
+      "status": "WATCH",
+      "evidence_level": "L1",
+      "isolated_test_environment": "NOT_RUN_IN_CURRENT_STACK",
+      "isolated_test_evidence": [],
+      "quality_delta": "UNKNOWN_NOT_MEASURED",
+      "latency_delta": "UNKNOWN_NOT_MEASURED",
+      "cost_delta": "UNKNOWN_NOT_MEASURED",
+      "memory_or_vram_delta": "UNKNOWN_NOT_MEASURED",
+      "failure_modes": [
+        "LICENSE_UNRESOLVED",
+        "DUPLICATE_SYSTEM_RISK"
+      ],
+      "recovery_behavior": [
+        "Pin exact commit, read official setup/license, th…"
+      ],
+      "rollback_behavior": [
+        "No integration performed; remove candidate adapte…"
+      ],
+      "security_or_privacy_notes": [
+        "Do not provide credentials or production data dur…"
+      ],
+      "known_incompatibilities": [
+        "Not authorized for LIN_3D_FINAL."
+      ],
+      "supersedes": [],
+      "superseded_by": [],
+      "lin_3d_relevance": "INDIRECT",
+      "lin_3d_same_path_test": {
+        "status": "NOT_RUN",
+        "execution_path": "NO_LIN_SAME_PATH_TEST",
+        "environment": "CURRENT_LIN_AUTHORITY",
+        "artifact_ids": []
+      },
+      "lin_3d_evidence": [],
+      "regression_tests": [],
+      "owner_or_executor": "Tool-intake lane",
+      "next_gate": "Run representative LIN-adjacent tasks and inspect lice…",
+      "last_verified_at": "2026-09-14",
+      "mutates_3d_state": false,
+      "authorized_scopes": []
+    },
+    {
+      "capability_id": "cap.oracle.browser_provider_routing",
+      "tool_or_system": "steipete/oracle",
+      "capability_name": "Browser/provider review routing",
+      "source_type": "CURRENT_OFFICIAL_REPOSITORY…",
+      "official_source_urls": [
+        "gh:steipete/oracle"
+      ],
+      "repository_url": "gh:steipete/oracle",
+      "exact_version_or_commit": "ad19526c9bb10c10223684c85200b3b135457db5",
+      "license_or_commercial_constraints": "LICENSE_AND_COMMERCIAL_CONSTRAINTS_NO…",
+      "reviewed_at": "2026-09-14",
+      "review_evidence": [
+        "gh:steipete/oracle@ad19526c9bb10c10223684c85200b3b135457db5"
+      ],
+      "claimed_benefit": "Browser/provider review routing",
+      "current_stack_equivalent": "Existing Production Skill OS / rev…",
+      "target_subsystem": "LATER_TOOL_INTAKE",
+      "status": "TEST_REQUIRED",
+      "evidence_level": "L1",
+      "isolated_test_environment": "NOT_RUN_IN_CURRENT_STACK",
+      "isolated_test_evidence": [],
+      "quality_delta": "UNKNOWN_NOT_MEASURED",
+      "latency_delta": "UNKNOWN_NOT_MEASURED",
+      "cost_delta": "UNKNOWN_NOT_MEASURED",
+      "memory_or_vram_delta": "UNKNOWN_NOT_MEASURED",
+      "failure_modes": [
+        "LICENSE_UNRESOLVED",
+        "DUPLICATE_SYSTEM_RISK"
+      ],
+      "recovery_behavior": [
+        "Pin exact commit, read official setup/license, th…"
+      ],
+      "rollback_behavior": [
+        "No integration performed; remove candidate adapte…"
+      ],
+      "security_or_privacy_notes": [
+        "Do not provide credentials or production data dur…"
+      ],
+      "known_incompatibilities": [
+        "Not authorized for LIN_3D_FINAL."
+      ],
+      "supersedes": [],
+      "superseded_by": [],
+      "lin_3d_relevance": "INDIRECT",
+      "lin_3d_same_path_test": {
+        "status": "NOT_RUN",
+        "execution_path": "NO_LIN_SAME_PATH_TEST",
+        "environment": "CURRENT_LIN_AUTHORITY",
+        "artifact_ids": []
+      },
+      "lin_3d_evidence": [],
+      "regression_tests": [],
+      "owner_or_executor": "Tool-intake lane",
+      "next_gate": "Test exact local WebGPT replacement workflow; do not i…",
+      "last_verified_at": "2026-09-14",
+      "mutates_3d_state": false,
+      "authorized_scopes": []
+    },
+    {
+      "capability_id": "cap.threejs_game_skills.asset_recovery_qa",
+      "tool_or_system": "threejs-game-skills",
+      "capability_name": "Resumable asset generation and evidence-based QA patte…",
+      "source_type": "CURRENT_OFFICIAL_REPOSITORY…",
+      "official_source_urls": [
+        "gh:majidmanzarpour/threejs-game-skills"
+      ],
+      "repository_url": "gh:majidmanzarpour/threejs-game-skills",
+      "exact_version_or_commit": "e5f301d548bb18c530afbece78cd25082f4cda9c",
+      "license_or_commercial_constraints": "LICENSE_AND_COMMERCIAL_CONSTRAINTS_NO…",
+      "reviewed_at": "2026-09-14",
+      "review_evidence": [
+        "gh:majidmanzarpour/threejs-game-skills@e5f301d548bb18c530afbece78cd25…"
+      ],
+      "claimed_benefit": "Resumable asset generation and evidence-based QA …",
+      "current_stack_equivalent": "Existing Production Skill OS / rev…",
+      "target_subsystem": "LATER_TOOL_INTAKE",
+      "status": "TEST_REQUIRED",
+      "evidence_level": "L1",
+      "isolated_test_environment": "NOT_RUN_IN_CURRENT_STACK",
+      "isolated_test_evidence": [],
+      "quality_delta": "UNKNOWN_NOT_MEASURED",
+      "latency_delta": "UNKNOWN_NOT_MEASURED",
+      "cost_delta": "UNKNOWN_NOT_MEASURED",
+      "memory_or_vram_delta": "UNKNOWN_NOT_MEASURED",
+      "failure_modes": [
+        "LICENSE_UNRESOLVED",
+        "DUPLICATE_SYSTEM_RISK"
+      ],
+      "recovery_behavior": [
+        "Pin exact commit, read official setup/license, th…"
+      ],
+      "rollback_behavior": [
+        "No integration performed; remove candidate adapte…"
+      ],
+      "security_or_privacy_notes": [
+        "Do not provide credentials or production data dur…"
+      ],
+      "known_incompatibilities": [
+        "Not authorized for LIN_3D_FINAL."
+      ],
+      "supersedes": [],
+      "superseded_by": [],
+      "lin_3d_relevance": "INDIRECT",
+      "lin_3d_same_path_test": {
+        "status": "NOT_RUN",
+        "execution_path": "NO_LIN_SAME_PATH_TEST",
+        "environment": "CURRENT_LIN_AUTHORITY",
+        "artifact_ids": []
+      },
+      "lin_3d_evidence": [],
+      "regression_tests": [],
+      "owner_or_executor": "Tool-intake lane",
+      "next_gate": "Test atomic Tripo checkpoint ideas against current R04…",
+      "last_verified_at": "2026-09-14",
+      "mutates_3d_state": false,
+      "authorized_scopes": []
+    },
+    {
+      "capability_id": "cap.unity_agent_plugin.official_editor_agent",
+      "tool_or_system": "Unity Agent Plugin",
+      "capability_name": "Official Unity editor agent integration",
+      "source_type": "CURRENT_OFFICIAL_REPOSITORY…",
+      "official_source_urls": [
+        "gh:Unity-Technologies/unity-agent-plugin"
+      ],
+      "repository_url": "gh:Unity-Technologies/unity-agent-plugin",
+      "exact_version_or_commit": "c7055702b44e58402ee481ff408aee407bcf9483 / 0.1.6-beta manifest",
+      "license_or_commercial_constraints": "LICENSE_AND_COMMERCIAL_CONSTRAINTS_NO…",
+      "reviewed_at": "2026-09-14",
+      "review_evidence": [
+        "gh:Unity-Technologies/unity-agent-plugin@c7055702b44e58402ee481ff408a…"
+      ],
+      "claimed_benefit": "Official Unity editor agent integration",
+      "current_stack_equivalent": "Existing Production Skill OS / rev…",
+      "target_subsystem": "LATER_TOOL_INTAKE",
+      "status": "TEST_REQUIRED",
+      "evidence_level": "L1",
+      "isolated_test_environment": "NOT_RUN_IN_CURRENT_STACK",
+      "isolated_test_evidence": [],
+      "quality_delta": "UNKNOWN_NOT_MEASURED",
+      "latency_delta": "UNKNOWN_NOT_MEASURED",
+      "cost_delta": "UNKNOWN_NOT_MEASURED",
+      "memory_or_vram_delta": "UNKNOWN_NOT_MEASURED",
+      "failure_modes": [
+        "LICENSE_UNRESOLVED",
+        "DUPLICATE_SYSTEM_RISK"
+      ],
+      "recovery_behavior": [
+        "Pin exact commit, read official setup/license, th…"
+      ],
+      "rollback_behavior": [
+        "No integration performed; remove candidate adapte…"
+      ],
+      "security_or_privacy_notes": [
+        "Do not provide credentials or production data dur…"
+      ],
+      "known_incompatibilities": [
+        "Not authorized for LIN_3D_FINAL."
+      ],
+      "supersedes": [],
+      "superseded_by": [],
+      "lin_3d_relevance": "INDIRECT",
+      "lin_3d_same_path_test": {
+        "status": "NOT_RUN",
+        "execution_path": "NO_LIN_SAME_PATH_TEST",
+        "environment": "CURRENT_LIN_AUTHORITY",
+        "artifact_ids": []
+      },
+      "lin_3d_evidence": [],
+      "regression_tests": [],
+      "owner_or_executor": "Tool-intake lane",
+      "next_gate": "Run current official plugin in an isolated Unity proje…",
+      "last_verified_at": "2026-09-14",
+      "mutates_3d_state": false,
+      "authorized_scopes": []
+    }
+  ]
+}

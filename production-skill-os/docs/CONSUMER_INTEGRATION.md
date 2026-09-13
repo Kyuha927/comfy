@@ -1,150 +1,123 @@
 # Consumer integration contract
 
-Production Skill OS is a read-mostly knowledge layer. It must not become a second orchestrator.
+Production Skill OS is a read-mostly evidence and selection layer. It is not a second
+orchestrator, does not execute a capability merely because it is registered, and never
+promotes LIN canon automatically.
 
-## Event in
+## Mandatory selection call
 
-Emit one compact failure event:
+Every consumer that selects a registered capability must call:
 
-```json
-{
-  "domain": "blender_bridge",
-  "error_code": "HTTP_429",
-  "message": "MCP SSE probe returned 429",
-  "environment": "blender-pro-bridge-local",
-  "execution_path": "webgpt->bridge->blender"
-}
+```bash
+python production-skill-os/adapters/authorize_capability.py   --capability-id <ID>   --version <PINNED_VERSION_OR_COMMIT>   --scope <GENERIC_PRODUCTION|LIN_3D_VALIDATION|LIN_3D_FINAL>   --lin-authority-head <CURRENT_LIN_HEAD>
 ```
 
-Run `adapters/route_packet.py`. Canonical matches may be used only inside the record's scope.
-Candidate/external matches remain advisory and require diagnosis. Unknown failures escalate.
+The executable source of truth is:
 
-## Evidence out
+- `tool-intake/TOOL_CAPABILITY_REGISTRY.json`
+- `tool-intake/SELECTION_CONTRACT.json`
+- `router/capability_guard.py`
 
-After a local reproduction/repair attempt, append evidence events for these gates:
+Do not infer permission from this prose, a PR description, green CI, provider documentation,
+or an earlier chat.
 
-1. `reproduction`
-2. `repair`
-3. `same_path_verification`
-4. `rollback`
-5. `regression`
-6. `receipt`
+## Scope behavior
 
-Every PASS must carry a non-empty receipt. The promotion engine requires all latest gate states to
-PASS in the same environment and execution path. It emits a proposal only; it never edits the catalog.
+`GENERIC_PRODUCTION` allows only exact-version `ABSORBED_GENERIC` or
+`VERIFIED_FOR_LIN_3D` records explicitly authorized for that scope.
 
-## Blender binding
-
-Recommended domain: `blender_bridge`.
-
-Receipts should favor durable identifiers already emitted by the bridge: head revision, job id,
-preview SHA-256, audit receipt, restore revision, and exact failure code. Never convert a tool-call
-receipt into success without terminal job state plus scene/pixel evidence.
-
-## Character 3D binding
-
-For new editable character builds, consumers must load
-`skills/blender-character-tripo-astra/SKILL.md` before choosing a Blender control path.
-
-First resolve the project-specific canon and image-edit policy. Then perform a character-specific
-preflight and choose exactly one source strategy:
+`LIN_3D_VALIDATION` is non-production. It permits explicitly scoped `REVIEWED`,
+`TEST_REQUIRED`, `ISOLATED_PASS`, or `LIN_3D_TEST_REQUIRED` records only when all three
+flags are supplied:
 
 ```text
-DEDICATED_PART_REFERENCES
-approved HEAD / HAIR / BODY_CLOTHING packets
--> Tripo Smart Mesh P2.0 part generation
--> per-part geometry gate
-
-FULL_BODY_MULTIVIEW_PART_AWARE
-exact approved full-body multiview masters
--> Tripo Smart Mesh P2.0 full-body generation
--> Generate in Parts or copied-candidate 3D segmentation
--> logical part geometry gate
+--isolated-workspace
+--no-production-mutation
+--no-canon-mutation
 ```
 
-Both strategies continue through:
+`LIN_3D_FINAL` permits only `VERIFIED_FOR_LIN_3D` with exact version, L8 same-path PASS,
+artifact IDs, regression PASS, rollback evidence, and the current reconciled LIN authority
+head. At initial integration `VERIFIED_FOR_LIN_3D=0`, so the final external capability path
+correctly denies all requests.
+
+## Current LIN binding
+
+Current reconciled project authority:
 
 ```text
-Tripo candidate selection and geometry acceptance before texture commitment
--> GPT-6 Astra Computer Use supervised Blender assembly
--> optional recorded human manual correction when faster or safer
--> Blender Bridge/MCP deterministic verification and exact edits
--> rig/deformation/secondary-motion/expression checks
--> fixed-camera render evidence
--> checkpoint, fresh-process reopen, and rollback proof
+repo=Kyuha927/lastline-echoes
+branch=lin-aster-tripo-r01-20260913
+head=e1b02b1773366677a543d764bd68638e13da1a27
+SSOT_BLOB=612fd6347f7d203f9b6d8a3737a72bbaf7a6f0fe
+LIVE_STATE_BLOB=f44c283bd5c02a1a8e8b3adf7785c867d78b0c2f
+POLICY=LIN_ASTER_3D_PRODUCTION_CONTROL_V1_2
 ```
 
-Use an execution path equivalent to one of:
+If the branch advances, reconcile the new authority and update the registry in a reviewed
+candidate change before further LIN authorization.
+
+The current R04 path is:
 
 ```text
-approved-parts->tripo-p2->geometry-gate->astra-computer-use->bridge-verify
-full-body-multiview->tripo-p2->part-aware-3d->geometry-gate->astra-computer-use->bridge-verify
+locked canon
+→ lineage-tracked non-canon component references
+→ H3.1 Ultra head
+→ H3.1 Ultra hair
+→ H3.1 Ultra body/outfit
+→ H3.1 Ultra coat/garment
+→ part QA and raw export
+→ supervised Blender assembly
+→ controlled/manual retopology and reconstruction
+→ deterministic state/pixel/save/reopen/rollback evidence
+→ user review
 ```
 
-The routing policy is user-directed and active for new character work. It is not a blanket quality
-claim about any provider result. Reusable repair claims still require the six evidence gates.
+`P2_FULL_BODY_PRIMARY_HERO_BASE=false`. Do not route the superseded P2 full-body hero
+capability. R03 A remains scaffold evidence; R03 B remains a provisional detail donor.
 
-Mandatory consumer behavior:
+## Model and tool boundaries
 
-- do not route zero-base character modeling to Astra when usable Tripo generation is available;
-- do not crop, redraw, inpaint, recolor, retouch, or otherwise edit a locked reference unless the exact task authorizes that derivative operation;
-- use dedicated part generation only when complete approved part packets exist;
-- otherwise preserve the exact full-body multiview source and isolate parts in generated 3D space;
-- require front/left/right/back input for dedicated production hair candidates;
-- use a head soft-start budget near 2,000 to 5,000 polygons unless justified otherwise;
-- reject painted-flat eye regions and require recessed orbital structure plus independently addressable eyes and pupils/irises;
-- treat texture generation as a post-geometry acceptance transition and preserve rejected Tripo job IDs;
-- use Astra Computer Use as the primary interactive operator for visual assembly and supervised setup;
-- use Bridge/MCP as the deterministic state-critical plane for inspection, exact operations, checkpointing, rendered-pixel/state verification, rollback, recovery, and receipts;
-- allow bounded human manual placement or repair when faster or safer, but record and independently verify it;
-- do not run the character build as one unattended prompt;
-- do not silently revert to MCP-primary creative interaction, another provider, or a weaker model route;
-- do not force destructive neck welding; separate aligned meshes may pass when required camera, shading, and deformation evidence passes;
-- use discrete expression-head mesh/state switching as the first stable fallback when shape-key correspondence is not proven;
-- declare every custom rigging or secondary-motion app, add-on, script, or template with exact version and artifact identity;
-- do not claim success from provider, model, or API receipts without geometry and pixel evidence;
-- require explicit user review before canon or final-lock promotion.
+- Tripo H3.1 is a candidate component source, not acceptance authority.
+- Astra Computer Use is the visual/spatial supervised assembly lane after authorization.
+- Sol Pro is the default analysis, specification, and delta-QA layer.
+- Blender Bridge/MCP is the exact deterministic state-critical and receipt lane after authorization.
+- Reviewed bpy/headless execution is bounded deterministic support after authorization.
+- Human correction is allowed only when recorded and independently verified.
+- USER is final lock authority.
 
-The preflight receipt must include reference authority and hashes, image-edit policy, part-packet
-completeness, hair unseen-side risk, garment/accessory segmentation risk, polygon and rig targets,
-required expressions, secondary-motion needs, available Computer Use/Bridge/human lanes, declared
-helper dependencies, chosen route, rejected alternatives, blockers, and next gate.
+No provider/API/tool call receipt is production proof. No silent fallback is allowed.
 
-Character-route receipts should include the source strategy; approved reference hashes; applicable
-image-edit policy; dedicated part-input hashes or exact full-body multiview hashes; Tripo model/version,
-job IDs, rejected-candidate reasons, texture state and export hashes; Generate in Parts or segmentation
-receipts when used; geometry-gate results; requested and actual Astra route and Computer Use
-availability; any human manual edits; declared helper dependencies; Blender version, object inventory,
-dimensions, revisions, job IDs, preview hashes, neck strategy, expression strategy, save/reopen proof,
-rollback proof, visible defects, and the next bounded correction.
+## Required handoff packet
 
-If Tripo, Astra Computer Use, authoritative references, required dedicated hair views, or declared
-helper dependencies are unavailable, report the exact blocker and continue only independent work. Do
-not conceal the missing lane by using Astra for zero-base modeling, editing a locked source without
-authority, silently changing provider/model, or making Bridge/MCP the creative GUI operator.
+The consumer must preserve capability ID, exact version/commit, requested scope, guard
+decision/code, current authority SHA, inputs and hashes, environment, execution path, output
+artifact IDs, costs, failures, recovery, rollback, regression result, visible defects, next
+gate, and user-review state.
+
+A validation result may update evidence and propose a status change. It must not mutate the
+registry to `VERIFIED_FOR_LIN_3D` without reviewed L8 evidence, and must not mutate production
+assets or canon.
 
 ## Merge-omission rejection
 
-A consumer integration or merge candidate must be rejected as incomplete if it preserves only the
-high-level `Tripo -> Astra -> Bridge` slogan while omitting any of the following operational gates:
+Reject any merge/integration that omits any of these:
 
-- source-gated part versus full-body route selection;
-- geometry-before-texture candidate selection;
-- hair four-view requirement;
-- recessed orbital and independently addressable eye geometry;
-- supervised non-one-shot assembly;
-- deterministic Bridge checkpoint/reopen/rollback evidence;
-- non-destructive neck-seam policy;
-- expression mesh switching fallback;
-- declared custom helper dependencies;
-- character-specific preflight and explicit user approval.
+- registry structural validation and unique capability IDs;
+- exact-version authorization;
+- stale LIN authority rejection;
+- validation isolation flags;
+- `VERIFIED_FOR_LIN_3D`-only final gate;
+- same-path, artifact, regression, and rollback requirements;
+- R04 H3.1 component route and P2 full-body supersession;
+- immutable canon versus lineage-tracked non-canon reference distinction;
+- geometry-before-texture;
+- supervised non-one-shot Blender loop;
+- deterministic checkpoint/render/fresh-process reopen/rollback;
+- explicit user review and no automatic canon or merge.
 
-## Unity binding
+## Existing failure-knowledge binding
 
-Recommended domain: `unity`.
-
-Use one production path string for a gate set, for example:
-`agent->unity-editor->compile->playmode->capture`. Receipts should include editor/package versions,
-compile result, PlayMode journey id, runtime screenshot/frame hash, and test result.
-
-Do not use editor-only evidence to promote a runtime/capture fix.
+The existing `skill_router.py`, failure catalog, evidence events, and promotion engine remain
+available for bounded failure knowledge. They do not bypass capability authorization. A
+canonical failure repair record is not automatically a `VERIFIED_FOR_LIN_3D` tool capability.

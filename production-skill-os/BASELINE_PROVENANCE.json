@@ -2,7 +2,7 @@
   "schema_version": "1.0",
   "baseline_id": "PRODUCTION_SKILL_OS_BASELINE_20260914",
   "repository": "Kyuha927/comfy",
-  "source_commit": "49ec4d2171b16d384d532ada25cc9ec750f85aff",
+  "source_commit": "7f9c5701a77d341bd7ca680b06242980600000dd",
   "source_commit_message": "docs: bind Production Skill OS to current LIN ASTER 3D SSOT",
   "source_root_tree": "d99527c5c49b76a2987c12aebea2603c10cdfcba",
   "source_subtree": "4e360822e8517e3922a5d4c03d32e4f746c6c4f7",

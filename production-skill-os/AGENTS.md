@@ -1,20 +1,22 @@
 # Scoped Agent Rule — Production Skill OS / LIN ASTER 3D
 
-For any LIN ASTER 3D route, Tripo/Astra/Bridge control-plane, reconstruction, ART_MASTER, MOBILE_HERO_MASTER, or related promotion work under this directory, read this project SSOT before acting:
+Before any LIN ASTER 3D, Tripo, Blender, Bridge, reconstruction, ART_MASTER,
+MOBILE_HERO_MASTER, capability-adoption, or promotion action under this tree:
 
-`https://github.com/Kyuha927/lastline-echoes/blob/lin-aster-tripo-r01-20260913/work/handovers/2026-09-13/00_READ_FIRST_LIN_ASTER_3D_ROUTE.md`
+1. Re-read the current project authority:
+   `Kyuha927/lastline-echoes@lin-aster-tripo-r01-20260913/work/handovers/2026-09-13/00_READ_FIRST_LIN_ASTER_3D_ROUTE.md`.
+2. Re-read `LIN_ASTER_3D_LIVE_STATE.json` and reject a stale authority SHA.
+3. Read `tool-intake/TOOL_STACK_SSOT.md`, `TOOL_CAPABILITY_REGISTRY.json`, and `SELECTION_CONTRACT.json`.
+4. Call `adapters/authorize_capability.py` before selecting a registered capability.
 
-Machine-readable current state:
+Hard rules:
 
-`https://github.com/Kyuha927/lastline-echoes/blob/lin-aster-tripo-r01-20260913/work/handovers/2026-09-13/LIN_ASTER_3D_LIVE_STATE.json`
-
-The Production Skill OS is a candidate evidence/promotion layer, not an autonomous background worker and not the LIN project canon owner.
-
-Rules:
-
-1. Do not merge or canon-promote merely because CI is green.
-2. Do not change the current Tripo or Bridge execution gate from stale chat context.
-3. Do not silently convert a `TRIPO_BASE_MESH_DRAFT` into an accepted production base.
-4. Project-specific SSOT and exact locked reference authority override generic skill defaults.
-5. Re-read the SSOT before completion, merge, promotion, or production-readiness claims.
-6. If unavailable, stop with `BLOCKED_CURRENT_3D_SSOT_UNAVAILABLE`.
+- `LIN_3D_FINAL` is fail-closed and accepts only `VERIFIED_FOR_LIN_3D` at the exact pinned version with L8 same-path, regression, and rollback evidence.
+- `LIN_3D_VALIDATION` requires an isolated workspace plus explicit no-production/no-canon mutation flags.
+- Unknown, stale, blocked, failed, watch, rejected, or superseded capabilities do not enter a production path.
+- Provider documentation, repository tests, isolated tests, and green CI are not LIN same-path proof.
+- The R04 maximum-quality component route is current. P2 full-body is not the LIN hero authority.
+- Production Skill OS is a selection/evidence layer, not a second orchestrator.
+- Do not mutate the frozen Blender Bridge acceptance workspace or a current LIN production asset while validating this gate.
+- Do not auto-merge, auto-promote canon, or convert user review into an automatic gate.
+- Final lock authority remains `USER_ONLY`.

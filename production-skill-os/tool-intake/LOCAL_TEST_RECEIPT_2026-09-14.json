@@ -1,0 +1,110 @@
+{
+  "receipt_id": "GITHUB_ACTIONS_CAPABILITY_GATE_34771461244",
+  "observed_at": "2026-09-14T02:23:50+09:00",
+  "environment": {
+    "execution": "GitHub Actions isolated ubuntu-latest candidate branch",
+    "python": "3.12.3",
+    "workflow_run_url": "https://github.com/Kyuha927/comfy/actions/runs/34771461244",
+    "workflow_run_id": "34771461244",
+    "trigger_commit": "912f299588cfbfd9c1bbdc2be88eb2f68a6ad388",
+    "cross_repository_ci_read_available": false,
+    "production_3d_mutation": false,
+    "canon_mutation": false,
+    "tripo_paid_action": false,
+    "blender_scene_opened": false
+  },
+  "authority": {
+    "repository": "Kyuha927/lastline-echoes",
+    "branch": "lin-aster-tripo-r01-20260913",
+    "branch_head_at_reconciliation": "e1b02b1773366677a543d764bd68638e13da1a27",
+    "ssot_path": "work/handovers/2026-09-13/00_READ_FIRST_LIN_ASTER_3D_ROUTE.md",
+    "ssot_blob_sha": "612fd6347f7d203f9b6d8a3737a72bbaf7a6f0fe",
+    "live_state_path": "work/handovers/2026-09-13/LIN_ASTER_3D_LIVE_STATE.json",
+    "live_state_blob_sha": "f44c283bd5c02a1a8e8b3adf7785c867d78b0c2f",
+    "production_control_path": "work/handovers/2026-09-13/LIN_ASTER_3D_PRODUCTION_CONTROL_CURRENT.md",
+    "production_control_policy_id": "LIN_ASTER_3D_PRODUCTION_CONTROL_V1_2",
+    "final_lock_authority": "USER_ONLY",
+    "auto_merge": false,
+    "auto_canon": false
+  },
+  "results": {
+    "registry_validate": {
+      "status": "PASS",
+      "records": 40,
+      "errors": []
+    },
+    "unit_tests": {
+      "status": "PASS",
+      "tests": 15,
+      "failures": 0,
+      "errors": 0,
+      "duration_seconds_reported": 0.009
+    },
+    "final_unverified_h31": {
+      "status": "PASS",
+      "expected_decision": "DENY",
+      "observed_code": "BLOCKED_CAPABILITY_NOT_VERIFIED_FOR_LIN_3D",
+      "process_exit_code": 2
+    },
+    "isolated_h31_validation": {
+      "status": "PASS",
+      "expected_decision": "ALLOW",
+      "observed_code": "CAPABILITY_AUTHORIZED",
+      "production_3d_mutation_allowed": false
+    },
+    "generic_guard": {
+      "status": "PASS",
+      "expected_decision": "ALLOW",
+      "observed_code": "CAPABILITY_AUTHORIZED",
+      "canon_promotion_allowed": false
+    },
+    "branch_wide_unit_tests": {
+      "status": "PASS",
+      "tests": 30,
+      "failures": 0,
+      "errors": 0,
+      "command": "python -m unittest discover -s production-skill-os/tests -v"
+    },
+    "payload_integrity": {
+      "status": "PASS",
+      "base64_sha256": "1007eaecfd5d4b1737f6f74057d5239e7814cb39ed1732fe5cdec6500411998c",
+      "tar_gz_sha256": "bfa254508d2ea89b57644f43fefb7db367ad2d9eea5499995ba4c7ae27cd2086"
+    },
+    "authority_reconciliation": {
+      "status": "PASS",
+      "comfy_base_head": "7f9c5701a77d341bd7ca680b06242980600000dd",
+      "lin_authority_head": "e1b02b1773366677a543d764bd68638e13da1a27",
+      "lin_authority_preflight_receipt_sha256": "c8f7c0cf749d9b52918069d9f1922737696f5fcc6962eeb398db3a1a6ea620c4",
+      "verification_boundary": "GitHub connector preflight receipt; CI cannot read the private sibling repository"
+    }
+  },
+  "file_sha256": {
+    "production-skill-os/tool-intake/TOOL_CAPABILITY_REGISTRY.json": "d1f19b0419b57e890880723207b61c1bf7ff07a723b0b6a10828188686d2bc88",
+    "production-skill-os/tool-intake/SELECTION_CONTRACT.json": "80431831337e90b9d02e07b6b46ed99d2687958464341ba00096731bf456f287",
+    "production-skill-os/tool-intake/LIN_AUTHORITY_PREFLIGHT_RECEIPT.json": "b0bfa72f06e6cf976b5f8fd04e8b79382646ff87dedf8a9575313a0b90584f49",
+    "production-skill-os/router/capability_guard.py": "2d3199dc8250fb0b437d7541bc1f677b2a186408e9515e8ddebb3b426c46fee1",
+    "production-skill-os/adapters/authorize_capability.py": "0f9ea76c036cf43cd065053d0a1e7d2058dde222c6698a4e25484bdaf16b49ad",
+    "production-skill-os/tests/test_tool_capability_guard.py": "719e72afb064ba99e7683aed557ccdbd51c60a5352a10de8d684e6fbab66231f",
+    "production-skill-os/tests/test_blender_character_route.py": "9edb9e6f69219f237cad988bee433f044e2266895619e073800bce9fc81a6643",
+    "production-skill-os/skills/blender-character-tripo-astra/SKILL.md": "317f5d70c53aa609ebbf987e3089694bf48c81a8cc761928cba85f5ff9f34534",
+    "production-skill-os/docs/CONSUMER_INTEGRATION.md": "57dc28a3b6260c4c8f281c7b7466aade596173aebbf212f2eaa47f46c494634a",
+    ".github/workflows/production-skill-os.yml": "a7e4699e382758381b9a3766845b6f1cee2ea6bdf1d56c7b28f3f1ccd18efd0b"
+  },
+  "limitations": [
+    "This receipt validates registry, guard, adapter, policy, and regression behavior only.",
+    "The LIN authority SHA was reconciled immediately before this run through the GitHub connector and passed to CI as a hash-checked receipt because the repository-scoped Actions token cannot read the private sibling repository.",
+    "It does not prove Tripo output quality, live Bridge transport, selected-LIN same-scene evidence, ART_MASTER, Mobile Hero, or real-device readiness."
+  ],
+  "canon_promotion_allowed": false,
+  "automatic_merge_allowed": false,
+  "user_final_approval_required": true,
+  "authorities": {
+    "comfy_base_branch": "work-handoffs-v4-20260912",
+    "comfy_base_head": "7f9c5701a77d341bd7ca680b06242980600000dd",
+    "lin_repository": "Kyuha927/lastline-echoes",
+    "lin_branch": "lin-aster-tripo-r01-20260913",
+    "lin_authority_head": "e1b02b1773366677a543d764bd68638e13da1a27",
+    "lin_authority_preflight_receipt_sha256": "c8f7c0cf749d9b52918069d9f1922737696f5fcc6962eeb398db3a1a6ea620c4",
+    "candidate_branch": "candidate/tool-capability-lin3d-gate-v2-20260914"
+  }
+}

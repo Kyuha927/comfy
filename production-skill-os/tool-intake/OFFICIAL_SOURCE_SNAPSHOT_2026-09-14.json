@@ -1,0 +1,50 @@
+{
+  "captured_at_kst": "2026-09-14",
+  "lin_authority": {
+    "repository": "Kyuha927/lastline-echoes",
+    "branch": "lin-aster-tripo-r01-20260913",
+    "branch_head_at_reconciliation": "e1b02b1773366677a543d764bd68638e13da1a27",
+    "ssot_path": "work/handovers/2026-09-13/00_READ_FIRST_LIN_ASTER_3D_ROUTE.md",
+    "ssot_blob_sha": "612fd6347f7d203f9b6d8a3737a72bbaf7a6f0fe",
+    "live_state_path": "work/handovers/2026-09-13/LIN_ASTER_3D_LIVE_STATE.json",
+    "live_state_blob_sha": "f44c283bd5c02a1a8e8b3adf7785c867d78b0c2f",
+    "production_control_path": "work/handovers/2026-09-13/LIN_ASTER_3D_PRODUCTION_CONTROL_CURRENT.md",
+    "production_control_policy_id": "LIN_ASTER_3D_PRODUCTION_CONTROL_V1_2",
+    "final_lock_authority": "USER_ONLY",
+    "auto_merge": false,
+    "auto_canon": false
+  },
+  "policies": {
+    "global_handoff_policy_blob": "cdfc9c96c82426f353dac39e34854015d68019da",
+    "official_source_first_policy_blob": "85c22d0d3ad9d704e4c8e3d5ec79ebbafa5c1570"
+  },
+  "official_tripo": {
+    "h31_snapshot": "v3.1-20260211",
+    "h31_max_faces_ceiling": 2000000,
+    "multiview_order": [
+      "front",
+      "left",
+      "back",
+      "right"
+    ],
+    "component_workflow": [
+      "body",
+      "head",
+      "hair"
+    ],
+    "note": "Provider documentation defines availability and recommended workflows, not LIN acceptance."
+  },
+  "external_repository_heads": {
+    "NVIDIA-NeMo/Switchyard": "9b6efb94cedadca4652e2e4c3e014abed2c44831",
+    "microsoft/AI-Engineering-Coach": "18b1a3d16b586c171426c6a407cc5c2dc073556e",
+    "psmon/pencil-creator": "9984c47c92e4995b0715a515efb2883e80281c92",
+    "steipete/oracle": "ad19526c9bb10c10223684c85200b3b135457db5",
+    "majidmanzarpour/threejs-game-skills": "e5f301d548bb18c530afbece78cd25082f4cda9c",
+    "Unity-Technologies/unity-agent-plugin": "c7055702b44e58402ee481ff408aee407bcf9483"
+  },
+  "bridge_live_probe": {
+    "status": "BLOCKED",
+    "observed_error": "MCP SSE probe returned 404 from tunnel gateway",
+    "production_mutation_attempted": false
+  }
+}

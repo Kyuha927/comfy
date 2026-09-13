@@ -3,99 +3,73 @@ from pathlib import Path
 
 ROOT = Path(__file__).resolve().parents[1]
 SKILL = ROOT / "skills" / "blender-character-tripo-astra" / "SKILL.md"
-README = ROOT / "README.md"
 CONSUMER = ROOT / "docs" / "CONSUMER_INTEGRATION.md"
-HANDOFF = (
-    ROOT.parent
-    / "releases"
-    / "work-handoffs"
-    / "2026-09-13-v5"
-    / "BLENDER_CONTROL_PLANE_CONTINUE_NO_CANON_MERGE.md"
-)
+REGISTRY = ROOT / "tool-intake" / "TOOL_CAPABILITY_REGISTRY.json"
+CONTRACT = ROOT / "tool-intake" / "SELECTION_CONTRACT.json"
+GUARD = ROOT / "router" / "capability_guard.py"
+ADAPTER = ROOT / "adapters" / "authorize_capability.py"
 
 
 class BlenderCharacterRoutePolicyTests(unittest.TestCase):
-    def test_skill_exists_and_pins_primary_route(self):
-        text = SKILL.read_text(encoding="utf-8")
-        self.assertIn("Smart Mesh P2.0", text)
-        self.assertIn("GPT-6 Astra Computer Use is the primary interactive Blender path", text)
-        self.assertIn("Blender Bridge/MCP is the deterministic state-critical plane", text)
-        self.assertIn("Do not ask GPT-6 Astra to create the character mesh from zero", text)
-        self.assertIn("Do not encode this policy as a fixed percentage", text)
-
-    def test_source_gated_part_strategy_and_hair_multiview_are_mandatory(self):
-        text = SKILL.read_text(encoding="utf-8")
-        self.assertIn("DEDICATED_PART_REFERENCES", text)
-        self.assertIn("FULL_BODY_MULTIVIEW_PART_AWARE", text)
-        self.assertIn("Do not crop, mask, redraw, retouch, recolor, inpaint", text)
-        self.assertIn("HEAD`, `HAIR`, and `BODY_CLOTHING", text)
-        self.assertIn("front, left, right, and back", text)
-        self.assertIn("A single-view hair result is provisional", text)
-
-    def test_head_geometry_and_texture_commitment_are_guarded(self):
-        text = SKILL.read_text(encoding="utf-8")
-        self.assertIn("approximately 2,000 to 5,000 polygons", text)
-        self.assertIn("actual recessed orbital structure", text)
-        self.assertIn("Eyeballs and pupils/irises must be independently addressable", text)
-        self.assertIn("Treat texture generation as a post-geometry acceptance transition", text)
-        self.assertIn("Preserve rejected Tripo job IDs", text)
-
-    def test_supervised_loop_and_manual_lane_are_explicit(self):
-        text = SKILL.read_text(encoding="utf-8")
-        self.assertIn("Do not run this as one unattended prompt", text)
-        self.assertIn("character-specific preflight", text)
-        self.assertIn("optional recorded human manual correction", text)
-        self.assertIn("act\n-> inspect real geometry or pixels", text)
-
-    def test_neck_and_expression_fallbacks_are_non_destructive(self):
-        text = SKILL.read_text(encoding="utf-8")
-        self.assertIn("Do not force destructive neck welding as the default", text)
-        self.assertIn("SEPARATE_ALIGNED", text)
-        self.assertIn("explicit mesh/state switching", text)
-        self.assertIn("do not force shape keys", text.lower())
-
-    def test_rigging_helpers_are_declared_dependencies(self):
-        text = SKILL.read_text(encoding="utf-8")
-        self.assertIn("Rigging and secondary-motion contract", text)
-        self.assertIn("record its name, version, configuration, artifact hash or commit", text)
-        self.assertIn("Do not claim the setup is reproducible without that dependency", text)
-
-    def test_evidence_and_fallback_guards_are_present(self):
-        text = SKILL.read_text(encoding="utf-8")
-        self.assertIn("fresh-process save/reopen", text)
-        self.assertIn("rollback proof", text)
-        self.assertIn("No silent fallback is allowed", text)
-        self.assertIn("user-review status, never automatic final approval", text)
-        self.assertIn("Merge-omission guards", text)
-
-    def test_docs_discover_and_bind_the_complete_route(self):
-        readme = README.read_text(encoding="utf-8")
+    def test_executable_capability_gate_is_bound(self):
+        skill = SKILL.read_text(encoding="utf-8")
         consumer = CONSUMER.read_text(encoding="utf-8")
-        self.assertIn("blender-character-tripo-astra/SKILL.md", readme)
-        self.assertIn(
-            "approved-parts->tripo-p2->geometry-gate->astra-computer-use->bridge-verify",
-            consumer,
-        )
-        self.assertIn(
-            "full-body-multiview->tripo-p2->part-aware-3d->geometry-gate->astra-computer-use->bridge-verify",
-            consumer,
-        )
-        self.assertIn("do not route zero-base character modeling to Astra", consumer)
-        self.assertIn("treat texture generation as a post-geometry acceptance transition", consumer)
-        self.assertIn("do not force destructive neck welding", consumer)
-        self.assertIn("Merge-omission rejection", consumer)
+        for token in (
+            "authorize_capability.py",
+            "LIN_3D_FINAL",
+            "VERIFIED_FOR_LIN_3D",
+            "LIN_3D_VALIDATION",
+            "--isolated-workspace",
+            "--no-production-mutation",
+            "--no-canon-mutation",
+        ):
+            self.assertIn(token, skill + consumer)
+        for path in (REGISTRY, CONTRACT, GUARD, ADAPTER):
+            self.assertTrue(path.exists(), path)
 
-    def test_safe_continuation_handoff_exists_and_cannot_claim_canon(self):
-        text = HANDOFF.read_text(encoding="utf-8")
-        self.assertIn("HANDOFF_ID=BLENDER_CONTROL_PLANE_CONTINUE_NO_CANON_MERGE_V1", text)
-        self.assertIn("TRIPO_FIRST=REQUIRED_WHEN_AUTHORIZED_AND_USABLE", text)
-        self.assertIn("ASTRA_ZERO_BASE_CHARACTER_MODELING=FORBIDDEN", text)
-        self.assertIn("VISUAL_INTERACTIVE_PRIMARY=GPT6_ASTRA_COMPUTER_USE", text)
-        self.assertIn("DETERMINISTIC_STATE_CRITICAL_PRIMARY=BLENDER_BRIDGE_MCP_OR_REVIEWED_SCRIPT", text)
-        self.assertIn("70948cc8e2f34d23d317d7fd798c6a2aa9de41d8", text)
-        self.assertIn("AUTO_MERGE=false", text)
-        self.assertIn("AUTO_CANON_PROMOTION=false", text)
-        self.assertIn("READY_FOR_USER_REVIEW", text)
+    def test_latest_lin_authority_is_pinned_and_stale_sha_is_blocked(self):
+        text = SKILL.read_text(encoding="utf-8") + CONSUMER.read_text(encoding="utf-8")
+        self.assertIn("e1b02b1773366677a543d764bd68638e13da1a27", text)
+        self.assertIn("612fd6347f7d203f9b6d8a3737a72bbaf7a6f0fe", text)
+        self.assertIn("f44c283bd5c02a1a8e8b3adf7785c867d78b0c2f", text)
+        self.assertIn("LIN_ASTER_3D_PRODUCTION_CONTROL_V1_2", text)
+
+    def test_r04_h31_component_route_replaces_p2_full_body_hero_route(self):
+        text = SKILL.read_text(encoding="utf-8") + CONSUMER.read_text(encoding="utf-8")
+        self.assertIn("H3.1 ULTRA HEAD", text)
+        self.assertIn("H3.1 ULTRA HAIR", text)
+        self.assertIn("H3.1 ULTRA BODY / OUTFIT", text)
+        self.assertIn("H3.1 ULTRA COAT", text)
+        self.assertIn("P2_FULL_BODY_PRIMARY_HERO_BASE=false", text)
+        self.assertIn("TRIPO_BASE_READY=false", text)
+        self.assertIn("R03 B is a whole-character detail donor only", text)
+
+    def test_reference_lineage_and_geometry_before_texture_are_preserved(self):
+        text = SKILL.read_text(encoding="utf-8")
+        self.assertIn("LINEAGE-TRACKED NON-CANON DERIVED WORKING REFERENCES", text)
+        self.assertIn("Do not fabricate a", text)
+        self.assertIn("missing part view", text)
+        self.assertIn("Do not texture, rig, or promote rejected geometry", text)
+        self.assertIn("PRIVACY=PRIVATE", text)
+
+    def test_control_roles_and_supervision_are_preserved(self):
+        text = SKILL.read_text(encoding="utf-8")
+        self.assertIn("GPT-6 Astra XHigh / Computer Use", text)
+        self.assertIn("GPT-5.6 Sol Pro", text)
+        self.assertIn("Blender Bridge/MCP", text)
+        self.assertIn("Reviewed bpy/headless Blender", text)
+        self.assertIn("Recorded human correction", text)
+        self.assertIn("Never run a one-shot unattended character build", text)
+        self.assertIn("act\n→ inspect real geometry or pixels", text)
+
+    def test_non_destructive_neck_expression_and_final_evidence(self):
+        text = SKILL.read_text(encoding="utf-8")
+        self.assertIn("SEPARATE_ALIGNED", text)
+        self.assertIn("expression-head mesh/state switching", text)
+        self.assertIn("fresh-process save/reopen", text)
+        self.assertIn("rollback/restore proof", text)
+        self.assertIn("USER_ONLY", text)
+        self.assertIn("A green CI run verifies the guard implementation, not 3D quality", text)
 
 
 if __name__ == "__main__":
