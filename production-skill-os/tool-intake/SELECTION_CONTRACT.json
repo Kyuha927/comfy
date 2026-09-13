@@ -1,5 +1,5 @@
 {
-  "schema_version": "1.1.0",
+  "schema_version": "1.1.1",
   "contract_id": "PSOS_CAPABILITY_SELECTION_CONTRACT_20260914",
   "status": "CANDIDATE_FAIL_CLOSED_CURRENT_AUTHORITY_BOUND",
   "registry_path": "production-skill-os/tool-intake/TOOL_CAPABILITY_REGISTRY.json",
@@ -7,11 +7,11 @@
   "authority": {
     "repository": "Kyuha927/lastline-echoes",
     "branch": "lin-aster-tripo-r01-20260913",
-    "branch_head_at_reconciliation": "31532b8073c94e4b414b5d6827c938c0e97d27ea",
+    "branch_head_at_reconciliation": "9cbf3a21f1693029b70aa4cbbe6b3d5b392acf56",
     "ssot_path": "work/handovers/2026-09-13/00_READ_FIRST_LIN_ASTER_3D_ROUTE.md",
-    "ssot_blob_sha": "dd4000fa995566416d019a2e5e5f1ff3fae2781d",
+    "ssot_blob_sha": "04281cb0c5450bc62887ea37b88709ad8f95f9b8",
     "live_state_path": "work/handovers/2026-09-13/LIN_ASTER_3D_LIVE_STATE.json",
-    "live_state_blob_sha": "d6518581dd0f9aebc0ba256a1d87d74ed49e1c58",
+    "live_state_blob_sha": "5171dc328f99b8a99a1c194d2637cefb53534b3d",
     "production_control_path": "work/handovers/2026-09-13/LIN_ASTER_3D_PRODUCTION_CONTROL_CURRENT.md",
     "production_control_policy_id": "LIN_ASTER_3D_PRODUCTION_CONTROL_V1_2",
     "final_lock_authority": "USER_ONLY",
