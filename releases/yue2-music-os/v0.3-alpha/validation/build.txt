@@ -77,7 +77,7 @@ running install_egg_info
 Copying src/yue2_music_os.egg-info to build/bdist.linux-x86_64/wheel/./yue2_music_os-0.3.0a1-py3.12.egg-info
 running install_scripts
 creating build/bdist.linux-x86_64/wheel/yue2_music_os-0.3.0a1.dist-info/WHEEL
-creating '/home/runner/work/comfy/comfy/releases/yue2-music-os/v0.3-alpha/dist/.tmp-97azyahy/yue2_music_os-0.3.0a1-py3-none-any.whl' and adding 'build/bdist.linux-x86_64/wheel' to it
+creating '/home/runner/work/comfy/comfy/releases/yue2-music-os/v0.3-alpha/dist/.tmp-xdkfl23y/yue2_music_os-0.3.0a1-py3-none-any.whl' and adding 'build/bdist.linux-x86_64/wheel' to it
 adding 'yue2_music_os/__init__.py'
 adding 'yue2_music_os/__main__.py'
 adding 'yue2_music_os/abc_tools.py'

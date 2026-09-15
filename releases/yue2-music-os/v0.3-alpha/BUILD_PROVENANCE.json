@@ -1,8 +1,10 @@
 {
+  "authoritative_parent_commit": "6dd00a1c0d77210664eb46079543690554f8d71b",
   "base_release": "releases/yue2-music-os/v0.2-alpha",
   "base_verified_commit": "646b118c48693045ad06bf70f17e3c17d72443b5",
-  "ci_run_id": 35012819207,
-  "construction": "copy verified v0.2 release, apply path-confined checksum-pinned v0.3 overlay",
+  "ci_run_id": 35013221485,
+  "construction": "authoritative v0.2 parent plus verified v0.2 source tree and isolated v0.3 release",
   "overlay_sha256": "72bcbe7133b897d9d7f642ca9834fcc8266f654c25b8026e05c8a2ee5f9a2d03",
-  "tested_source_commit": "4cd10982f7e652e6a0e71d0f7eba76c5f44bc716"
+  "tested_source_commit": "8ff33ab5264b7af5cc948bf312747310d36b0e89",
+  "verification_branch": "yue2-music-os-note-ir-v0.3-integration-20260916"
 }
