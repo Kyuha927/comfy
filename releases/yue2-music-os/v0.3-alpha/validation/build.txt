@@ -1,0 +1,206 @@
+running egg_info
+creating src/yue2_music_os.egg-info
+writing src/yue2_music_os.egg-info/PKG-INFO
+writing dependency_links to src/yue2_music_os.egg-info/dependency_links.txt
+writing entry points to src/yue2_music_os.egg-info/entry_points.txt
+writing requirements to src/yue2_music_os.egg-info/requires.txt
+writing top-level names to src/yue2_music_os.egg-info/top_level.txt
+writing manifest file 'src/yue2_music_os.egg-info/SOURCES.txt'
+reading manifest file 'src/yue2_music_os.egg-info/SOURCES.txt'
+reading manifest template 'MANIFEST.in'
+adding license file 'LICENSE'
+writing manifest file 'src/yue2_music_os.egg-info/SOURCES.txt'
+running bdist_wheel
+running build
+running build_py
+creating build/lib/yue2_music_os
+copying src/yue2_music_os/models.py -> build/lib/yue2_music_os
+copying src/yue2_music_os/note_ir.py -> build/lib/yue2_music_os
+copying src/yue2_music_os/production.py -> build/lib/yue2_music_os
+copying src/yue2_music_os/__init__.py -> build/lib/yue2_music_os
+copying src/yue2_music_os/config.py -> build/lib/yue2_music_os
+copying src/yue2_music_os/service.py -> build/lib/yue2_music_os
+copying src/yue2_music_os/note_providers.py -> build/lib/yue2_music_os
+copying src/yue2_music_os/engines.py -> build/lib/yue2_music_os
+copying src/yue2_music_os/note_workspace.py -> build/lib/yue2_music_os
+copying src/yue2_music_os/__main__.py -> build/lib/yue2_music_os
+copying src/yue2_music_os/api.py -> build/lib/yue2_music_os
+copying src/yue2_music_os/abc_tools.py -> build/lib/yue2_music_os
+copying src/yue2_music_os/sample_data.py -> build/lib/yue2_music_os
+copying src/yue2_music_os/storage.py -> build/lib/yue2_music_os
+running egg_info
+writing src/yue2_music_os.egg-info/PKG-INFO
+writing dependency_links to src/yue2_music_os.egg-info/dependency_links.txt
+writing entry points to src/yue2_music_os.egg-info/entry_points.txt
+writing requirements to src/yue2_music_os.egg-info/requires.txt
+writing top-level names to src/yue2_music_os.egg-info/top_level.txt
+reading manifest file 'src/yue2_music_os.egg-info/SOURCES.txt'
+reading manifest template 'MANIFEST.in'
+adding license file 'LICENSE'
+writing manifest file 'src/yue2_music_os.egg-info/SOURCES.txt'
+creating build/lib/yue2_music_os/static
+copying src/yue2_music_os/static/note-editor.html -> build/lib/yue2_music_os/static
+copying src/yue2_music_os/static/index.html -> build/lib/yue2_music_os/static
+copying src/yue2_music_os/static/app.js -> build/lib/yue2_music_os/static
+copying src/yue2_music_os/static/styles.css -> build/lib/yue2_music_os/static
+copying src/yue2_music_os/static/note-editor.css -> build/lib/yue2_music_os/static
+copying src/yue2_music_os/static/yue2-mark.svg -> build/lib/yue2_music_os/static
+copying src/yue2_music_os/static/note-editor.js -> build/lib/yue2_music_os/static
+installing to build/bdist.linux-x86_64/wheel
+running install
+running install_lib
+creating build/bdist.linux-x86_64/wheel
+creating build/bdist.linux-x86_64/wheel/yue2_music_os
+copying build/lib/yue2_music_os/models.py -> build/bdist.linux-x86_64/wheel/./yue2_music_os
+creating build/bdist.linux-x86_64/wheel/yue2_music_os/static
+copying build/lib/yue2_music_os/static/note-editor.html -> build/bdist.linux-x86_64/wheel/./yue2_music_os/static
+copying build/lib/yue2_music_os/static/index.html -> build/bdist.linux-x86_64/wheel/./yue2_music_os/static
+copying build/lib/yue2_music_os/static/app.js -> build/bdist.linux-x86_64/wheel/./yue2_music_os/static
+copying build/lib/yue2_music_os/static/styles.css -> build/bdist.linux-x86_64/wheel/./yue2_music_os/static
+copying build/lib/yue2_music_os/static/note-editor.css -> build/bdist.linux-x86_64/wheel/./yue2_music_os/static
+copying build/lib/yue2_music_os/static/yue2-mark.svg -> build/bdist.linux-x86_64/wheel/./yue2_music_os/static
+copying build/lib/yue2_music_os/static/note-editor.js -> build/bdist.linux-x86_64/wheel/./yue2_music_os/static
+copying build/lib/yue2_music_os/note_ir.py -> build/bdist.linux-x86_64/wheel/./yue2_music_os
+copying build/lib/yue2_music_os/production.py -> build/bdist.linux-x86_64/wheel/./yue2_music_os
+copying build/lib/yue2_music_os/__init__.py -> build/bdist.linux-x86_64/wheel/./yue2_music_os
+copying build/lib/yue2_music_os/config.py -> build/bdist.linux-x86_64/wheel/./yue2_music_os
+copying build/lib/yue2_music_os/service.py -> build/bdist.linux-x86_64/wheel/./yue2_music_os
+copying build/lib/yue2_music_os/note_providers.py -> build/bdist.linux-x86_64/wheel/./yue2_music_os
+copying build/lib/yue2_music_os/engines.py -> build/bdist.linux-x86_64/wheel/./yue2_music_os
+copying build/lib/yue2_music_os/note_workspace.py -> build/bdist.linux-x86_64/wheel/./yue2_music_os
+copying build/lib/yue2_music_os/__main__.py -> build/bdist.linux-x86_64/wheel/./yue2_music_os
+copying build/lib/yue2_music_os/api.py -> build/bdist.linux-x86_64/wheel/./yue2_music_os
+copying build/lib/yue2_music_os/abc_tools.py -> build/bdist.linux-x86_64/wheel/./yue2_music_os
+copying build/lib/yue2_music_os/sample_data.py -> build/bdist.linux-x86_64/wheel/./yue2_music_os
+copying build/lib/yue2_music_os/storage.py -> build/bdist.linux-x86_64/wheel/./yue2_music_os
+running install_egg_info
+Copying src/yue2_music_os.egg-info to build/bdist.linux-x86_64/wheel/./yue2_music_os-0.3.0a1-py3.12.egg-info
+running install_scripts
+creating build/bdist.linux-x86_64/wheel/yue2_music_os-0.3.0a1.dist-info/WHEEL
+creating '/home/runner/work/comfy/comfy/releases/yue2-music-os/v0.3-alpha/dist/.tmp-97azyahy/yue2_music_os-0.3.0a1-py3-none-any.whl' and adding 'build/bdist.linux-x86_64/wheel' to it
+adding 'yue2_music_os/__init__.py'
+adding 'yue2_music_os/__main__.py'
+adding 'yue2_music_os/abc_tools.py'
+adding 'yue2_music_os/api.py'
+adding 'yue2_music_os/config.py'
+adding 'yue2_music_os/engines.py'
+adding 'yue2_music_os/models.py'
+adding 'yue2_music_os/note_ir.py'
+adding 'yue2_music_os/note_providers.py'
+adding 'yue2_music_os/note_workspace.py'
+adding 'yue2_music_os/production.py'
+adding 'yue2_music_os/sample_data.py'
+adding 'yue2_music_os/service.py'
+adding 'yue2_music_os/storage.py'
+adding 'yue2_music_os/static/app.js'
+adding 'yue2_music_os/static/index.html'
+adding 'yue2_music_os/static/note-editor.css'
+adding 'yue2_music_os/static/note-editor.html'
+adding 'yue2_music_os/static/note-editor.js'
+adding 'yue2_music_os/static/styles.css'
+adding 'yue2_music_os/static/yue2-mark.svg'
+adding 'yue2_music_os-0.3.0a1.dist-info/licenses/LICENSE'
+adding 'yue2_music_os-0.3.0a1.dist-info/METADATA'
+adding 'yue2_music_os-0.3.0a1.dist-info/WHEEL'
+adding 'yue2_music_os-0.3.0a1.dist-info/entry_points.txt'
+adding 'yue2_music_os-0.3.0a1.dist-info/top_level.txt'
+adding 'yue2_music_os-0.3.0a1.dist-info/RECORD'
+removing build/bdist.linux-x86_64/wheel
+running egg_info
+writing src/yue2_music_os.egg-info/PKG-INFO
+writing dependency_links to src/yue2_music_os.egg-info/dependency_links.txt
+writing entry points to src/yue2_music_os.egg-info/entry_points.txt
+writing requirements to src/yue2_music_os.egg-info/requires.txt
+writing top-level names to src/yue2_music_os.egg-info/top_level.txt
+reading manifest file 'src/yue2_music_os.egg-info/SOURCES.txt'
+reading manifest template 'MANIFEST.in'
+adding license file 'LICENSE'
+writing manifest file 'src/yue2_music_os.egg-info/SOURCES.txt'
+running sdist
+running egg_info
+writing src/yue2_music_os.egg-info/PKG-INFO
+writing dependency_links to src/yue2_music_os.egg-info/dependency_links.txt
+writing entry points to src/yue2_music_os.egg-info/entry_points.txt
+writing requirements to src/yue2_music_os.egg-info/requires.txt
+writing top-level names to src/yue2_music_os.egg-info/top_level.txt
+reading manifest file 'src/yue2_music_os.egg-info/SOURCES.txt'
+reading manifest template 'MANIFEST.in'
+adding license file 'LICENSE'
+writing manifest file 'src/yue2_music_os.egg-info/SOURCES.txt'
+running check
+creating yue2_music_os-0.3.0a1
+creating yue2_music_os-0.3.0a1/docs
+creating yue2_music_os-0.3.0a1/examples
+creating yue2_music_os-0.3.0a1/scripts
+creating yue2_music_os-0.3.0a1/src/yue2_music_os
+creating yue2_music_os-0.3.0a1/src/yue2_music_os.egg-info
+creating yue2_music_os-0.3.0a1/src/yue2_music_os/static
+creating yue2_music_os-0.3.0a1/tests
+copying files to yue2_music_os-0.3.0a1...
+copying .env.example -> yue2_music_os-0.3.0a1
+copying HANDOFF.md -> yue2_music_os-0.3.0a1
+copying LICENSE -> yue2_music_os-0.3.0a1
+copying MANIFEST.in -> yue2_music_os-0.3.0a1
+copying README.md -> yue2_music_os-0.3.0a1
+copying THIRD_PARTY_NOTICES.md -> yue2_music_os-0.3.0a1
+copying pyproject.toml -> yue2_music_os-0.3.0a1
+copying docs/API.md -> yue2_music_os-0.3.0a1/docs
+copying docs/ARCHITECTURE.md -> yue2_music_os-0.3.0a1/docs
+copying docs/NOTE_IR.md -> yue2_music_os-0.3.0a1/docs
+copying docs/PRODUCTION_RENDERERS.md -> yue2_music_os-0.3.0a1/docs
+copying docs/REAL_WORKER_ACCEPTANCE.md -> yue2_music_os-0.3.0a1/docs
+copying docs/SECURITY.md -> yue2_music_os-0.3.0a1/docs
+copying examples/basic_pitch_command_provider.py -> yue2_music_os-0.3.0a1/examples
+copying examples/note-provider-config.example.json -> yue2_music_os-0.3.0a1/examples
+copying examples/song.json -> yue2_music_os-0.3.0a1/examples
+copying scripts/apply_note_ir_v0_3_overlay.py -> yue2_music_os-0.3.0a1/scripts
+copying scripts/ci_verify_note_ir_v0_3.sh -> yue2_music_os-0.3.0a1/scripts
+copying scripts/install_basic_pitch_worker.sh -> yue2_music_os-0.3.0a1/scripts
+copying scripts/install_controller.sh -> yue2_music_os-0.3.0a1/scripts
+copying scripts/install_worker.sh -> yue2_music_os-0.3.0a1/scripts
+copying scripts/smoke.sh -> yue2_music_os-0.3.0a1/scripts
+copying src/yue2_music_os/__init__.py -> yue2_music_os-0.3.0a1/src/yue2_music_os
+copying src/yue2_music_os/__main__.py -> yue2_music_os-0.3.0a1/src/yue2_music_os
+copying src/yue2_music_os/abc_tools.py -> yue2_music_os-0.3.0a1/src/yue2_music_os
+copying src/yue2_music_os/api.py -> yue2_music_os-0.3.0a1/src/yue2_music_os
+copying src/yue2_music_os/config.py -> yue2_music_os-0.3.0a1/src/yue2_music_os
+copying src/yue2_music_os/engines.py -> yue2_music_os-0.3.0a1/src/yue2_music_os
+copying src/yue2_music_os/models.py -> yue2_music_os-0.3.0a1/src/yue2_music_os
+copying src/yue2_music_os/note_ir.py -> yue2_music_os-0.3.0a1/src/yue2_music_os
+copying src/yue2_music_os/note_providers.py -> yue2_music_os-0.3.0a1/src/yue2_music_os
+copying src/yue2_music_os/note_workspace.py -> yue2_music_os-0.3.0a1/src/yue2_music_os
+copying src/yue2_music_os/production.py -> yue2_music_os-0.3.0a1/src/yue2_music_os
+copying src/yue2_music_os/sample_data.py -> yue2_music_os-0.3.0a1/src/yue2_music_os
+copying src/yue2_music_os/service.py -> yue2_music_os-0.3.0a1/src/yue2_music_os
+copying src/yue2_music_os/storage.py -> yue2_music_os-0.3.0a1/src/yue2_music_os
+copying src/yue2_music_os.egg-info/PKG-INFO -> yue2_music_os-0.3.0a1/src/yue2_music_os.egg-info
+copying src/yue2_music_os.egg-info/SOURCES.txt -> yue2_music_os-0.3.0a1/src/yue2_music_os.egg-info
+copying src/yue2_music_os.egg-info/dependency_links.txt -> yue2_music_os-0.3.0a1/src/yue2_music_os.egg-info
+copying src/yue2_music_os.egg-info/entry_points.txt -> yue2_music_os-0.3.0a1/src/yue2_music_os.egg-info
+copying src/yue2_music_os.egg-info/requires.txt -> yue2_music_os-0.3.0a1/src/yue2_music_os.egg-info
+copying src/yue2_music_os.egg-info/top_level.txt -> yue2_music_os-0.3.0a1/src/yue2_music_os.egg-info
+copying src/yue2_music_os/static/app.js -> yue2_music_os-0.3.0a1/src/yue2_music_os/static
+copying src/yue2_music_os/static/index.html -> yue2_music_os-0.3.0a1/src/yue2_music_os/static
+copying src/yue2_music_os/static/note-editor.css -> yue2_music_os-0.3.0a1/src/yue2_music_os/static
+copying src/yue2_music_os/static/note-editor.html -> yue2_music_os-0.3.0a1/src/yue2_music_os/static
+copying src/yue2_music_os/static/note-editor.js -> yue2_music_os-0.3.0a1/src/yue2_music_os/static
+copying src/yue2_music_os/static/styles.css -> yue2_music_os-0.3.0a1/src/yue2_music_os/static
+copying src/yue2_music_os/static/yue2-mark.svg -> yue2_music_os-0.3.0a1/src/yue2_music_os/static
+copying tests/test_abc_tools.py -> yue2_music_os-0.3.0a1/tests
+copying tests/test_api.py -> yue2_music_os-0.3.0a1/tests
+copying tests/test_cli.py -> yue2_music_os-0.3.0a1/tests
+copying tests/test_config.py -> yue2_music_os-0.3.0a1/tests
+copying tests/test_engines.py -> yue2_music_os-0.3.0a1/tests
+copying tests/test_frontend_contract.py -> yue2_music_os-0.3.0a1/tests
+copying tests/test_note_api.py -> yue2_music_os-0.3.0a1/tests
+copying tests/test_note_ir.py -> yue2_music_os-0.3.0a1/tests
+copying tests/test_note_providers.py -> yue2_music_os-0.3.0a1/tests
+copying tests/test_note_workspace.py -> yue2_music_os-0.3.0a1/tests
+copying tests/test_production.py -> yue2_music_os-0.3.0a1/tests
+copying tests/test_scripts.py -> yue2_music_os-0.3.0a1/tests
+copying tests/test_service.py -> yue2_music_os-0.3.0a1/tests
+copying tests/test_storage.py -> yue2_music_os-0.3.0a1/tests
+Writing yue2_music_os-0.3.0a1/setup.cfg
+Creating tar archive
+removing 'yue2_music_os-0.3.0a1' (and everything under it)
+Successfully built yue2_music_os-0.3.0a1-py3-none-any.whl and yue2_music_os-0.3.0a1.tar.gz

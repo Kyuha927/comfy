@@ -1,0 +1,76 @@
+{
+  "artifacts": [
+    {
+      "name": "yue2-music-os-v0.2-alpha-source.zip",
+      "sha256": "7825cbd853733455bfc03eebdb2a7ac7731f4a431de824108ec0ef6ee0d4335d",
+      "size_bytes": 151308
+    },
+    {
+      "name": "yue2_music_os-0.2.0a1-py3-none-any.whl",
+      "sha256": "776f1a69fa31c11d80dae6d98ff3482f3d1475cd9bb76e7a86ccbd6b970c9274",
+      "size_bytes": 62510
+    }
+  ],
+  "checks": {
+    "bash_syntax": "PASS",
+    "desktop_static_render_local_evidence": "PASS",
+    "http_smoke_generate_rank_production": "PASS",
+    "javascript_syntax": "PASS",
+    "mobile_static_render_local_evidence": "PASS",
+    "python_3_12_install": "PASS",
+    "python_compileall": "PASS",
+    "source_checksums": "PASS",
+    "wheel_required_members": "PASS"
+  },
+  "ci_run_attempt": 1,
+  "ci_run_id": 34947425082,
+  "not_run": [
+    "real YuE2 GPU inference",
+    "real SheetSage2 transcription",
+    "live Flow/Lyria call",
+    "live Suno call",
+    "live Eleven Music call"
+  ],
+  "release": "yue2-music-os-v0.2-alpha",
+  "static_render": {
+    "desktop": {
+      "horizontal_overflow": false,
+      "page_errors": [],
+      "production_visible": true,
+      "provider_count": 2,
+      "viewport": {
+        "height": 1100,
+        "width": 1440
+      }
+    },
+    "evidence_note": "Rendered locally with Playwright; binary screenshots are retained outside the Git branch. Layout metrics and page-error counts are committed.",
+    "mobile": {
+      "horizontal_overflow": false,
+      "page_errors": [],
+      "production_visible": true,
+      "provider_count": 2,
+      "viewport": {
+        "height": 844,
+        "width": 390
+      }
+    }
+  },
+  "target_branch": "yue2-music-os-composition-router-v0.2-alpha-20260915",
+  "tested_source_commit": "d63349c2953aff68f135ff8a99e920a440b922ff",
+  "tests": {
+    "branch_coverage_percent": 81.07,
+    "errors": 0,
+    "failed": 0,
+    "minimum_percent": 75,
+    "passed": 48
+  },
+  "verdict": "PASS_CONTROLLER_AND_ROUTER_REAL_MODELS_PENDING",
+  "wheel": {
+    "member_count": 21,
+    "name": "yue2_music_os-0.2.0a1-py3-none-any.whl",
+    "required_members": "PASS",
+    "sha256": "776f1a69fa31c11d80dae6d98ff3482f3d1475cd9bb76e7a86ccbd6b970c9274",
+    "size_bytes": 62510,
+    "wheel": "yue2_music_os-0.2.0a1-py3-none-any.whl"
+  }
+}

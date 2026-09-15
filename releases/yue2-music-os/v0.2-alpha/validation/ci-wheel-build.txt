@@ -1,0 +1,13 @@
+Processing ./.
+  Installing build dependencies: started
+  Installing build dependencies: finished with status 'done'
+  Getting requirements to build wheel: started
+  Getting requirements to build wheel: finished with status 'done'
+  Preparing metadata (pyproject.toml): started
+  Preparing metadata (pyproject.toml): finished with status 'done'
+Building wheels for collected packages: yue2-music-os
+  Building wheel for yue2-music-os (pyproject.toml): started
+  Building wheel for yue2-music-os (pyproject.toml): finished with status 'done'
+  Created wheel for yue2-music-os: filename=yue2_music_os-0.2.0a1-py3-none-any.whl size=62510 sha256=776f1a69fa31c11d80dae6d98ff3482f3d1475cd9bb76e7a86ccbd6b970c9274
+  Stored in directory: /tmp/pip-ephem-wheel-cache-2agez9a5/wheels/29/82/85/cb60da33e9512e7d2e3bcc099748d606bf6a7f17fa296ad7fc
+Successfully built yue2-music-os

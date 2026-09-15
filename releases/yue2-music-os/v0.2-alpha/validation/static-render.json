@@ -1,0 +1,23 @@
+{
+  "desktop": {
+    "horizontal_overflow": false,
+    "page_errors": [],
+    "production_visible": true,
+    "provider_count": 2,
+    "viewport": {
+      "height": 1100,
+      "width": 1440
+    }
+  },
+  "evidence_note": "Rendered locally with Playwright; binary screenshots are retained outside the Git branch. Layout metrics and page-error counts are committed.",
+  "mobile": {
+    "horizontal_overflow": false,
+    "page_errors": [],
+    "production_visible": true,
+    "provider_count": 2,
+    "viewport": {
+      "height": 844,
+      "width": 390
+    }
+  }
+}

@@ -1,0 +1,9 @@
+Processing /mnt/data/yue2_repair/work/v0.2-alpha
+  Preparing metadata (pyproject.toml): started
+  Preparing metadata (pyproject.toml): finished with status 'done'
+Building wheels for collected packages: yue2-music-os
+  Building wheel for yue2-music-os (pyproject.toml): started
+  Building wheel for yue2-music-os (pyproject.toml): finished with status 'done'
+  Created wheel for yue2-music-os: filename=yue2_music_os-0.2.0a1-py3-none-any.whl size=62510 sha256=f56d0011a8943572d8286bbd288b86f5ec2d93dd9e4910f969a0f5b5c94ef0e4
+  Stored in directory: /tmp/pip-ephem-wheel-cache-jp6pjaut/wheels/8c/32/5a/d8adfd4a8acd003bd635d7fc055443f42f8f62eee8ea4f2451
+Successfully built yue2-music-os
