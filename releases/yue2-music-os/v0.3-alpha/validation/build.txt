@@ -77,7 +77,7 @@ running install_egg_info
 Copying src/yue2_music_os.egg-info to build/bdist.linux-x86_64/wheel/./yue2_music_os-0.3.0a1-py3.12.egg-info
 running install_scripts
 creating build/bdist.linux-x86_64/wheel/yue2_music_os-0.3.0a1.dist-info/WHEEL
-creating '/home/runner/work/comfy/comfy/releases/yue2-music-os/v0.3-alpha/dist/.tmp-xdkfl23y/yue2_music_os-0.3.0a1-py3-none-any.whl' and adding 'build/bdist.linux-x86_64/wheel' to it
+creating '/home/runner/work/comfy/comfy/releases/yue2-music-os/v0.3-alpha/dist/.tmp-5589cgvk/yue2_music_os-0.3.0a1-py3-none-any.whl' and adding 'build/bdist.linux-x86_64/wheel' to it
 adding 'yue2_music_os/__init__.py'
 adding 'yue2_music_os/__main__.py'
 adding 'yue2_music_os/abc_tools.py'
@@ -146,17 +146,20 @@ copying THIRD_PARTY_NOTICES.md -> yue2_music_os-0.3.0a1
 copying pyproject.toml -> yue2_music_os-0.3.0a1
 copying docs/API.md -> yue2_music_os-0.3.0a1/docs
 copying docs/ARCHITECTURE.md -> yue2_music_os-0.3.0a1/docs
+copying docs/FREE_MULTITRACK_WORKER.md -> yue2_music_os-0.3.0a1/docs
 copying docs/NOTE_IR.md -> yue2_music_os-0.3.0a1/docs
 copying docs/PRODUCTION_RENDERERS.md -> yue2_music_os-0.3.0a1/docs
 copying docs/REAL_WORKER_ACCEPTANCE.md -> yue2_music_os-0.3.0a1/docs
 copying docs/SECURITY.md -> yue2_music_os-0.3.0a1/docs
 copying examples/basic_pitch_command_provider.py -> yue2_music_os-0.3.0a1/examples
+copying examples/free_multitrack_command_provider.py -> yue2_music_os-0.3.0a1/examples
 copying examples/note-provider-config.example.json -> yue2_music_os-0.3.0a1/examples
 copying examples/song.json -> yue2_music_os-0.3.0a1/examples
 copying scripts/apply_note_ir_v0_3_overlay.py -> yue2_music_os-0.3.0a1/scripts
 copying scripts/ci_verify_note_ir_v0_3.sh -> yue2_music_os-0.3.0a1/scripts
 copying scripts/install_basic_pitch_worker.sh -> yue2_music_os-0.3.0a1/scripts
 copying scripts/install_controller.sh -> yue2_music_os-0.3.0a1/scripts
+copying scripts/install_free_multitrack_worker.sh -> yue2_music_os-0.3.0a1/scripts
 copying scripts/install_worker.sh -> yue2_music_os-0.3.0a1/scripts
 copying scripts/smoke.sh -> yue2_music_os-0.3.0a1/scripts
 copying src/yue2_music_os/__init__.py -> yue2_music_os-0.3.0a1/src/yue2_music_os
@@ -191,6 +194,7 @@ copying tests/test_api.py -> yue2_music_os-0.3.0a1/tests
 copying tests/test_cli.py -> yue2_music_os-0.3.0a1/tests
 copying tests/test_config.py -> yue2_music_os-0.3.0a1/tests
 copying tests/test_engines.py -> yue2_music_os-0.3.0a1/tests
+copying tests/test_free_multitrack_example.py -> yue2_music_os-0.3.0a1/tests
 copying tests/test_frontend_contract.py -> yue2_music_os-0.3.0a1/tests
 copying tests/test_note_api.py -> yue2_music_os-0.3.0a1/tests
 copying tests/test_note_ir.py -> yue2_music_os-0.3.0a1/tests
