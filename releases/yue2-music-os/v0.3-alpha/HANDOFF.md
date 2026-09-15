@@ -7,10 +7,11 @@ Keep the existing YuE2 composition and commercial-render router intact while add
 ## Baseline and branch
 
 - Repository: `Kyuha927/comfy`
+- Authoritative parent commit: `6dd00a1c0d77210664eb46079543690554f8d71b`
 - Preserved baseline release: `releases/yue2-music-os/v0.2-alpha`
 - Development release: `releases/yue2-music-os/v0.3-alpha`
-- Development branch: `yue2-music-os-note-ir-free-v0.3-dev-20260916`
-- v0.2 remains immutable; v0.3 is copied from the previously verified v0.2 source and receives an overlay.
+- Clean integration branch: `yue2-music-os-note-ir-v0.3-integration-20260916`
+- v0.2 remains immutable; v0.3 is an isolated release copied from the previously verified v0.2 source and extended with the Note IR layer.
 
 ## Implemented in v0.3
 
