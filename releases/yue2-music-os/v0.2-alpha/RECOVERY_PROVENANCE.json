@@ -1,0 +1,23 @@
+{
+  "corrupted_transport_branch": {
+    "branch": "yue2-music-os-v0.1-alpha-20260912",
+    "decoded_archive_sha256": "328d5be5cf6ba3b04e5e8140e2946c9233f96419729bf8c7d4c372d114b92963",
+    "decoded_archive_size_bytes": 53112,
+    "recovery_workflow_commit": "7a3db89171b25e3670464c77be0ac82d1625d2aa",
+    "transport_commit_before_recovery_workflow": "836c92c18ea3a3846b1cf8bcce008735d5898354",
+    "workflow_run_id": 34943155178,
+    "xz_integrity": "FAIL_COMPRESSED_DATA_CORRUPT"
+  },
+  "original_verified_source": {
+    "artifact_name": "yue2-music-os-v0.1-alpha.zip",
+    "baseline_branch_coverage_percent": 82.99,
+    "baseline_tests": 40,
+    "sha256": "fe186b3fd1f2e041c8ca50ba42936eb49a088b4c4610c5e1b04d244e6ac80216",
+    "size_bytes": 87463,
+    "verification_report": "YUE2_MUSIC_OS_FINAL_REPORT.md"
+  },
+  "real_model_or_provider_execution": "NOT_RUN_DURING_RECOVERY",
+  "recovery_action": "The verified Library ZIP was extracted into a clean v0.2 source tree. The corrupted GitHub bootstrap archive was not trusted or repaired in place.",
+  "recovery_date_utc": "2026-09-15T08:01:45Z",
+  "repository": "Kyuha927/comfy"
+}
