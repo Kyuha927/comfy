@@ -3,7 +3,7 @@ name: Integrate YuE2 Music OS Note IR v0.3 Alpha
 on:
   push:
     branches:
-      - yue2-music-os-note-ir-free-v0.3-dev-20260916
+      - yue2-music-os-note-ir-v0.3-integration-20260916
     paths:
       - '.bootstrap/yue2-note-ir-v0.3.ready'
   workflow_dispatch:
