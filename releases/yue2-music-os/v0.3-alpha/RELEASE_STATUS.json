@@ -1,0 +1,48 @@
+{
+  "artifacts": [
+    {
+      "name": "yue2_music_os-0.3.0a1-py3-none-any.whl",
+      "sha256": "e38094fc52780b5d75b3100bdd2314775288fd1600a076e3b6d232eb2a6aaf34",
+      "size_bytes": 93691
+    },
+    {
+      "name": "yue2_music_os-0.3.0a1.tar.gz",
+      "sha256": "5dd3d180ce757bb3dd07d477362d5806e08d2d752d73817cda15e06d0dac7d51",
+      "size_bytes": 122084
+    }
+  ],
+  "branch": "yue2-music-os-note-ir-free-v0.3-dev-20260916",
+  "checks": {
+    "api_token_round_trip": "PASS",
+    "existing_v0_2_regression_suite": "PASS",
+    "http_smoke": "PASS",
+    "individual_note_edit_and_revision_history": "PASS",
+    "javascript_syntax": "PASS",
+    "midi_export": "PASS",
+    "note_ir_stable_ids_and_fusion": "PASS",
+    "provider_command_no_shell_and_timeout": "PASS",
+    "sdist_required_members": "PASS",
+    "wheel_required_members": "PASS"
+  },
+  "ci_run_attempt": 1,
+  "ci_run_id": 35012560594,
+  "not_run": [
+    "real YourMT3-family full-mix inference",
+    "real BS-RoFormer stem separation",
+    "real Basic Pitch target-Mac inference",
+    "polyphonic waveform single-note repair",
+    "paid provider calls",
+    "representative-song human listening acceptance"
+  ],
+  "release": "yue2-music-os-v0.3-alpha",
+  "tested_source_commit": "f44bbb7409ee85bccdf424bc5bd367b094015165",
+  "tests": {
+    "branch_coverage_percent": 81.05,
+    "errors": 0,
+    "failed": 0,
+    "minimum_percent": 80,
+    "passed": 0,
+    "skipped": 0
+  },
+  "verdict": "PASS_CONTROLLER_NOTE_IR_REAL_MULTI_INSTRUMENT_MODELS_PENDING"
+}

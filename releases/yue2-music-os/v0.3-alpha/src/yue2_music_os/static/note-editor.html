@@ -1,0 +1,144 @@
+<!doctype html>
+<html lang="ko">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="description" content="YuE2 Music OS의 음표 단위 Music IR 채보·검수·편집 화면">
+  <title>Note IR 편집실 · YuE2 Music OS</title>
+  <link rel="stylesheet" href="/note-editor.css">
+</head>
+<body>
+  <header class="topbar">
+    <a class="brand" href="/">YuE2 Music OS</a>
+    <div class="top-actions">
+      <span id="connectionStatus" class="pill muted">연결 확인 중</span>
+      <button id="tokenButton" class="ghost" type="button">API 토큰</button>
+    </div>
+  </header>
+
+  <main class="shell">
+    <section class="hero card">
+      <div>
+        <p class="eyebrow">AUDIO → NOTE GRAPH → EDIT</p>
+        <h1>음 하나까지 잡아내고,<br><em>증거를 보며 고칩니다.</em></h1>
+        <p>원본 오디오는 고정합니다. 모든 수정은 Music IR의 새 리비전으로 남고 MIDI에 즉시 반영됩니다.</p>
+      </div>
+      <div class="truth-box">
+        <b>편집 경계</b>
+        <span>악보·MIDI 음표 수정: 지원</span>
+        <span>단선율 오디오 피치 수정: 엔진 필요</span>
+        <span>화음 속 음 하나 직접 수정: 재합성 권장</span>
+      </div>
+    </section>
+
+    <section class="grid setup-grid">
+      <article class="card">
+        <div class="heading">
+          <div><p class="eyebrow">01 · SOURCE</p><h2>프로젝트와 음원</h2></div>
+          <button id="refreshButton" class="icon" type="button" title="새로고침">↻</button>
+        </div>
+        <label><span>프로젝트</span><select id="projectSelect"><option value="">선택하세요</option></select></label>
+        <label><span>원본 음원</span><select id="audioSelect"><option value="">오디오를 선택하세요</option></select></label>
+        <p class="hint">새 음원 업로드는 <a href="/#tab-transcribe">기존 음원 채보 화면</a>에서 할 수 있습니다.</p>
+      </article>
+
+      <article class="card">
+        <div class="heading"><div><p class="eyebrow">02 · ENGINE</p><h2>채보 엔진</h2></div></div>
+        <div id="providerList" class="provider-list empty">엔진 정보를 불러오는 중입니다.</div>
+        <label><span>악기 힌트 · 선택</span><input id="instrumentHint" placeholder="예: piano, guitar, vocals"></label>
+        <div class="two-cols">
+          <label><span>BPM</span><input id="tempoInput" type="number" min="1" max="400" step="0.1" value="120"></label>
+          <label><span>검토 기준</span><input id="confidenceInput" type="number" min="0" max="1" step="0.01" value="0.82"></label>
+        </div>
+        <button id="analyzeButton" class="primary" type="button">무료 채보 시작</button>
+        <div class="import-row">
+          <label class="file-button" for="jsonInput">정규화 JSON 가져오기</label>
+          <input id="jsonInput" type="file" accept="application/json,.json" hidden>
+          <small>YourMT3 등 외부 무료 엔진 결과도 같은 Note IR로 합칩니다.</small>
+        </div>
+      </article>
+
+      <article class="card">
+        <div class="heading"><div><p class="eyebrow">03 · VERSION</p><h2>Music IR</h2></div></div>
+        <label><span>분석본</span><select id="irSelect"><option value="">분석본을 선택하세요</option></select></label>
+        <div id="irStats" class="stats muted">분석본을 선택하면 통계가 표시됩니다.</div>
+        <div class="button-row">
+          <button id="exportJsonButton" class="secondary" type="button" disabled>JSON</button>
+          <button id="exportMidiButton" class="secondary" type="button" disabled>MIDI</button>
+        </div>
+        <div id="revisionList" class="revision-list empty">리비전 없음</div>
+      </article>
+    </section>
+
+    <section class="workspace-grid">
+      <article class="card roll-card">
+        <div class="heading roll-heading">
+          <div><p class="eyebrow">PIANO ROLL</p><h2>음표 지도</h2></div>
+          <div class="filters">
+            <label class="inline"><input id="reviewOnly" type="checkbox"> 검토 음만</label>
+            <label class="inline">신뢰도 <input id="drawThreshold" type="range" min="0" max="1" step="0.01" value="0"></label>
+          </div>
+        </div>
+        <div class="canvas-wrap">
+          <canvas id="pianoRoll" width="1400" height="640" aria-label="음표 피아노롤"></canvas>
+          <div id="emptyRoll" class="canvas-empty">Music IR을 선택하세요.</div>
+        </div>
+        <div class="legend">
+          <span><i class="swatch normal"></i> 자동 확정 후보</span>
+          <span><i class="swatch review"></i> 검토 필요</span>
+          <span><i class="swatch selected"></i> 선택한 음</span>
+        </div>
+        <audio id="sourceAudio" controls preload="metadata"></audio>
+      </article>
+
+      <aside class="card inspector">
+        <div class="heading"><div><p class="eyebrow">NOTE INSPECTOR</p><h2>음 하나 편집</h2></div></div>
+        <div id="notePlaceholder" class="empty">피아노롤에서 음을 클릭하세요.</div>
+        <form id="noteForm" hidden>
+          <div class="identity">
+            <code id="noteId"></code>
+            <span id="noteConfidence" class="pill"></span>
+          </div>
+          <div id="providerVotes" class="votes"></div>
+          <div class="two-cols">
+            <label><span>MIDI 피치</span><input id="pitchInput" type="number" min="0" max="127" required></label>
+            <label><span>센트</span><input id="centsInput" type="number" min="-100" max="100" step="0.1"></label>
+          </div>
+          <div class="two-cols">
+            <label><span>시작 초</span><input id="startInput" type="number" min="0" step="0.001" required></label>
+            <label><span>끝 초</span><input id="endInput" type="number" min="0" step="0.001" required></label>
+          </div>
+          <div class="two-cols">
+            <label><span>세기</span><input id="velocityInput" type="number" min="0" max="127" required></label>
+            <label><span>악기</span><input id="noteInstrumentInput" maxlength="120" required></label>
+          </div>
+          <label><span>검토 상태</span>
+            <select id="reviewStateInput">
+              <option value="auto">자동</option><option value="review">검토 필요</option>
+              <option value="confirmed">확인 완료</option><option value="edited">수정됨</option>
+              <option value="rejected">오인식</option>
+            </select>
+          </label>
+          <label><span>수정 이유</span><input id="editReasonInput" maxlength="500" value="manual note edit"></label>
+          <div class="checks">
+            <label class="inline"><input id="mutedInput" type="checkbox"> 음소거</label>
+            <label class="inline"><input id="deletedInput" type="checkbox"> 삭제 표시</label>
+          </div>
+          <div id="audioBoundary" class="boundary"></div>
+          <div class="button-row">
+            <button id="playNoteButton" class="secondary" type="button">이 음 구간 듣기</button>
+            <button class="primary" type="submit">새 리비전으로 저장</button>
+          </div>
+        </form>
+      </aside>
+    </section>
+
+    <section class="card log-card">
+      <div class="heading"><div><p class="eyebrow">RECEIPT</p><h2>작업 기록</h2></div></div>
+      <pre id="statusLog">준비 중…</pre>
+    </section>
+  </main>
+
+  <script src="/note-editor.js" defer></script>
+</body>
+</html>

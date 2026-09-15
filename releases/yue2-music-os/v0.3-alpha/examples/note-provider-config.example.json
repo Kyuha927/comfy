@@ -1,0 +1,23 @@
+{
+  "basic-pitch-cli": {
+    "mode": "command",
+    "tier": "free",
+    "label": "Basic Pitch isolated Python 3.11 worker",
+    "argv": [
+      "/absolute/path/to/basic-pitch-venv/bin/python",
+      "/absolute/path/to/basic_pitch_command_provider.py",
+      "--input", "{input}",
+      "--output-json", "{output_json}",
+      "--instrument-hint", "{instrument_hint}"
+    ],
+    "timeout_seconds": 3600,
+    "capabilities": {
+      "full_mix": false,
+      "isolated_stem": true,
+      "polyphonic": true,
+      "per_note_confidence": false,
+      "direct_audio_edit": false
+    },
+    "license_reference": "Spotify Basic Pitch Apache-2.0; verify installed package/model notices"
+  }
+}
