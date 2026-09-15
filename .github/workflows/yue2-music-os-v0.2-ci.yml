@@ -6,12 +6,11 @@ on:
       - yue2-music-os-composition-router-v0.2-alpha-20260915
     paths:
       - "releases/yue2-music-os/v0.2-alpha/**"
-      - ".bootstrap/**"
       - ".github/workflows/yue2-music-os-v0.2-ci.yml"
   workflow_dispatch:
 
 permissions:
-  contents: write
+  contents: read
 
 concurrency:
   group: yue2-music-os-v0.2-${{ github.ref }}
@@ -21,7 +20,7 @@ env:
   SOURCE_DATE_EPOCH: "1789430400"
 
 jobs:
-  verify-build-publish:
+  verify-build:
     runs-on: ubuntu-24.04
     timeout-minutes: 25
     defaults:
@@ -31,81 +30,49 @@ jobs:
     steps:
       - name: Check out source
         uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1
-        with:
-          fetch-depth: 0
-
-      - name: Restore exact verified source when needed
-        working-directory: ${{ github.workspace }}
-        env:
-          BOOTSTRAP_URL: 'https://sdmntprwestcentralus.oaiusercontent.com/files/00000000-af50-81fb-ba77-5cf6ff1742e1/raw?se=2026-09-15T08%3A29%3A03Z&sp=r&sv=2026-02-06&sr=b&scid=dc8a4ccb-2ba5-5287-be26-0c0d6f2751f4&skoid=0765b554-4b90-4fa2-9d6d-0055a2427910&sktid=a48cca56-e6da-484e-a814-9c849652bcb3&skt=2026-09-15T01%3A06%3A09Z&ske=2026-09-16T01%3A06%3A09Z&sks=b&skv=2026-02-06&sig=p/PZyQEh2EOb29pz6A2/wBJpyEQh3Rew8LSLzpiL4mo%3D'
-          BOOTSTRAP_SHA256: '2788ea2e48d80d008761ca7edadf226dee2278dfcf03284dda79a608d53008d1'
-        run: |
-          set -euo pipefail
-          release='releases/yue2-music-os/v0.2-alpha'
-          if [[ -f "$release/src/yue2_music_os/production.py" ]]; then
-            echo "Complete source tree already present; bootstrap download is not needed."
-            (cd "$release" && sha256sum -c SHA256SUMS.txt)
-            exit 0
-          fi
-          test -n "$BOOTSTRAP_URL"
-          rm -f /tmp/yue2-music-os-v0.2-alpha-bootstrap.zip
-          curl --fail --location --retry 4 --retry-all-errors \
-            --connect-timeout 20 --max-time 180 \
-            "$BOOTSTRAP_URL" -o /tmp/yue2-music-os-v0.2-alpha-bootstrap.zip
-          echo "$BOOTSTRAP_SHA256  /tmp/yue2-music-os-v0.2-alpha-bootstrap.zip" | sha256sum -c -
-          rm -rf /tmp/yue2-bootstrap-source
-          mkdir -p /tmp/yue2-bootstrap-source
-          unzip -q /tmp/yue2-music-os-v0.2-alpha-bootstrap.zip -d /tmp/yue2-bootstrap-source
-          test -f /tmp/yue2-bootstrap-source/yue2-music-os-v0.2-alpha/src/yue2_music_os/production.py
-          rm -rf "$release"
-          mkdir -p "$(dirname "$release")"
-          cp -a /tmp/yue2-bootstrap-source/yue2-music-os-v0.2-alpha "$release"
-          (cd "$release" && sha256sum -c SHA256SUMS.txt)
 
       - name: Set up Python 3.12
         uses: actions/setup-python@5fda3b95a4ea91299a34e894583c3862153e4b97
         with:
           python-version: "3.12"
 
+      - name: Install verification toolchain
+        run: |
+          set -euo pipefail
+          python -m pip install --disable-pip-version-check --upgrade pip setuptools wheel
+          python -m pip install --disable-pip-version-check -e '.[dev]'
+          python -m pip check
+
       - name: Verify committed source checksums
         run: |
           set -euo pipefail
           sha256sum -c SHA256SUMS.txt
 
-      - name: Install verification dependencies
-        run: |
-          set -euo pipefail
-          python -m pip install --disable-pip-version-check -e '.[dev]'
-          python -m pip check
-
       - name: Compile and syntax checks
         run: |
           set -euo pipefail
-          {
-            python -m compileall -q src tests
-            node --check src/yue2_music_os/static/app.js
-            bash -n scripts/*.sh
-            echo "CI SYNTAX PASS"
-          } | tee validation/ci-syntax.txt
+          python -m compileall -q src tests
+          node --check src/yue2_music_os/static/app.js
+          bash -n scripts/*.sh
 
       - name: Test with branch coverage gate
         run: |
           set -euo pipefail
+          mkdir -p validation
           pytest \
             --cov=yue2_music_os \
             --cov-branch \
             --cov-report=term-missing \
             --cov-report=json:validation/ci-coverage.json \
             --cov-fail-under=75 \
-            --junitxml=validation/ci-junit.xml \
-            | tee validation/ci-pytest.txt
+            --junitxml=validation/ci-junit.xml
 
       - name: HTTP production-router smoke
         run: |
           set -euo pipefail
           ./scripts/smoke.sh | tee validation/ci-smoke.txt
 
-      - name: Check release evidence boundary
+      - name: Enforce evidence and commercial-safety boundaries
         run: |
           set -euo pipefail
           python - <<'PY'
@@ -119,160 +86,41 @@ jobs:
           assert status["implemented"]["commercial_safety"]["source_audio_copied_to_provider_packages"] is False
           assert status["explicitly_not_verified"]["real_yue2_gpu_inference"] == "NOT_RUN"
           assert status["explicitly_not_verified"]["live_flow_lyria_call"] == "NOT_RUN"
-          print("RELEASE EVIDENCE BOUNDARY PASS")
+          print("EVIDENCE BOUNDARY PASS")
           PY
 
-      - name: Build deterministic release artifacts
-        env:
-          TESTED_SOURCE_COMMIT: ${{ github.sha }}
-          CI_RUN_ID: ${{ github.run_id }}
-          CI_RUN_ATTEMPT: ${{ github.run_attempt }}
+      - name: Build and compare deterministic wheels
         run: |
           set -euo pipefail
-          rm -rf dist build src/*.egg-info
-          mkdir -p dist validation
-          python -m pip wheel . --no-deps --no-build-isolation -w dist | tee validation/ci-wheel-build.txt
-          python - <<'PY'
+          rm -rf /tmp/yue2-wheel-a /tmp/yue2-wheel-b build src/*.egg-info
+          mkdir -p /tmp/yue2-wheel-a /tmp/yue2-wheel-b
+          python -m pip wheel . --no-deps --no-build-isolation -w /tmp/yue2-wheel-a
+          rm -rf build src/*.egg-info
+          python -m pip wheel . --no-deps --no-build-isolation -w /tmp/yue2-wheel-b
+          wheel_a="$(find /tmp/yue2-wheel-a -maxdepth 1 -name 'yue2_music_os-0.2.0a1-*.whl' -print -quit)"
+          wheel_b="$(find /tmp/yue2-wheel-b -maxdepth 1 -name 'yue2_music_os-0.2.0a1-*.whl' -print -quit)"
+          test -n "$wheel_a"
+          test -n "$wheel_b"
+          cmp "$wheel_a" "$wheel_b"
+          WHEEL_PATH="$wheel_a" python - <<'PY'
           import hashlib
-          import json
           import os
-          import stat
           import zipfile
           from pathlib import Path
 
-          root = Path('.')
-          archive = root / 'dist/yue2-music-os-v0.2-alpha-source.zip'
-          excluded_top = {'dist', 'validation', '.venv', 'build', 'var', 'runtime', '.pytest_cache'}
-          source_files = []
-          for path in sorted(root.rglob('*'), key=lambda value: value.as_posix()):
-              if not path.is_file() or path.is_symlink():
-                  continue
-              rel = path.relative_to(root)
-              if rel.parts and rel.parts[0] in excluded_top:
-                  continue
-              if '__pycache__' in rel.parts or path.suffix in {'.pyc', '.pyo'}:
-                  continue
-              source_files.append((path, rel))
-          with zipfile.ZipFile(archive, 'w', compression=zipfile.ZIP_DEFLATED, compresslevel=9) as output:
-              for path, rel in source_files:
-                  info = zipfile.ZipInfo(
-                      (Path('yue2-music-os-v0.2-alpha') / rel).as_posix(),
-                      date_time=(2026, 9, 15, 0, 0, 0),
-                  )
-                  info.external_attr = (stat.S_IMODE(path.stat().st_mode) & 0xFFFF) << 16
-                  info.compress_type = zipfile.ZIP_DEFLATED
-                  output.writestr(info, path.read_bytes(), compress_type=zipfile.ZIP_DEFLATED, compresslevel=9)
-
-          wheel = next((root / 'dist').glob('yue2_music_os-0.2.0a1-*.whl'))
+          wheel = Path(os.environ["WHEEL_PATH"])
           with zipfile.ZipFile(wheel) as package:
               members = set(package.namelist())
           required = {
-              'yue2_music_os/production.py',
-              'yue2_music_os/static/app.js',
-              'yue2_music_os/static/index.html',
-              'yue2_music_os/static/styles.css',
+              "yue2_music_os/production.py",
+              "yue2_music_os/static/app.js",
+              "yue2_music_os/static/index.html",
+              "yue2_music_os/static/styles.css",
           }
           missing = sorted(required - members)
           if missing:
-              raise SystemExit('wheel missing required members: ' + ', '.join(missing))
-
-          def artifact(path: Path) -> dict[str, object]:
-              return {
-                  'name': path.name,
-                  'size_bytes': path.stat().st_size,
-                  'sha256': hashlib.sha256(path.read_bytes()).hexdigest(),
-              }
-
-          artifacts = [artifact(archive), artifact(wheel)]
-          (root / 'dist/SHA256SUMS.txt').write_text(
-              ''.join(f"{item['sha256']}  {item['name']}\n" for item in artifacts),
-              encoding='utf-8',
-          )
-          wheel_report = {
-              **artifacts[1],
-              'wheel': wheel.name,
-              'member_count': len(members),
-              'required_members': 'PASS',
-          }
-          (root / 'validation/wheel-report.json').write_text(
-              json.dumps(wheel_report, indent=2, sort_keys=True) + '\n', encoding='utf-8'
-          )
-          (root / 'validation/dist-artifacts.json').write_text(
-              json.dumps(artifacts, indent=2, sort_keys=True) + '\n', encoding='utf-8'
-          )
-          static = json.loads((root / 'validation/static-render.json').read_text(encoding='utf-8'))
-          report = {
-              'release': 'yue2-music-os-v0.2-alpha',
-              'target_branch': 'yue2-music-os-composition-router-v0.2-alpha-20260915',
-              'tested_source_commit': os.environ['TESTED_SOURCE_COMMIT'],
-              'ci_run_id': int(os.environ['CI_RUN_ID']),
-              'ci_run_attempt': int(os.environ['CI_RUN_ATTEMPT']),
-              'verdict': 'PASS_CONTROLLER_AND_ROUTER_REAL_MODELS_PENDING',
-              'tests': {'passed': 48, 'failed': 0, 'branch_coverage_percent': 81.07, 'minimum_percent': 75},
-              'checks': {
-                  'source_checksums': 'PASS',
-                  'python_3_12_install': 'PASS',
-                  'python_compileall': 'PASS',
-                  'javascript_syntax': 'PASS',
-                  'bash_syntax': 'PASS',
-                  'http_smoke_generate_rank_production': 'PASS',
-                  'wheel_required_members': 'PASS',
-                  'desktop_static_render_local_evidence': 'PASS',
-                  'mobile_static_render_local_evidence': 'PASS',
-              },
-              'static_render': static,
-              'wheel': wheel_report,
-              'artifacts': artifacts,
-              'not_run': [
-                  'real YuE2 GPU inference',
-                  'real SheetSage2 transcription',
-                  'live Flow/Lyria call',
-                  'live Suno call',
-                  'live Eleven Music call',
-              ],
-          }
-          (root / 'validation/VALIDATION_REPORT.json').write_text(
-              json.dumps(report, indent=2, sort_keys=True) + '\n', encoding='utf-8'
-          )
-          (root / 'validation/CI_ARTIFACT_BUILD.json').write_text(
-              json.dumps({
-                  'tested_source_commit': os.environ['TESTED_SOURCE_COMMIT'],
-                  'ci_run_id': int(os.environ['CI_RUN_ID']),
-                  'ci_run_attempt': int(os.environ['CI_RUN_ATTEMPT']),
-                  'source_date_epoch': int(os.environ['SOURCE_DATE_EPOCH']),
-                  'artifacts': artifacts,
-              }, indent=2, sort_keys=True) + '\n',
-              encoding='utf-8',
-          )
+              raise SystemExit("wheel missing required members: " + ", ".join(missing))
+          print("DETERMINISTIC WHEEL PASS")
+          print("sha256=" + hashlib.sha256(wheel.read_bytes()).hexdigest())
+          print("members=" + str(len(members)))
           PY
-          (cd dist && sha256sum -c SHA256SUMS.txt)
-
-      - name: Publish verified artifacts to the branch
-        run: |
-          set -euo pipefail
-          rm -rf .coverage .pytest_cache build src/*.egg-info
-          find . -type d -name __pycache__ -prune -exec rm -rf {} +
-          find . -type f -name '*.py[co]' -delete
-          cd "$GITHUB_WORKSPACE"
-          rm -rf .bootstrap
-          python - <<'PYWORKFLOW'
-          from pathlib import Path
-          path = Path('.github/workflows/yue2-music-os-v0.2-ci.yml')
-          text = path.read_text(encoding='utf-8')
-          lines = [
-              "          BOOTSTRAP_URL: ''" if line.lstrip().startswith('BOOTSTRAP_URL:') else line
-              for line in text.splitlines()
-          ]
-          path.write_text('\n'.join(lines) + '\n', encoding='utf-8')
-          PYWORKFLOW
-          git config user.name "github-actions[bot]"
-          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
-          git add -A .bootstrap .github/workflows/yue2-music-os-v0.2-ci.yml \
-            releases/yue2-music-os/v0.2-alpha
-          git add -f releases/yue2-music-os/v0.2-alpha/dist
-          if git diff --cached --quiet; then
-            echo "No artifact changes to publish."
-            exit 0
-          fi
-          git commit -m "chore: publish verified YuE2 Music OS v0.2 artifacts [skip ci]"
-          git push origin "HEAD:${GITHUB_REF_NAME}"
