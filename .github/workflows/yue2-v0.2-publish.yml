@@ -20,7 +20,7 @@ jobs:
     runs-on: ubuntu-latest
     timeout-minutes: 20
     env:
-      SOURCE_SHA256: "9804b6b3aac5538b4115819f3622d01e28d4d8fd1f74c640a138e94c2e486d8a"
+      SOURCE_SHA256: "ec3a2b785b45c7994979ddfaee32534bda365381984dc12aba0d3f77d776aca8"
       SOURCE_ROOT: yue2-music-os-v0.2-alpha
       FINAL_BRANCH: yue2-music-os-v0.2-alpha-verified-20260915
       BASE_COMMIT: 39243c99a259fe43a7484d3bde2107ffe8286bf1
