@@ -30,7 +30,7 @@ jobs:
 
       - name: Restore checksum-pinned source
         env:
-          BOOTSTRAP_URL: 'https://sdmntprcentralindia.oaiusercontent.com/files/00000000-54ac-8208-898c-c77b6e20f58a/raw?se=2026-09-15T08%3A35%3A32Z&sp=r&sv=2026-02-06&sr=b&scid=ed01dd69-e6b1-5ee0-9339-2705baf7cfaa&skoid=0765b554-4b90-4fa2-9d6d-0055a2427910&sktid=a48cca56-e6da-484e-a814-9c849652bcb3&skt=2026-09-14T20%3A12%3A21Z&ske=2026-09-15T20%3A12%3A21Z&sks=b&skv=2026-02-06&sig=Hr6dETu2Mf4X5z5mcwWw8VGV7a3z8SCHGE4VbcVe9vo%3D'
+          BOOTSTRAP_URL: ''
           BOOTSTRAP_SHA256: '2788ea2e48d80d008761ca7edadf226dee2278dfcf03284dda79a608d53008d1'
         run: |
           set -euo pipefail

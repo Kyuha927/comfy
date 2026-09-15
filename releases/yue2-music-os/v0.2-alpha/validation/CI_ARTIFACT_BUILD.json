@@ -1,0 +1,18 @@
+{
+  "artifacts": [
+    {
+      "name": "yue2-music-os-v0.2-alpha-source.zip",
+      "sha256": "7825cbd853733455bfc03eebdb2a7ac7731f4a431de824108ec0ef6ee0d4335d",
+      "size_bytes": 151308
+    },
+    {
+      "name": "yue2_music_os-0.2.0a1-py3-none-any.whl",
+      "sha256": "776f1a69fa31c11d80dae6d98ff3482f3d1475cd9bb76e7a86ccbd6b970c9274",
+      "size_bytes": 62510
+    }
+  ],
+  "ci_run_attempt": 1,
+  "ci_run_id": 34947425082,
+  "source_date_epoch": 1789430400,
+  "tested_source_commit": "d63349c2953aff68f135ff8a99e920a440b922ff"
+}
