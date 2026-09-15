@@ -69,6 +69,14 @@ jobs:
             find "$RELEASE_DIR" -type f -name '*.py[co]' -delete
             tar -xzf "$overlay" -C .
             python "$RELEASE_DIR/scripts/apply_note_ir_v0_3_overlay.py"
+            cat > "$RELEASE_DIR/MANIFEST.in" <<'EOF'
+          include HANDOFF.md
+          include THIRD_PARTY_NOTICES.md
+          include .env.example
+          recursive-include docs *.md
+          recursive-include examples *.py *.json
+          recursive-include scripts *.py *.sh
+          EOF
           else
             echo 'Bootstrap archive absent; verifying existing v0.3 tree.'
             test -f "$RELEASE_DIR/src/yue2_music_os/note_ir.py"
