@@ -55,6 +55,10 @@ jobs:
           decoded_parts: list[bytes] = []
           for path in parts:
               encoded = b''.join(path.read_bytes().split())
+              missing_padding = (-len(encoded)) % 4
+              if missing_padding:
+                  encoded += b'=' * missing_padding
+                  print(f'{path.name}: restored {missing_padding} omitted padding byte(s)')
               try:
                   decoded = base64.b64decode(encoded, validate=True)
               except Exception as exc:
