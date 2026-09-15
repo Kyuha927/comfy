@@ -53,8 +53,11 @@ jobs:
                   path = PurePosixPath(member.name)
                   if path.is_absolute() or '..' in path.parts or member.issym() or member.islnk():
                       raise SystemExit(f'unsafe overlay member: {member.name}')
-                  if path != expected and expected not in path.parents:
-                      raise SystemExit(f'overlay escaped v0.3 root: {member.name}')
+                  if path == expected or expected in path.parents:
+                      continue
+                  if member.isdir() and path != PurePosixPath('.') and path in expected.parents:
+                      continue
+                  raise SystemExit(f'overlay escaped v0.3 root: {member.name}')
           PY
             rm -rf "$RELEASE_DIR"
             cp -a "$BASE_DIR" "$RELEASE_DIR"
