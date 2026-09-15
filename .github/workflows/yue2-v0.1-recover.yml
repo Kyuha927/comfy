@@ -17,7 +17,7 @@ jobs:
     runs-on: ubuntu-latest
     timeout-minutes: 25
     env:
-      EXPECTED_ARCHIVE_SHA256: 7bc2a91cc676eeb0583f9e2be90482ada2a0037f3ab5d575788ab3a84692d3a7
+      EXPECTED_ARCHIVE_SHA256: 328d5be5cf6ba3b04e5e8140e2946c9233f96419729bf8c7d4c372d114b92963
       SOURCE_ROOT: /tmp/yue2-source/yue2_music_os/releases/yue2-music-os/v0.1-alpha
       FINAL_BRANCH: yue2-music-os-v0.1-alpha-recovered-20260915
       BASE_COMMIT: 39243c99a259fe43a7484d3bde2107ffe8286bf1
@@ -35,6 +35,7 @@ jobs:
           from pathlib import Path
           import base64
           import hashlib
+          import os
 
           parts = sorted(Path('.bootstrap').glob('yue2-music-os.tar.xz.b64.part-*'), key=lambda p: p.name)
           if len(parts) != 4:
@@ -46,10 +47,10 @@ jobs:
           except Exception as exc:
               raise SystemExit(f'base64 decode failed: {type(exc).__name__}: {exc}') from exc
           digest = hashlib.sha256(archive).hexdigest()
+          expected = os.environ['EXPECTED_ARCHIVE_SHA256']
           print(f'parts={[p.name for p in parts]}')
           print(f'encoded_bytes={len(encoded)} compact_bytes={len(compact)} archive_bytes={len(archive)}')
           print(f'archive_sha256={digest}')
-          expected = '7bc2a91cc676eeb0583f9e2be90482ada2a0037f3ab5d575788ab3a84692d3a7'
           if digest != expected:
               raise SystemExit(f'archive checksum mismatch: expected {expected}, got {digest}')
           Path('/tmp/yue2-music-os.tar.xz').write_bytes(archive)
