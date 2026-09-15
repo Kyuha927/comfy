@@ -95,11 +95,21 @@ coverage_percent = round(float(coverage['totals']['percent_covered']), 2)
 if coverage_percent < 80:
     raise SystemExit(f'coverage below gate: {coverage_percent}')
 
-suite = ET.parse(validation / 'pytest.xml').getroot()
-tests = int(suite.attrib.get('tests', 0))
-failures = int(suite.attrib.get('failures', 0))
-errors = int(suite.attrib.get('errors', 0))
-skipped = int(suite.attrib.get('skipped', 0))
+xml_root = ET.parse(validation / 'pytest.xml').getroot()
+if xml_root.tag == 'testsuite':
+    suites = [xml_root]
+elif xml_root.tag == 'testsuites':
+    suites = list(xml_root.findall('testsuite'))
+else:
+    raise SystemExit(f'unexpected pytest XML root: {xml_root.tag}')
+if not suites:
+    raise SystemExit('pytest XML contains no test suites')
+tests = sum(int(item.attrib.get('tests', 0)) for item in suites)
+failures = sum(int(item.attrib.get('failures', 0)) for item in suites)
+errors = sum(int(item.attrib.get('errors', 0)) for item in suites)
+skipped = sum(int(item.attrib.get('skipped', 0)) for item in suites)
+if tests <= 0:
+    raise SystemExit('pytest XML reports zero collected tests')
 if failures or errors:
     raise SystemExit('pytest XML contains failures or errors')
 
