@@ -1,0 +1,130 @@
+name: Recover and Publish YuE2 Music OS
+
+on:
+  push:
+    branches:
+      - yue2-music-os-v0.1-alpha-20260912
+    paths:
+      - ".github/workflows/yue2-recover-publish-v4.yml"
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+concurrency:
+  group: yue2-recover-publish-${{ github.ref }}
+  cancel-in-progress: false
+
+jobs:
+  recover-verify-publish:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 25
+    steps:
+      - name: Check out transport branch
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1
+        with:
+          fetch-depth: 0
+
+      - name: Recover source bundle and prove archive integrity
+        id: recover
+        shell: bash
+        run: |
+          set -euo pipefail
+          parts=(
+            .bootstrap/yue2-music-os.tar.xz.b64.part-00
+            .bootstrap/yue2-music-os.tar.xz.b64.part-01
+            .bootstrap/yue2-music-os.tar.xz.b64.part-02-05
+            .bootstrap/yue2-music-os.tar.xz.b64.part-06-12
+          )
+          for part in "${parts[@]}"; do
+            test -s "$part"
+            printf '%s  %s\n' "$(wc -c < "$part")" "$part"
+          done
+          cat "${parts[@]}" | tr -d '\n\r\t ' | base64 --decode > /tmp/yue2-music-os.tar.xz
+          actual_sha="$(sha256sum /tmp/yue2-music-os.tar.xz | awk '{print $1}')"
+          actual_size="$(wc -c < /tmp/yue2-music-os.tar.xz)"
+          echo "archive_sha256=${actual_sha}" | tee -a "$GITHUB_OUTPUT"
+          echo "archive_size=${actual_size}" | tee -a "$GITHUB_OUTPUT"
+          xz --test /tmp/yue2-music-os.tar.xz
+          mkdir -p /tmp/yue2-source
+          tar -xJf /tmp/yue2-music-os.tar.xz -C /tmp/yue2-source
+          release=/tmp/yue2-source/yue2_music_os/releases/yue2-music-os/v0.1-alpha
+          test -f "$release/pyproject.toml"
+          test -f "$release/RELEASE_STATUS.json"
+          test -f "$release/SHA256SUMS.txt"
+          test -f "$release/src/yue2_music_os/engines.py"
+          test -f "$release/src/yue2_music_os/service.py"
+          printf 'Recovered archive SHA-256: %s\n' "$actual_sha"
+          printf 'Recovered archive size: %s bytes\n' "$actual_size"
+
+      - name: Set up Python
+        uses: actions/setup-python@5fda3b95a4ea91299a34e894583c3862153e4b97
+        with:
+          python-version: "3.12"
+
+      - name: Verify recovered application
+        working-directory: /tmp/yue2-source/yue2_music_os/releases/yue2-music-os/v0.1-alpha
+        shell: bash
+        run: |
+          set -euo pipefail
+          python -m pip install --disable-pip-version-check -e '.[dev]'
+          python -m compileall -q src tests
+          node --check src/yue2_music_os/static/app.js
+          bash -n scripts/*.sh
+          pytest --cov=yue2_music_os --cov-branch --cov-report=term-missing --cov-fail-under=75
+          ./scripts/smoke.sh
+          python -m pip wheel . --no-deps --no-build-isolation -w /tmp/yue2-wheel
+          test -n "$(find /tmp/yue2-wheel -maxdepth 1 -name '*.whl' -print -quit)"
+          sha256sum -c SHA256SUMS.txt
+
+      - name: Write recovery provenance
+        working-directory: /tmp/yue2-source/yue2_music_os/releases/yue2-music-os/v0.1-alpha
+        env:
+          ARCHIVE_SHA: ${{ steps.recover.outputs.archive_sha256 }}
+          ARCHIVE_SIZE: ${{ steps.recover.outputs.archive_size }}
+          TRANSPORT_SHA: ${{ github.sha }}
+        shell: bash
+        run: |
+          set -euo pipefail
+          cat > RECOVERY_PROVENANCE.json <<EOF
+          {
+            "transport_branch": "yue2-music-os-v0.1-alpha-20260912",
+            "transport_commit": "${TRANSPORT_SHA}",
+            "archive_sha256": "${ARCHIVE_SHA}",
+            "archive_size_bytes": ${ARCHIVE_SIZE},
+            "recovered_at_utc": "$(date -u +%Y-%m-%dT%H:%M:%SZ)",
+            "verification": {
+              "xz_integrity": "PASS",
+              "python_compileall": "PASS",
+              "javascript_syntax": "PASS",
+              "bash_syntax": "PASS",
+              "pytest_min_branch_coverage": 75,
+              "http_smoke": "PASS",
+              "wheel_build": "PASS",
+              "internal_sha256sums": "PASS"
+            },
+            "real_gpu_inference": "NOT_RUN"
+          }
+          EOF
+
+      - name: Publish recovered clean branch
+        shell: bash
+        env:
+          FINAL_BRANCH: yue2-music-os-composition-lab-recovered-20260915
+          BASE_COMMIT: 39243c99a259fe43a7484d3bde2107ffe8286bf1
+        run: |
+          set -euo pipefail
+          if git ls-remote --exit-code --heads origin "refs/heads/${FINAL_BRANCH}" >/dev/null 2>&1; then
+            echo "Recovered branch already exists; refusing to overwrite it." >&2
+            exit 2
+          fi
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git checkout --detach "${BASE_COMMIT}"
+          git switch -c "${FINAL_BRANCH}"
+          mkdir -p releases/yue2-music-os
+          cp -a /tmp/yue2-source/yue2_music_os/releases/yue2-music-os/v0.1-alpha releases/yue2-music-os/
+          git add releases/yue2-music-os/v0.1-alpha
+          test -n "$(git status --porcelain)"
+          git commit -m "feat: recover verified YuE2 Music OS composition lab"
+          git push origin "HEAD:refs/heads/${FINAL_BRANCH}"
