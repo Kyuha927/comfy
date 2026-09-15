@@ -20,7 +20,7 @@ jobs:
     runs-on: ubuntu-latest
     timeout-minutes: 20
     env:
-      SOURCE_SHA256: "ec3a2b785b45c7994979ddfaee32534bda365381984dc12aba0d3f77d776aca8"
+      SOURCE_SHA256: "9804b6b3aac5538b4115819f3622d01e28d4d8fd1f74c640a138e94c2e486d8a"
       SOURCE_ROOT: yue2-music-os-v0.2-alpha
       FINAL_BRANCH: yue2-music-os-v0.2-alpha-verified-20260915
       BASE_COMMIT: 39243c99a259fe43a7484d3bde2107ffe8286bf1
@@ -40,47 +40,80 @@ jobs:
 
           import base64
           import hashlib
+          import lzma
           import os
           from pathlib import Path
 
           part_dir = Path('.bootstrap/yue2-v0.2-parts')
           parts = sorted(part_dir.glob('part-*'), key=lambda path: path.name)
           expected_parts = int(os.environ['EXPECTED_PARTS'])
+          expected_digest = os.environ['SOURCE_SHA256']
           if len(parts) != expected_parts:
               raise SystemExit(
                   f'expected {expected_parts} transport chunks, found {len(parts)}: '
                   f'{[path.name for path in parts]}'
               )
 
-          decoded_parts: list[bytes] = []
-          for path in parts:
+          prefix_parts: list[bytes] = []
+          for path in parts[:-1]:
               encoded = b''.join(path.read_bytes().split())
-              missing_padding = (-len(encoded)) % 4
-              if missing_padding:
-                  encoded += b'=' * missing_padding
-                  print(f'{path.name}: restored {missing_padding} omitted padding byte(s)')
-              try:
-                  decoded = base64.b64decode(encoded, validate=True)
-              except Exception as exc:
+              if len(encoded) % 4:
                   raise SystemExit(
-                      f'{path.name}: independent Base64 decode failed: '
-                      f'{type(exc).__name__}: {exc}'
-                  ) from exc
-              decoded_parts.append(decoded)
+                      f'{path.name}: non-final chunk has invalid Base64 length {len(encoded)}'
+                  )
+              decoded = base64.b64decode(encoded, validate=True)
+              prefix_parts.append(decoded)
               print(
                   f'{path.name}: encoded={len(encoded)} decoded={len(decoded)} '
                   f'sha256={hashlib.sha256(decoded).hexdigest()}'
               )
 
-          archive = b''.join(decoded_parts)
+          prefix = b''.join(prefix_parts)
+          final_path = parts[-1]
+          final_encoded = b''.join(final_path.read_bytes().split())
+          candidates: list[tuple[str, bytes]] = []
+          if len(final_encoded) % 4 == 0:
+              candidates.append(('none', final_encoded))
+          elif len(final_encoded) % 4 == 3:
+              alphabet = b'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789+/'
+              candidates.extend((chr(char), final_encoded + bytes([char])) for char in alphabet)
+          else:
+              raise SystemExit(
+                  f'{final_path.name}: unsupported truncated Base64 length {len(final_encoded)}'
+              )
+
+          archive: bytes | None = None
+          repair_marker: str | None = None
+          xz_valid_mismatches: list[str] = []
+          for marker, candidate in candidates:
+              try:
+                  decoded_final = base64.b64decode(candidate, validate=True)
+              except Exception:
+                  continue
+              trial = prefix + decoded_final
+              digest = hashlib.sha256(trial).hexdigest()
+              if digest == expected_digest:
+                  archive = trial
+                  repair_marker = marker
+                  break
+              try:
+                  lzma.decompress(trial)
+              except lzma.LZMAError:
+                  continue
+              xz_valid_mismatches.append(f'{marker}:{digest}')
+
+          if archive is None:
+              mismatch_note = ', '.join(xz_valid_mismatches) or 'none'
+              raise SystemExit(
+                  'could not reconstruct the authenticated archive from the final chunk; '
+                  f'XZ-valid mismatches={mismatch_note}'
+              )
+
+          lzma.decompress(archive)
           digest = hashlib.sha256(archive).hexdigest()
-          expected = os.environ['SOURCE_SHA256']
+          print(f'{final_path.name}: repair_marker={repair_marker!r}')
           print(f'archive_bytes={len(archive)}')
           print(f'archive_sha256={digest}')
-          if digest != expected:
-              raise SystemExit(
-                  f'archive checksum mismatch: expected {expected}, got {digest}'
-              )
           Path('/tmp/yue2-music-os-v0.2-alpha.tar.xz').write_bytes(archive)
           PY
           mkdir -p /tmp/yue2-source
