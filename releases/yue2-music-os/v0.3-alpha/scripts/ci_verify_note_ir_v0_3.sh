@@ -122,7 +122,7 @@ def describe(path: Path) -> dict[str, object]:
 
 status = {
     'release': 'yue2-music-os-v0.3-alpha',
-    'branch': 'yue2-music-os-note-ir-free-v0.3-dev-20260916',
+    'branch': os.environ.get('GITHUB_REF_NAME', 'unknown'),
     'tested_source_commit': os.environ['TESTED_SOURCE_COMMIT'],
     'ci_run_id': int(os.environ['CI_RUN_ID']),
     'ci_run_attempt': int(os.environ['CI_RUN_ATTEMPT']),
@@ -163,10 +163,12 @@ status = {
 provenance = {
     'base_release': 'releases/yue2-music-os/v0.2-alpha',
     'base_verified_commit': '646b118c48693045ad06bf70f17e3c17d72443b5',
+    'authoritative_parent_commit': '6dd00a1c0d77210664eb46079543690554f8d71b',
+    'verification_branch': os.environ.get('GITHUB_REF_NAME', 'unknown'),
     'overlay_sha256': os.environ.get('OVERLAY_SHA256'),
     'tested_source_commit': os.environ['TESTED_SOURCE_COMMIT'],
     'ci_run_id': int(os.environ['CI_RUN_ID']),
-    'construction': 'copy verified v0.2 release, apply path-confined checksum-pinned v0.3 overlay',
+    'construction': 'authoritative v0.2 parent plus verified v0.2 source tree and isolated v0.3 release',
 }
 (root / 'BUILD_PROVENANCE.json').write_text(
     json.dumps(provenance, indent=2, sort_keys=True) + '\n', encoding='utf-8'
