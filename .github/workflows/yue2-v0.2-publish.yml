@@ -1,0 +1,84 @@
+name: Publish YuE2 Music OS v0.2 Alpha
+
+on:
+  push:
+    branches:
+      - yue2-music-os-v0.2-alpha-transport-20260915
+    paths:
+      - ".bootstrap/yue2-v0.2-parts/**"
+      - ".github/workflows/yue2-v0.2-publish.yml"
+
+permissions:
+  contents: write
+
+concurrency:
+  group: yue2-v0-2-publish-${{ github.ref }}
+  cancel-in-progress: false
+
+jobs:
+  verify-and-publish:
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    env:
+      SOURCE_SHA256: "9804b6b3aac5538b4115819f3622d01e28d4d8fd1f74c640a138e94c2e486d8a"
+      SOURCE_ROOT: yue2-music-os-v0.2-alpha
+      FINAL_BRANCH: yue2-music-os-v0.2-alpha-verified-20260915
+      BASE_COMMIT: 39243c99a259fe43a7484d3bde2107ffe8286bf1
+      EXPECTED_PARTS: "8"
+    steps:
+      - name: Check out transport branch
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1
+        with:
+          fetch-depth: 0
+
+      - name: Reassemble and authenticate source archive
+        shell: bash
+        run: |
+          set -euo pipefail
+          mapfile -t parts < <(find .bootstrap/yue2-v0.2-parts -maxdepth 1 -type f -name 'part-*' -print | LC_ALL=C sort)
+          test "${#parts[@]}" -eq "${EXPECTED_PARTS}"
+          cat "${parts[@]}" | tr -d '\r\n' | base64 --decode > /tmp/yue2-music-os-v0.2-alpha.tar.xz
+          echo "${SOURCE_SHA256}  /tmp/yue2-music-os-v0.2-alpha.tar.xz" | sha256sum -c -
+          mkdir -p /tmp/yue2-source
+          tar -xJf /tmp/yue2-music-os-v0.2-alpha.tar.xz -C /tmp/yue2-source
+          test -f "/tmp/yue2-source/${SOURCE_ROOT}/RELEASE_STATUS.json"
+          test -f "/tmp/yue2-source/${SOURCE_ROOT}/SHA256SUMS.txt"
+          test -x "/tmp/yue2-source/${SOURCE_ROOT}/scripts/release_check.sh"
+
+      - name: Set up Python 3.12
+        uses: actions/setup-python@5fda3b95a4ea91299a34e894583c3862153e4b97
+        with:
+          python-version: "3.12"
+
+      - name: Install controller and test dependencies
+        working-directory: /tmp/yue2-source/${{ env.SOURCE_ROOT }}
+        shell: bash
+        run: |
+          set -euo pipefail
+          python -m pip install -e '.[dev]'
+
+      - name: Run strict release gate
+        working-directory: /tmp/yue2-source/${{ env.SOURCE_ROOT }}
+        shell: bash
+        run: |
+          set -euo pipefail
+          ./scripts/release_check.sh "${RUNNER_TEMP}/yue2-release-check"
+
+      - name: Publish immutable clean branch
+        shell: bash
+        run: |
+          set -euo pipefail
+          if git ls-remote --exit-code --heads origin "refs/heads/${FINAL_BRANCH}" >/dev/null 2>&1; then
+            echo "Final branch already exists; refusing to overwrite it." >&2
+            exit 2
+          fi
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git checkout --detach "${BASE_COMMIT}"
+          git switch -c "${FINAL_BRANCH}"
+          mkdir -p releases/yue2-music-os/v0.2-alpha .github/workflows
+          cp -a "/tmp/yue2-source/${SOURCE_ROOT}/." releases/yue2-music-os/v0.2-alpha/
+          cp releases/yue2-music-os/v0.2-alpha/ci/yue2-music-os-v0.2-ci.yml .github/workflows/yue2-music-os-v0.2-ci.yml
+          git add releases/yue2-music-os/v0.2-alpha .github/workflows/yue2-music-os-v0.2-ci.yml
+          git commit -m "feat: add verified YuE2 Music OS v0.2 alpha"
+          git push origin "HEAD:refs/heads/${FINAL_BRANCH}"
