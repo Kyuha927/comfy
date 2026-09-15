@@ -2,13 +2,13 @@
   "artifacts": [
     {
       "name": "yue2_music_os-0.3.0a1-py3-none-any.whl",
-      "sha256": "e38094fc52780b5d75b3100bdd2314775288fd1600a076e3b6d232eb2a6aaf34",
+      "sha256": "06c54eed152812d7e83bd0dcca14b1a5f954c185210360cc8542f71b7463fee3",
       "size_bytes": 93691
     },
     {
       "name": "yue2_music_os-0.3.0a1.tar.gz",
-      "sha256": "5dd3d180ce757bb3dd07d477362d5806e08d2d752d73817cda15e06d0dac7d51",
-      "size_bytes": 122084
+      "sha256": "a50a4c0cf00438526ba48f4d2b0ba8fb305ba5a333e73d9558f974ca8b542780",
+      "size_bytes": 121886
     }
   ],
   "branch": "yue2-music-os-note-ir-free-v0.3-dev-20260916",
@@ -25,7 +25,7 @@
     "wheel_required_members": "PASS"
   },
   "ci_run_attempt": 1,
-  "ci_run_id": 35012560594,
+  "ci_run_id": 35012819207,
   "not_run": [
     "real YourMT3-family full-mix inference",
     "real BS-RoFormer stem separation",
@@ -35,13 +35,13 @@
     "representative-song human listening acceptance"
   ],
   "release": "yue2-music-os-v0.3-alpha",
-  "tested_source_commit": "f44bbb7409ee85bccdf424bc5bd367b094015165",
+  "tested_source_commit": "4cd10982f7e652e6a0e71d0f7eba76c5f44bc716",
   "tests": {
     "branch_coverage_percent": 81.05,
     "errors": 0,
     "failed": 0,
     "minimum_percent": 80,
-    "passed": 0,
+    "passed": 63,
     "skipped": 0
   },
   "verdict": "PASS_CONTROLLER_NOTE_IR_REAL_MULTI_INSTRUMENT_MODELS_PENDING"
