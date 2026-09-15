@@ -1,0 +1,19 @@
+{
+  "sdist": {
+    "name": "yue2_music_os-0.3.0a1.tar.gz",
+    "sha256": "46acd881ed7b5b93893a45dac95abc90ba18e02f9ec95fcf254cd78c104c9d5f",
+    "size_bytes": 130174
+  },
+  "sdist_member_count": 78,
+  "source_zip": {
+    "name": "yue2-music-os-v0.3-alpha-source.zip",
+    "sha256": "a0ded68d001f1f6c5904bd9e668015ff04b5265f905005887b0391d60cd443aa",
+    "size_bytes": 240984
+  },
+  "wheel": {
+    "name": "yue2_music_os-0.3.0a1-py3-none-any.whl",
+    "sha256": "b5551d5a7e5241d2efda68d37861466f67363968e50ab335b3f9868864756400",
+    "size_bytes": 93691
+  },
+  "wheel_member_count": 27
+}

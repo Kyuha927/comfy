@@ -1,0 +1,120 @@
+name: Integrate YuE2 Music OS Note IR v0.3 Alpha
+
+on:
+  push:
+    branches:
+      - yue2-music-os-note-ir-v0.3-integration-20260916
+    paths:
+      - '.bootstrap/yue2-note-ir-v0.3.ready'
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+concurrency:
+  group: yue2-note-ir-v0.3-${{ github.ref }}
+  cancel-in-progress: false
+
+env:
+  BASE_DIR: releases/yue2-music-os/v0.2-alpha
+  RELEASE_DIR: releases/yue2-music-os/v0.3-alpha
+  OVERLAY_SHA256: 72bcbe7133b897d9d7f642ca9834fcc8266f654c25b8026e05c8a2ee5f9a2d03
+
+jobs:
+  integrate-verify-publish:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 35
+    steps:
+      - name: Check out development branch
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1
+        with:
+          fetch-depth: 0
+
+      - name: Reconstruct v0.3 from verified v0.2 and pinned overlay
+        shell: bash
+        run: |
+          set -euo pipefail
+          overlay=/tmp/yue2-note-ir-v0.3-overlay.tar.gz
+          if compgen -G '.bootstrap/yue2-note-ir-v0.3.b64.part-*' >/dev/null; then
+            test -f .bootstrap/yue2-note-ir-v0.3.ready
+            cat .bootstrap/yue2-note-ir-v0.3.b64.part-* | base64 --decode > "$overlay"
+            test -f "$BASE_DIR/src/yue2_music_os/production.py"
+            test -f "$BASE_DIR/validation/VALIDATION_REPORT.json"
+            echo "$OVERLAY_SHA256  $overlay" | sha256sum -c -
+            python - "$overlay" <<'PY'
+          import sys, tarfile
+          from pathlib import PurePosixPath
+          expected = PurePosixPath('releases/yue2-music-os/v0.3-alpha')
+          with tarfile.open(sys.argv[1], 'r:gz') as bundle:
+              members = bundle.getmembers()
+              if not members:
+                  raise SystemExit('overlay archive is empty')
+              for member in members:
+                  path = PurePosixPath(member.name)
+                  if path.is_absolute() or '..' in path.parts or member.issym() or member.islnk():
+                      raise SystemExit(f'unsafe overlay member: {member.name}')
+                  if path == expected or expected in path.parents:
+                      continue
+                  if member.isdir() and path != PurePosixPath('.') and path in expected.parents:
+                      continue
+                  raise SystemExit(f'overlay escaped v0.3 root: {member.name}')
+          PY
+            rm -rf "$RELEASE_DIR"
+            cp -a "$BASE_DIR" "$RELEASE_DIR"
+            rm -rf "$RELEASE_DIR/dist" "$RELEASE_DIR/validation" "$RELEASE_DIR/build" \
+              "$RELEASE_DIR/.pytest_cache" "$RELEASE_DIR/.coverage" "$RELEASE_DIR/src/"*.egg-info
+            rm -f "$RELEASE_DIR/SHA256SUMS.txt" "$RELEASE_DIR/RELEASE_STATUS.json" \
+              "$RELEASE_DIR/RECOVERY_PROVENANCE.json"
+            find "$RELEASE_DIR" -type d -name __pycache__ -prune -exec rm -rf {} +
+            find "$RELEASE_DIR" -type f -name '*.py[co]' -delete
+            tar -xzf "$overlay" -C .
+            python "$RELEASE_DIR/scripts/apply_note_ir_v0_3_overlay.py"
+            cat > "$RELEASE_DIR/MANIFEST.in" <<'EOF'
+          include HANDOFF.md
+          include THIRD_PARTY_NOTICES.md
+          include .env.example
+          recursive-include docs *.md
+          recursive-include examples *.py *.json
+          recursive-include scripts *.py *.sh
+          EOF
+          else
+            echo 'Bootstrap archive absent; verifying existing v0.3 tree.'
+            test -f "$RELEASE_DIR/src/yue2_music_os/note_ir.py"
+          fi
+          grep -q 'version = "0.3.0a1"' "$RELEASE_DIR/pyproject.toml"
+          grep -q '__version__ = "0.3.0a1"' "$RELEASE_DIR/src/yue2_music_os/__init__.py"
+          test -x "$RELEASE_DIR/scripts/ci_verify_note_ir_v0_3.sh"
+          test -x "$RELEASE_DIR/scripts/install_basic_pitch_worker.sh"
+
+      - name: Set up Python 3.12
+        uses: actions/setup-python@5fda3b95a4ea91299a34e894583c3862153e4b97
+        with:
+          python-version: '3.12'
+
+      - name: Run all regression, security and distribution gates
+        env:
+          TESTED_SOURCE_COMMIT: ${{ github.sha }}
+          CI_RUN_ID: ${{ github.run_id }}
+          CI_RUN_ATTEMPT: ${{ github.run_attempt }}
+          OVERLAY_SHA256: ${{ env.OVERLAY_SHA256 }}
+        run: bash "$RELEASE_DIR/scripts/ci_verify_note_ir_v0_3.sh"
+
+      - name: Publish isolated v0.3 development release
+        shell: bash
+        run: |
+          set -euo pipefail
+          rm -rf "$RELEASE_DIR/.coverage" "$RELEASE_DIR/.pytest_cache" \
+            "$RELEASE_DIR/build" "$RELEASE_DIR/src/"*.egg-info
+          find "$RELEASE_DIR" -type d -name __pycache__ -prune -exec rm -rf {} +
+          find "$RELEASE_DIR" -type f -name '*.py[co]' -delete
+          rm -f .bootstrap/yue2-note-ir-v0.3.b64.part-* .bootstrap/yue2-note-ir-v0.3.ready
+          git config user.name 'github-actions[bot]'
+          git config user.email '41898282+github-actions[bot]@users.noreply.github.com'
+          git add -A "$RELEASE_DIR" .bootstrap
+          git add -f "$RELEASE_DIR/dist" "$RELEASE_DIR/validation"
+          if git diff --cached --quiet; then
+            echo 'No integration changes to publish.'
+            exit 0
+          fi
+          git commit -m 'feat: integrate free-first Note IR v0.3 [skip ci]'
+          git push origin "HEAD:${GITHUB_REF_NAME}"

@@ -1,0 +1,46 @@
+{
+  "free-multitrack-v1": {
+    "mode": "command",
+    "tier": "free",
+    "label": "Free six-stem transcription (Demucs 6s + Basic Pitch)",
+    "argv": [
+      "/absolute/path/to/free-multitrack-venv/bin/python",
+      "/absolute/path/to/free_multitrack_command_provider.py",
+      "--input", "{input}",
+      "--output-json", "{output_json}",
+      "--output-dir", "{output_dir}",
+      "--instrument-hint", "{instrument_hint}",
+      "--precision", "auto"
+    ],
+    "timeout_seconds": 21600,
+    "capabilities": {
+      "full_mix": true,
+      "isolated_stem": true,
+      "polyphonic": true,
+      "per_note_confidence": false,
+      "direct_audio_edit": false
+    },
+    "license_reference": "audio-separator MIT; Spotify Basic Pitch Apache-2.0; review Demucs and downloaded model notices before redistribution"
+  },
+  "basic-pitch-cli": {
+    "mode": "command",
+    "tier": "free",
+    "label": "Basic Pitch isolated Python 3.11 worker",
+    "argv": [
+      "/absolute/path/to/basic-pitch-venv/bin/python",
+      "/absolute/path/to/basic_pitch_command_provider.py",
+      "--input", "{input}",
+      "--output-json", "{output_json}",
+      "--instrument-hint", "{instrument_hint}"
+    ],
+    "timeout_seconds": 3600,
+    "capabilities": {
+      "full_mix": false,
+      "isolated_stem": true,
+      "polyphonic": true,
+      "per_note_confidence": false,
+      "direct_audio_edit": false
+    },
+    "license_reference": "Spotify Basic Pitch Apache-2.0; verify installed package/model notices"
+  }
+}

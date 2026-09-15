@@ -1,0 +1,314 @@
+<!doctype html>
+<html lang="ko">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="description" content="YuE2와 SheetSage2를 위한 악보 중심 음악 제작 컨트롤러">
+  <title>YuE2 Music OS</title>
+  <link rel="stylesheet" href="/styles.css">
+</head>
+<body>
+  <div class="ambient ambient-one"></div>
+  <div class="ambient ambient-two"></div>
+  <header class="topbar">
+    <a class="brand" href="/" aria-label="YuE2 Music OS 홈">
+      <span class="brand-mark" aria-hidden="true"><img src="/yue2-mark.svg" alt=""></span>
+      <span>
+        <strong>YuE2 Music OS</strong>
+        <small>Independent score-first controller</small>
+      </span>
+    </a>
+    <div class="top-actions">
+      <span id="engineBadge" class="status-pill muted">엔진 확인 중</span>
+      <button id="openSettings" class="ghost-button" type="button">연결 설정</button>
+    </div>
+  </header>
+
+  <main class="app-shell">
+    <aside class="sidebar panel">
+      <div class="section-heading compact">
+        <div>
+          <span class="eyebrow">WORKSPACE</span>
+          <h2>프로젝트</h2>
+        </div>
+        <button id="newProjectButton" class="icon-button" type="button" title="새 프로젝트">＋</button>
+      </div>
+      <select id="projectSelect" aria-label="프로젝트 선택">
+        <option value="">프로젝트를 선택하세요</option>
+      </select>
+
+      <div class="divider"></div>
+      <div class="section-heading compact">
+        <div>
+          <span class="eyebrow">QUEUE</span>
+          <h2>작업 기록</h2>
+        </div>
+        <button id="refreshButton" class="icon-button" type="button" title="새로고침">↻</button>
+      </div>
+      <div id="jobList" class="job-list empty-state">프로젝트를 선택하면 작업이 표시됩니다.</div>
+
+      <div class="sidebar-note">
+        <strong>검증 우선</strong>
+        <p>음표·리듬·마디 불변 조건과 실제 오디오 평가는 분리해 기록합니다.</p>
+      </div>
+    </aside>
+
+    <section class="workspace">
+      <section class="hero panel">
+        <div>
+          <span class="eyebrow">WHITE-BOX MUSIC</span>
+          <h1>말로 지시하고,<br><em>악보로 확인하고</em>,<br>귀로 판정합니다.</h1>
+          <p>생성, 음원 채보, 코드 제거, 악보 비교를 한 프로젝트 안에서 추적합니다. 원본은 고정하고 모든 변경을 새 버전으로 남깁니다.</p>
+        </div>
+        <div class="hero-meter" aria-label="워크플로 개요">
+          <div><b>01</b><span>Audio / Lyrics</span></div>
+          <i>→</i>
+          <div><b>02</b><span>ABC Score</span></div>
+          <i>→</i>
+          <div><b>03</b><span>Verified Render</span></div>
+        </div>
+      </section>
+
+      <nav class="mode-tabs" aria-label="작업 모드" role="tablist">
+        <button id="tab-button-generate" class="mode-tab active" data-tab="generate" type="button" role="tab" aria-selected="true" aria-controls="tab-generate">생성</button>
+        <button id="tab-button-transcribe" class="mode-tab" data-tab="transcribe" type="button" role="tab" aria-selected="false" aria-controls="tab-transcribe">음원 채보</button>
+        <button id="tab-button-surgery" class="mode-tab" data-tab="surgery" type="button" role="tab" aria-selected="false" aria-controls="tab-surgery">악보 수술실</button>
+        <button id="tab-button-production" class="mode-tab" data-tab="production" type="button" role="tab" aria-selected="false" aria-controls="tab-production">최종 렌더</button>
+        <button id="tab-button-library" class="mode-tab" data-tab="library" type="button" role="tab" aria-selected="false" aria-controls="tab-library">결과 보관함</button>
+      </nav>
+
+      <section id="tab-generate" class="tab-panel active panel" role="tabpanel" aria-labelledby="tab-button-generate" aria-hidden="false">
+        <div class="section-heading">
+          <div>
+            <span class="eyebrow">CREATE / RE-RENDER</span>
+            <h2>노래 생성</h2>
+          </div>
+          <span class="microcopy">후보는 GPU 한 장에서 순차 생성됩니다.</span>
+        </div>
+        <form id="generateForm" class="form-grid">
+          <label class="span-2">
+            <span>스타일 지시</span>
+            <textarea id="styleInput" rows="4" required>Korean, cinematic J-pop, adult female lead vocal, 165 BPM, intimate verse, explosive melodic chorus, live drums, distorted guitar, piano, clear diction</textarea>
+          </label>
+          <label class="span-2">
+            <span>가사</span>
+            <textarea id="lyricsInput" rows="10" required>[Verse]
+멈춘 시계 틈에 남은 목소리
+잊으려 할수록 선명해져
+
+[Chorus]
+끝나지 않은 밤을 가르며
+나는 다시 너의 이름을 불러</textarea>
+          </label>
+          <label>
+            <span>계획 모드</span>
+            <select id="cotInput">
+              <option value="full">Full · 멜로디와 코드</option>
+              <option value="melody">Melody · 멜로디만 고정</option>
+              <option value="off">Off · 악보 계획 없음</option>
+            </select>
+          </label>
+          <label>
+            <span>시드</span>
+            <input id="seedInput" type="number" min="0" max="2147483647" value="42">
+          </label>
+          <label>
+            <span>후보 수</span>
+            <input id="candidateInput" type="number" min="1" max="8" value="2">
+          </label>
+          <label>
+            <span>조건 악보 · 선택</span>
+            <select id="generationScoreSelect"><option value="">새 계획 생성</option></select>
+          </label>
+          <div class="span-2 form-action-row">
+            <div class="contract-note">
+              <b>주의</b> 악보 변경 후 렌더링은 전체 녹음을 새로 생성합니다. 편집 구간 밖의 음색과 표현도 달라질 수 있습니다.
+            </div>
+            <button class="primary-button" type="submit">생성 작업 시작 <span>↗</span></button>
+          </div>
+        </form>
+      </section>
+
+      <section id="tab-transcribe" class="tab-panel panel" role="tabpanel" aria-labelledby="tab-button-transcribe" aria-hidden="true">
+        <div class="section-heading">
+          <div>
+            <span class="eyebrow">AUDIO → SCORE</span>
+            <h2>SheetSage2 음원 채보</h2>
+          </div>
+          <span class="microcopy">자동 채보 오류는 반드시 청취와 악보 검토로 확인합니다.</span>
+        </div>
+        <form id="transcribeForm" class="form-grid">
+          <label class="span-2 upload-zone" id="uploadZone">
+            <input id="fileInput" type="file" accept=".wav,.flac,.mp3,.m4a,.ogg,.abc,.mid,.midi,.txt" multiple>
+            <span class="upload-icon">⇧</span>
+            <b>음원·악보 파일 업로드</b>
+            <small>WAV, FLAC, MP3, M4A, OGG, ABC, MIDI · 서버 제한 내</small>
+          </label>
+          <label class="span-2">
+            <span>채보할 음원</span>
+            <select id="transcribeAudioSelect" required><option value="">업로드한 음원을 선택하세요</option></select>
+          </label>
+          <label class="switch-row span-2">
+            <input id="melodyOnlyInput" type="checkbox" checked>
+            <span class="switch"></span>
+            <span><b>멜로디 전용 악보</b><small>코드 심벌을 제외해 새 편곡의 자유도를 확보합니다.</small></span>
+          </label>
+          <div class="span-2 form-action-row end">
+            <button class="primary-button" type="submit">채보 작업 시작 <span>↗</span></button>
+          </div>
+        </form>
+      </section>
+
+      <section id="tab-surgery" class="tab-panel panel" role="tabpanel" aria-labelledby="tab-button-surgery" aria-hidden="true">
+        <div class="section-heading">
+          <div>
+            <span class="eyebrow">SYMBOLIC QA</span>
+            <h2>악보 수술실</h2>
+          </div>
+          <span class="microcopy">문자열이 아니라 실제 음높이·시점·길이를 비교합니다.</span>
+        </div>
+        <div class="tool-cards">
+          <form id="compareForm" class="tool-card">
+            <div class="tool-number">01</div>
+            <h3>Before / After 비교</h3>
+            <p>멜로디, 리듬, 마디와 템포의 불변 조건을 검사하고 화성 변화는 별도로 보고합니다.</p>
+            <label><span>원본 악보</span><select id="beforeScoreSelect" required></select></label>
+            <label><span>수정 악보</span><select id="afterScoreSelect" required></select></label>
+            <label><span>비교 음성부</span>
+              <select id="voicesSelect"><option value="both">Vocal + Ins</option><option value="Vocal">Vocal</option><option value="Ins">Ins</option></select>
+            </label>
+            <label class="switch-row small">
+              <input id="allowTempoInput" type="checkbox"><span class="switch"></span><span>의도한 템포 변경 허용</span>
+            </label>
+            <button class="secondary-button" type="submit">불변 조건 검사</button>
+          </form>
+
+          <form id="stripForm" class="tool-card">
+            <div class="tool-number">02</div>
+            <h3>코드 제거</h3>
+            <p>원본 파일을 덮어쓰지 않고, 선택한 멜로디 음성부를 보존한 코드 없는 새 ABC를 만듭니다.</p>
+            <label><span>원본 악보</span><select id="stripScoreSelect" required></select></label>
+            <label><span>남길 음성부</span>
+              <select id="keepVoiceSelect"><option value="both">Vocal + Ins</option><option value="Vocal">Vocal만</option><option value="Ins">Ins만</option></select>
+            </label>
+            <div class="spacer"></div>
+            <button class="secondary-button" type="submit">코드 없는 복사본 생성</button>
+          </form>
+        </div>
+      </section>
+
+      <section id="tab-production" class="tab-panel panel" role="tabpanel" aria-labelledby="tab-button-production" aria-hidden="true">
+        <div class="section-heading">
+          <div>
+            <span class="eyebrow">COMPOSITION → COMMERCIAL RENDER</span>
+            <h2>최종 렌더 라우터</h2>
+          </div>
+          <span class="microcopy">YuE2는 작곡 후보를 만들고, 최종 연주는 별도 렌더러가 맡습니다.</span>
+        </div>
+        <form id="productionForm" class="form-grid">
+          <label class="span-2">
+            <span>YuE2 생성 작업</span>
+            <select id="productionGenerationSelect" required><option value="">완료된 생성 작업을 선택하세요</option></select>
+          </label>
+          <label>
+            <span>후보 선택</span>
+            <select id="productionCandidateSelect">
+              <option value="best-technical">기술 검사 최우선 후보</option>
+              <option value="1">후보 1</option><option value="2">후보 2</option><option value="3">후보 3</option><option value="4">후보 4</option>
+              <option value="5">후보 5</option><option value="6">후보 6</option><option value="7">후보 7</option><option value="8">후보 8</option>
+            </select>
+          </label>
+          <label>
+            <span>곡 이름</span>
+            <input id="productionTitleInput" maxlength="160" value="Untitled production render" required>
+          </label>
+          <div class="span-2">
+            <span class="field-label">최종 렌더러</span>
+            <div id="providerList" class="provider-grid empty-state">렌더러 정보를 불러오는 중입니다.</div>
+          </div>
+          <label class="span-2">
+            <span>렌더 메모 · 선택</span>
+            <textarea id="productionNotesInput" rows="3" maxlength="4000" placeholder="예: 후렴 보컬을 더 선명하게, 165 BPM 유지"></textarea>
+          </label>
+          <label class="switch-row span-2">
+            <input id="commercialIntentInput" type="checkbox" checked>
+            <span class="switch"></span>
+            <span><b>상업 발매 목적</b><small>활성화하면 비상업 YuE2 오디오는 렌더러 패키지에서 자동 제외됩니다.</small></span>
+          </label>
+          <label class="switch-row span-2 license-gate">
+            <input id="licenseAckInput" type="checkbox">
+            <span class="switch"></span>
+            <span><b>라이선스와 제공업체 약관을 직접 확인했습니다</b><small>이 확인 없이는 상업 렌더 작업을 시작하지 않습니다.</small></span>
+          </label>
+          <div class="span-2 production-actions">
+            <div class="contract-note">
+              <b>정직한 자동 선별</b> 후보 순위는 파일·영수증·ABC 무결성만 검사합니다. 음악성은 A/B 청취로 최종 결정하세요.
+            </div>
+            <div class="button-stack">
+              <button id="rankCandidatesButton" class="secondary-button" type="button">후보 기술 검사</button>
+              <button class="primary-button" type="submit">최종 렌더 패키지 만들기 <span>↗</span></button>
+            </div>
+          </div>
+        </form>
+      </section>
+
+      <section id="tab-library" class="tab-panel panel" role="tabpanel" aria-labelledby="tab-button-library" aria-hidden="true">
+        <div class="section-heading">
+          <div>
+            <span class="eyebrow">AUDITABLE OUTPUTS</span>
+            <h2>결과 보관함</h2>
+          </div>
+          <div class="filter-row">
+            <button class="filter-chip active" data-kind="all" type="button">전체</button>
+            <button class="filter-chip" data-kind="audio" type="button">오디오</button>
+            <button class="filter-chip" data-kind="score" type="button">악보</button>
+            <button class="filter-chip" data-kind="comparison" type="button">비교</button>
+          </div>
+        </div>
+        <div id="artifactList" class="artifact-grid empty-state">프로젝트를 선택하면 결과가 표시됩니다.</div>
+      </section>
+    </section>
+  </main>
+
+  <section class="listen-dock" aria-label="A/B 청취 도크">
+    <div class="dock-title"><span class="eyebrow">LISTENING DESK</span><b>A/B 청취</b></div>
+    <div class="audio-slot">
+      <span class="slot-letter">A</span>
+      <div><strong id="audioATitle">오디오를 선택하세요</strong><audio id="audioA" controls preload="metadata"></audio></div>
+    </div>
+    <button id="swapAudioButton" class="swap-button" type="button" title="A와 B 바꾸기">⇄</button>
+    <div class="audio-slot">
+      <span class="slot-letter">B</span>
+      <div><strong id="audioBTitle">오디오를 선택하세요</strong><audio id="audioB" controls preload="metadata"></audio></div>
+    </div>
+  </section>
+
+  <dialog id="projectDialog">
+    <form id="projectForm" method="dialog" class="dialog-card">
+      <div class="section-heading compact"><div><span class="eyebrow">NEW WORKSPACE</span><h2>새 프로젝트</h2></div><button class="icon-button" type="button" data-close-dialog="projectDialog">×</button></div>
+      <label><span>프로젝트 이름</span><input id="projectNameInput" maxlength="120" required placeholder="예: LIN ASTER Theme v01"></label>
+      <div class="dialog-actions"><button class="ghost-button" type="button" data-close-dialog="projectDialog">취소</button><button class="primary-button" type="submit">만들기</button></div>
+    </form>
+  </dialog>
+
+  <dialog id="settingsDialog">
+    <form method="dialog" class="dialog-card">
+      <div class="section-heading compact"><div><span class="eyebrow">LOCAL CONNECTION</span><h2>연결 설정</h2></div><button class="icon-button" value="close">×</button></div>
+      <label><span>API 토큰</span><input id="tokenInput" type="password" autocomplete="off" placeholder="서버에 토큰을 설정한 경우 입력"></label>
+      <p class="dialog-help">토큰은 이 브라우저의 로컬 저장소에만 보관됩니다. 외부 네트워크에 공개하지 마세요.</p>
+      <div class="dialog-actions"><button id="saveSettings" class="primary-button" value="close">저장 후 연결 확인</button></div>
+    </form>
+  </dialog>
+
+  <dialog id="previewDialog" class="preview-dialog">
+    <form method="dialog" class="dialog-card preview-card">
+      <div class="section-heading compact"><div><span class="eyebrow">ARTIFACT PREVIEW</span><h2 id="previewTitle">파일 미리보기</h2></div><button class="icon-button" value="close">×</button></div>
+      <pre id="previewContent" tabindex="0"></pre>
+      <div class="dialog-actions"><button class="ghost-button" value="close">닫기</button></div>
+    </form>
+  </dialog>
+
+  <div id="toast" class="toast" role="status" aria-live="polite"></div>
+  <script src="/app.js" defer></script>
+</body>
+</html>
