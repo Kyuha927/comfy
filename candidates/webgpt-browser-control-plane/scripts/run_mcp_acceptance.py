@@ -70,6 +70,7 @@ def main() -> int:
         ],
     }
     output = ROOT / "artifacts" / "mcp-transport-acceptance.json"
+    output.parent.mkdir(parents=True, exist_ok=True)
     output.write_text(json.dumps(report, indent=2, sort_keys=True) + "\n")
     print(json.dumps(report, indent=2, sort_keys=True))
     return result["exit_code"]
