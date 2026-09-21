@@ -1,6 +1,7 @@
 #!/usr/bin/env python3
 from __future__ import annotations
 
+import hashlib
 import json
 import subprocess
 import sys
@@ -15,6 +16,18 @@ ROOT = Path(__file__).resolve().parents[1]
 def candidate_version() -> str:
     with (ROOT / "pyproject.toml").open("rb") as handle:
         return str(tomllib.load(handle)["project"]["version"])
+
+
+def source_manifest_sha256() -> str:
+    return hashlib.sha256((ROOT / "MANIFEST.sha256").read_bytes()).hexdigest()
+
+
+def repeated_suite_is_current(report: dict[str, Any] | None) -> bool:
+    return bool(
+        report
+        and isinstance(report.get("source_manifest_sha256"), str)
+        and report["source_manifest_sha256"] == source_manifest_sha256()
+    )
 
 
 def invoke(path: Path, *, timeout_seconds: int = 180) -> dict[str, Any]:
@@ -113,12 +126,17 @@ def main() -> int:
                 and exit_stability.get("run_count") == 10
                 and isinstance(exit_stability.get("expected_tests_per_run"), int)
                 and exit_stability.get("expected_tests_per_run", 0) > 0
+                and repeated_suite_is_current(exit_stability)
                 and exit_stability.get("total_tests")
                 == exit_stability.get("run_count", 0)
                 * exit_stability.get("expected_tests_per_run", 0)
             )
             else "NOT_RUN",
-            "evidence": {"offline_suite": offline, "repeated_suite": exit_stability},
+            "evidence": {
+                "offline_suite": offline,
+                "repeated_suite": exit_stability,
+                "current_source_manifest_sha256": source_manifest_sha256(),
+            },
             "remaining": "kill every transition, browser/tunnel crash, reboot, partition, disk full, backup/restore, and migration rollback",
         },
         "G8_SECURITY_VERIFICATION": {

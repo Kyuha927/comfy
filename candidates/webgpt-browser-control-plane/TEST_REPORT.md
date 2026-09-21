@@ -8,14 +8,20 @@
 
 - Compilation of `src`, `tests`, and `scripts`: `PASS`.
 - Jev/CUA boundary suite: `PASS`, 10 tests.
-- Packaging-safety suite: `PASS`, 4 tests.
-- Full unit/integration discovery: `PASS`, 123 tests in one process.
+- Packaging-safety suite: `PASS`, 6 tests.
+- Full unit/integration discovery: `PASS`, 125 tests in the current Phase-A
+  verification run. The release-gate evidence also records 10 independent
+  passing runs, 125 tests each (1,250 total), bound to the current source
+  manifest.
 
 The exact test count must be read from every current run receipt. It must not be
-copied from the historical baseline evidence below. Current MCP, HTTP-process,
-security, package, deterministic-archive, extracted-source, stability,
-burn-in, and release-gate checks remain pending until their observed receipts
-are generated.
+copied from the historical baseline evidence below. The current local
+release-gate receipt additionally records MCP stdio and HTTP-process
+acceptance, scoped static and secret scanning, a bounded 30-second burn-in,
+and the source-bound repeated-suite check as `PASS_OFFLINE_ONLY`. Packaging,
+safe fresh extraction, fresh extracted-source verification, remote-clone
+verification, and local deployment acceptance remain pending until their
+respective observed receipts are generated.
 
 ## Historical WBCP 0.2.0a1 baseline evidence — not current-candidate evidence
 
@@ -53,6 +59,9 @@ are generated.
 7. The HTTP transport lacked principal-level tool filtering, rate/capacity limits, duplicate-key rejection, batch caps, and response CORS. These controls are now enforced and regression-tested.
 8. Repeated full-suite runs could intermittently finish all assertions but leave TestClient or Playwright lifecycle resources alive. TestClient now uses explicit context entry/exit, and Playwright cleanup is idempotent and attempts every owned layer even after an earlier close error. Ten independent full-suite processes now exit normally.
 9. Candidate packaging previously relied on a clean tree assumption. Source/archive and package-manifest builders now reject symlinks and resolved path escapes, with dedicated regressions.
+10. The release gate could read a repeated-suite artifact generated for an older
+    source manifest. Each stability report now carries the SHA-256 of the
+    current `MANIFEST.sha256`, and the release gate rejects a stale binding.
 
 ## Environment blocker confirmed
 

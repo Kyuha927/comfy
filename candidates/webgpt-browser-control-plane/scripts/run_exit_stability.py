@@ -2,6 +2,7 @@
 from __future__ import annotations
 
 import argparse
+import hashlib
 import json
 import os
 import re
@@ -12,6 +13,11 @@ from pathlib import Path
 from typing import Any
 
 ROOT = Path(__file__).resolve().parents[1]
+
+
+def source_manifest_sha256() -> str:
+    """Bind a repeated-run report to the exact tracked candidate source."""
+    return hashlib.sha256((ROOT / "MANIFEST.sha256").read_bytes()).hexdigest()
 
 
 def one_run(
@@ -128,6 +134,7 @@ def main() -> int:
     report = {
         "suite": "WBCP_REPEATED_FULL_SUITE_EXIT_STABILITY",
         "status": "PASS" if passed else "FAIL",
+        "source_manifest_sha256": source_manifest_sha256(),
         "expected_tests_per_run": expected_tests,
         "expected_tests_source": (
             "explicit_argument" if args.expected_tests is not None else "first_passing_run"

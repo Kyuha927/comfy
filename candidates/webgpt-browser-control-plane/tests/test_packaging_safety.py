@@ -61,6 +61,21 @@ class PackagingSafetyTests(unittest.TestCase):
                 paths = getattr(module, function)()
                 self.assertEqual([path.name for path in paths], ["README.md"])
 
+    def test_repeated_suite_report_is_bound_to_current_source_manifest(self) -> None:
+        stability = load_script("run_exit_stability")
+        release = load_script("run_release_gates")
+        with tempfile.TemporaryDirectory() as td:
+            root = Path(td)
+            (root / "MANIFEST.sha256").write_text("candidate source\n", encoding="utf-8")
+            stability.ROOT = root
+            release.ROOT = root
+            current = stability.source_manifest_sha256()
+            self.assertEqual(current, release.source_manifest_sha256())
+            self.assertTrue(release.repeated_suite_is_current({"source_manifest_sha256": current}))
+            self.assertFalse(
+                release.repeated_suite_is_current({"source_manifest_sha256": "0" * 64})
+            )
+
     def test_safe_extractor_rejects_path_escape_and_removes_partial_output(self) -> None:
         module = load_script("safe_extract_candidate")
         with tempfile.TemporaryDirectory() as td:
