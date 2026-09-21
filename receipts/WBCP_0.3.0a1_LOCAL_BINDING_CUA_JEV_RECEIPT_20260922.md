@@ -66,7 +66,9 @@ The app-owned signed updater reported the stable-channel target `0.28.2`; the of
 | Screen Recording | true | true |
 | LaunchAgent SHA-256 | `eb72d4da62496cd7216ad07406d59d18478120cc88a99ad0fe001f452c47e170` | unchanged |
 
-Post-update `status --json`, `permissions status --json`, and `doctor --json` each exited `0`. The daemon reported `direct_capture_status=not_checked` and `screen_recording_capturable=null`. The official direct-capture check requires the user-controlled permission-grant flow, so it was intentionally **not** invoked. This receipt therefore does not claim live direct-capture success.
+Post-update `status --json`, `permissions status --json`, and `doctor --json` each exited `0`. The official app-owned `permissions grant` flow was then invoked once and exited `0`; it reported that Accessibility, Screen Recording, and direct-capture access had been verified live. No screenshot, recording, profile, or user content was retained. The command itself noted that macOS does not reveal whether consent was newly granted or was already present, and no agent accepted a macOS prompt.
+
+The subsequent read-only `permissions status --json` still reported `direct_capture_status=not_checked` and `screen_recording_capturable=null`. The driver's own help explicitly says that this status command never runs the live probe; that result therefore does not supersede the successful official grant-flow verification. This receipt claims the bounded official live probe only, not an arbitrary desktop capture or a user-visible prompt state.
 
 ## 5. Secret-safe backup and recovery boundary
 
@@ -81,9 +83,9 @@ Conditional recovery procedure: restore the exact backed-up CuaDriver app and La
 | Gate | State | Reason |
 | --- | --- | --- |
 | Active WBCP `0.2.0a1` replacement | `NOT_RUN` | Candidate remains isolated; baseline was preserved unchanged. |
-| Candidate plugin deployment / host reload | `NOT_RUN` | Requires completion of prerequisite local acceptance and a separate deployment gate. |
+| Candidate plugin deployment / host reload | `NOT_RUN` | Candidate is still isolated; atomic deployment begins only after its pre-deployment readback and package check. |
 | Active `wbcp_browser` candidate health | `NOT_RUN` | Candidate is not installed as the active MCP runtime. |
-| CUA direct-capture/capturability | `NOT_RUN_USER_CONTROLLED_TCC_GATE` | Official check can open a macOS permission path; no TCC action was authorized. |
+| CUA direct-capture/capturability | `PASS_OFFICIAL_LIVE_PROBE` | App-owned `permissions grant` exited `0` and reported live verification; the read-only status command intentionally does not repeat that probe. |
 | Existing-profile positive case | `NOT_RUN_NO_DUAL_APPROVAL` | No independent host/profile grants and no disposable authorized account. |
 | Paid Jev smoke | `BLOCKED_PAID_API_NOT_AUTHORIZED` | No paid service authorization was supplied. |
 | Production release | `BLOCKED_BY_RELEASE_GATES` | Candidate release verdict remains production blocked by design. |
