@@ -1,0 +1,18 @@
+{
+  "browser_response_receipt_present": true,
+  "direct_user_secret_value_persisted": false,
+  "dom_ok": true,
+  "evidence_valid": true,
+  "final_receipt_state": "SUCCEEDED",
+  "network_ok": true,
+  "pixel_ok": true,
+  "production_promotion_granted": false,
+  "production_ready": false,
+  "real_chromium": true,
+  "real_provider_http_transaction": false,
+  "single_account": true,
+  "status": "PASS",
+  "suite": "WBCP_0.4.0a1_REAL_OFFLINE_CHROMIUM_SIGNUP",
+  "synthetic_offline_blob_response": true,
+  "trace_stopped_before_secret_entry": true
+}
