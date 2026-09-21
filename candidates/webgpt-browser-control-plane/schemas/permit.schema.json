@@ -1,0 +1,47 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://example.invalid/wbcp/permit.schema.json",
+  "title": "WBCP Finite Permit Claims",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "iss",
+    "jti",
+    "sub",
+    "session_id",
+    "allowed_actions",
+    "exact_hosts",
+    "risk_ceiling",
+    "max_calls",
+    "max_cost",
+    "currency",
+    "nbf",
+    "exp",
+    "nonce"
+  ],
+  "properties": {
+    "iss": {"type": "string"},
+    "jti": {"type": "string", "format": "uuid"},
+    "sub": {"type": "string", "minLength": 1},
+    "session_id": {"type": "string", "minLength": 1},
+    "allowed_actions": {
+      "type": "array",
+      "minItems": 1,
+      "uniqueItems": true,
+      "items": {"type": "string"}
+    },
+    "exact_hosts": {
+      "type": "array",
+      "minItems": 1,
+      "uniqueItems": true,
+      "items": {"type": "string"}
+    },
+    "risk_ceiling": {"type": "integer", "minimum": 0, "maximum": 4},
+    "max_calls": {"type": "integer", "minimum": 1, "maximum": 10000},
+    "max_cost": {"type": "number", "minimum": 0},
+    "currency": {"type": "string", "pattern": "^[A-Z]{3}$"},
+    "nbf": {"type": "number"},
+    "exp": {"type": "number"},
+    "nonce": {"type": "string", "minLength": 16}
+  }
+}

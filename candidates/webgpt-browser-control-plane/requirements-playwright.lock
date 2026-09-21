@@ -1,0 +1,3 @@
+# Candidate-bound deterministic browser dependency.  Production still needs a
+# fresh official release and browser-binary reconciliation.
+playwright==1.62.0

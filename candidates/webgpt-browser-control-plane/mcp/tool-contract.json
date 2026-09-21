@@ -1,0 +1,106 @@
+{
+  "schema_version": "2.0",
+  "status": "IMPLEMENTED_STDIO_AND_AUTHENTICATED_STREAMABLE_HTTP_OFFLINE_VERIFIED",
+  "tools": [
+    {
+      "name": "browser.health",
+      "risk": "R0",
+      "readOnlyHint": true,
+      "destructiveHint": false
+    },
+    {
+      "name": "browser.session.create",
+      "risk": "R1",
+      "readOnlyHint": false,
+      "destructiveHint": false
+    },
+    {
+      "name": "browser.session.close",
+      "risk": "R1",
+      "readOnlyHint": false,
+      "destructiveHint": false
+    },
+    {
+      "name": "browser.inspect",
+      "risk": "R0",
+      "readOnlyHint": true,
+      "destructiveHint": false
+    },
+    {
+      "name": "browser.navigate",
+      "risk": "R1",
+      "readOnlyHint": false,
+      "destructiveHint": false
+    },
+    {
+      "name": "browser.query",
+      "risk": "R0",
+      "readOnlyHint": true,
+      "destructiveHint": false
+    },
+    {
+      "name": "browser.action.preflight",
+      "risk": "DYNAMIC",
+      "readOnlyHint": true,
+      "destructiveHint": false
+    },
+    {
+      "name": "browser.action.authorize",
+      "risk": "DYNAMIC",
+      "readOnlyHint": false,
+      "destructiveHint": false
+    },
+    {
+      "name": "browser.action.commit",
+      "risk": "DYNAMIC_R2_TO_R4",
+      "readOnlyHint": false,
+      "destructiveHint": true
+    },
+    {
+      "name": "browser.job.get",
+      "risk": "R0",
+      "readOnlyHint": true,
+      "destructiveHint": false
+    },
+    {
+      "name": "browser.job.cancel",
+      "risk": "R1",
+      "readOnlyHint": false,
+      "destructiveHint": false
+    },
+    {
+      "name": "browser.evidence.get",
+      "risk": "R0",
+      "readOnlyHint": true,
+      "destructiveHint": false
+    }
+  ],
+  "constraints": {
+    "no_generic_untyped_click_tool": true,
+    "preflight_authorize_commit_split": true,
+    "all_mutations_require_exact_action_digest": true,
+    "tool_schema_changes_require_admin_rescan_and_diff_review": true,
+    "permit_and_approval_issuance_not_exposed_as_mcp_tools": true,
+    "http_bearer_auth_required": true,
+    "exact_host_and_origin_validation": true,
+    "r3_r4_require_dom_pixel_provider_receipt": true,
+    "canonical_base64url_signed_tokens": true,
+    "authenticated_principal_tool_allowlist": true,
+    "request_rate_and_concurrency_limits": true,
+    "bounded_streaming_request_body": true,
+    "batch_item_cap": true,
+    "duplicate_json_keys_rejected": true,
+    "allowlisted_response_cors": true
+  },
+  "protocol_versions": [
+    "2026-07-28",
+    "2025-11-25",
+    "2025-06-18",
+    "2025-03-26"
+  ],
+  "transport": {
+    "stdio": "newline-delimited JSON-RPC 2.0",
+    "http": "POST /mcp JSON-RPC; GET returns 405; bearer authentication; exact Host/Origin; allowlisted CORS; principal tool allowlist; rate/capacity limits; streaming byte cap; batch cap; duplicate-key rejection",
+    "sse": "not implemented; stateless POST is the reviewed candidate route"
+  }
+}
