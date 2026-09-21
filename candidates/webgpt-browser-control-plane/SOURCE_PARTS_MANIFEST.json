@@ -1,55 +1,55 @@
 {
   "candidate": "webgpt-browser-control-plane",
   "decoded_filename": "WBCP_0.4.0a1_SOURCE.tar.gz",
-  "decoded_sha256": "2a56f8929f5850ea640deb562fac5c52525cade27a83bf7cc7d199c863039555",
-  "decoded_size_bytes": 145997,
+  "decoded_sha256": "ec006c9080a87c9ef1c6a49b5559b5eb328b456ed2391d755c2b3cc7ef06282e",
+  "decoded_size_bytes": 151790,
   "encoding": "base64",
   "part_count": 9,
   "parts": [
     {
       "chars": 24000,
       "path": "releases/WBCP_0.4.0a1_SOURCE.tar.gz.b64.parts/part-000.b64",
-      "sha256_utf8": "aa97490c080af63f93c790600c9a03bdcc1ab07eed6ac8cbf3527f5a31251a6b"
+      "sha256_utf8": "c7b915e0282cf0abd948e872cf484c5407ffd9945cac5b9cddbfb5c4945acbed"
     },
     {
       "chars": 24000,
       "path": "releases/WBCP_0.4.0a1_SOURCE.tar.gz.b64.parts/part-001.b64",
-      "sha256_utf8": "40fd7e8b0bff8cda93be20464540e7771f10dffa4f35438a229807e078a644a7"
+      "sha256_utf8": "fe0f41b9a9baddb472718bdd3e3a4359dd0ea16e28d5eba18d2c6bfdb00a8469"
     },
     {
       "chars": 24000,
       "path": "releases/WBCP_0.4.0a1_SOURCE.tar.gz.b64.parts/part-002.b64",
-      "sha256_utf8": "c7f94ef90aa748e93e8bbf514c7eefac0ccb7b0eec3f25b960ac443f3f237ac5"
+      "sha256_utf8": "4528a75cf24dbc1971110c3face478d31456f9e3b657a5fe59086b18d043f6a9"
     },
     {
       "chars": 24000,
       "path": "releases/WBCP_0.4.0a1_SOURCE.tar.gz.b64.parts/part-003.b64",
-      "sha256_utf8": "3420d291368e15e1890e509fe68a34207f915dd415f29675e101bee6cb68a238"
+      "sha256_utf8": "6eb0b2725cb51ddd66bdf335b39a4c3fd2a6e7dee3bda8603b39e7b931a80851"
     },
     {
       "chars": 24000,
       "path": "releases/WBCP_0.4.0a1_SOURCE.tar.gz.b64.parts/part-004.b64",
-      "sha256_utf8": "5682c1bc29c351cdcc3642c73d8217aa11f10b8b21e3f6eb9b5cb6f012aadeba"
+      "sha256_utf8": "d99b7d9a2c909ca073f75c83cc47010f5d22203bd19ea7b8083d3c2896624578"
     },
     {
       "chars": 24000,
       "path": "releases/WBCP_0.4.0a1_SOURCE.tar.gz.b64.parts/part-005.b64",
-      "sha256_utf8": "c915dc0058141180127595f98867e8c4ec0747676ba84a7c13d571e17650c168"
+      "sha256_utf8": "acccb0597faf1dd4de3da0e965e1f96d9f715dfe85ec005a3a3eaecb16b01b6d"
     },
     {
       "chars": 24000,
       "path": "releases/WBCP_0.4.0a1_SOURCE.tar.gz.b64.parts/part-006.b64",
-      "sha256_utf8": "599907323f90b951bf4fad9ef722d3a37d7b0da2bd03e83a150af7ab1fe6eb50"
+      "sha256_utf8": "7afb09c48f2de90e36afc68751fcb53dd3adef20acc719fb8a9f0f505c9e571b"
     },
     {
       "chars": 24000,
       "path": "releases/WBCP_0.4.0a1_SOURCE.tar.gz.b64.parts/part-007.b64",
-      "sha256_utf8": "d1c853f4f437f3a2027f8c32698a6f4dcc72d7a0194653b05013c7516da0e85f"
+      "sha256_utf8": "5914b879ff6e1e4cfbb0562928854bd89b432a633affda4a96ebd2cce0ec1205"
     },
     {
-      "chars": 2664,
+      "chars": 10388,
       "path": "releases/WBCP_0.4.0a1_SOURCE.tar.gz.b64.parts/part-008.b64",
-      "sha256_utf8": "d5f67742ee21922a716f4cd273805b7e1525bae0bafff4b47b235bd9289a7043"
+      "sha256_utf8": "ef39019615d6f26fabcc11cf3a40e266979df051d484430397a2c423f3623642"
     }
   ],
   "production_promotion_granted": false,
