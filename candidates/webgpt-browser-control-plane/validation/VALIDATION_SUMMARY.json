@@ -1,14 +1,27 @@
 {
   "candidate": "webgpt-browser-control-plane",
-  "deterministic_double_build": "PASS_ALL_ARTIFACT_HASHES_IDENTICAL",
-  "manifests": {
-    "package_files": 119,
-    "source_files": 117,
-    "status": "PASS"
+  "deterministic_double_build": "PASS_ALL_RELEASE_ARTIFACT_HASHES_IDENTICAL",
+  "offline_signup": {
+    "browser_response_receipt_present": true,
+    "direct_user_secret_value_persisted": false,
+    "dom_ok": true,
+    "evidence_valid": true,
+    "final_receipt_state": "SUCCEEDED",
+    "network_ok": true,
+    "pixel_ok": true,
+    "production_promotion_granted": false,
+    "production_ready": false,
+    "real_chromium": true,
+    "real_provider_http_transaction": false,
+    "single_account": true,
+    "status": "PASS",
+    "suite": "WBCP_0.4.0a1_REAL_OFFLINE_CHROMIUM_SIGNUP",
+    "synthetic_offline_blob_response": true,
+    "trace_stopped_before_secret_entry": true
   },
   "production_promotion_granted": false,
   "production_ready": false,
-  "real_offline_chromium_signup_provider_receipt": "PASS",
+  "real_provider_account_transaction": "NOT_RUN",
   "reconstruction": {
     "git_bundle": "172_TESTS_PASS",
     "tar_gz": "172_TESTS_PASS",
@@ -17,22 +30,52 @@
   "release_gate_exit_code": 2,
   "release_verdict": "CONDITIONAL_OFFLINE_AND_LOCAL_TRANSPORT_PASS_PRODUCTION_BLOCKED",
   "repeated_short_soak": {
-    "evidence_chain_valid": true,
-    "iterations_per_run": 250,
     "runs": 4,
+    "status": "PASS",
+    "total_iterations": 1000,
     "total_succeeded": 1000,
-    "workers_per_run": 8
+    "workers_per_run": [
+      8
+    ]
   },
-  "secret_scan": {
-    "findings": 0,
-    "status": "PASS"
+  "secret_scan_findings": 0,
+  "source": {
+    "archive_file_count": 120,
+    "archive_root": "WBCP_0.4.0a1",
+    "candidate": "webgpt-browser-control-plane",
+    "git_bundle": {
+      "path": "WBCP_0.4.0a1.git.bundle",
+      "sha256": "f45e1736d35acc0554f9d5ecedee933c5d84f7bacd525a0f4412cf33e10213ff",
+      "size_bytes": 194488
+    },
+    "git_commit": "2f6460760ef4ac8a10ae614aca425a4f113e485f",
+    "git_tree": "8bb7826c2282637374faf6c78c7e083058b05f2c",
+    "legacy_manifest_file_sha256": "6b7577ec97494f3d86ee8bf8e974a69aa33c8aa712acb632a5c3933453206292",
+    "package_manifest_file_sha256": "30b86f209c48d61c6ab15d4fc1599cbd52ac9f9828555ccd73ff2640ce12e747",
+    "package_tree_sha256": "cd0ae9b6789803e411ef9830156e98baa5cd7faf532f336f5e8febaf28a276e0",
+    "production_promotion_granted": false,
+    "production_ready": false,
+    "source_manifest_file_sha256": "6b7577ec97494f3d86ee8bf8e974a69aa33c8aa712acb632a5c3933453206292",
+    "source_tar_gz": {
+      "path": "WBCP_0.4.0a1_SOURCE.tar.gz",
+      "sha256": "ec006c9080a87c9ef1c6a49b5559b5eb328b456ed2391d755c2b3cc7ef06282e",
+      "size_bytes": 151790
+    },
+    "source_tree_sha256": "2350cb43562a33852498f1ddd9ef17ad76c3e165437bb3fd10ab82a5e28d2c00",
+    "source_zip": {
+      "path": "WBCP_0.4.0a1_SOURCE.zip",
+      "sha256": "64f81d147b292641f65b110f4142afb3f6a1d7d408a21f5d90e4da8680aaf015",
+      "size_bytes": 220698
+    },
+    "status": "SAFE_SIGNUP_CANDIDATE_COMPLETE_PRODUCTION_BLOCKED",
+    "tests": {
+      "failed": 0,
+      "passed": 172
+    },
+    "version": "0.4.0a1"
   },
-  "static_security_audit": {
-    "findings": 0,
-    "status": "PASS"
-  },
+  "static_security_findings": 0,
   "status": "SAFE_SIGNUP_CANDIDATE_COMPLETE_PRODUCTION_BLOCKED",
-  "target_mac_signup_e2e": "NOT_RUN",
   "tests": {
     "failed": 0,
     "passed": 172
