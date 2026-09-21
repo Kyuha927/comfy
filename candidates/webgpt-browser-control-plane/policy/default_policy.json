@@ -1,0 +1,102 @@
+{
+  "schema_version": "1.0",
+  "status": "CANDIDATE_NOT_PRODUCTION",
+  "r4_mode": "block",
+  "require_known_cost_actions": [
+    "start_paid_generation",
+    "purchase",
+    "payment",
+    "transfer"
+  ],
+  "maximum_action_cost": 100.0,
+  "currency": "USD",
+  "block_web_content_authority": true,
+  "block_secret_shaped_payloads": true,
+  "allowed_action_types": [
+    "health",
+    "inspect",
+    "query",
+    "screenshot",
+    "read_network",
+    "read_console",
+    "job_get",
+    "evidence_get",
+    "job_cancel",
+    "session_close",
+    "session_create",
+    "navigate",
+    "scroll",
+    "focus",
+    "switch_tab",
+    "open_tab",
+    "close_tab",
+    "wait",
+    "type",
+    "select",
+    "upload_staged",
+    "download",
+    "create_draft",
+    "edit_draft",
+    "add_to_cart",
+    "checkpoint",
+    "submit",
+    "send",
+    "publish",
+    "comment",
+    "book",
+    "reserve",
+    "start_paid_generation",
+    "commit_upload",
+    "create_external_resource"
+  ],
+  "domain_policy": {
+    "default": "deny",
+    "exact_host_allowlist_required": true,
+    "wildcards_allowed": false,
+    "https_only": true,
+    "redirect_revalidation_each_hop": true,
+    "dns_rebinding_defense_required": true,
+    "private_loopback_link_local_blocked": true
+  },
+  "verification_policy": {
+    "R0": {
+      "minimum_signals": 2,
+      "all_three_required": false
+    },
+    "R1": {
+      "minimum_signals": 2,
+      "all_three_required": false
+    },
+    "R2": {
+      "minimum_signals": 2,
+      "all_three_required": false
+    },
+    "R3": {
+      "minimum_signals": 3,
+      "all_three_required": true
+    },
+    "R4": {
+      "minimum_signals": 3,
+      "all_three_required": true
+    },
+    "signals": [
+      "DOM_OR_ACCESSIBILITY",
+      "PIXEL",
+      "NETWORK_OR_PROVIDER_RECEIPT"
+    ]
+  },
+  "approval_policy": {
+    "R0": "FINITE_SESSION_PERMIT",
+    "R1": "FINITE_SESSION_PERMIT",
+    "R2": "FINITE_WRITE_PERMIT",
+    "R3": "FINITE_WRITE_PERMIT_PLUS_ONE_SHOT_HIGH_IMPACT_APPROVAL",
+    "R4": "DEFAULT_BLOCK; DUAL_CONTROL_ONLY_IF_EXPLICITLY_ENABLED",
+    "R5": "HARD_BLOCK"
+  },
+  "secret_policy": {
+    "model_may_receive_passwords": false,
+    "model_may_receive_totp_or_recovery_codes": false,
+    "credentials_must_be_entered_by_user_in_browser": true,
+    "auth_state_must_not_be_committed": true
+  }
+}

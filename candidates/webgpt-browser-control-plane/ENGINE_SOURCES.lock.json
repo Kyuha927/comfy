@@ -1,0 +1,29 @@
+{
+  "candidate_version": "0.3.0a1",
+  "cua": {
+    "bounded_mode_required": true,
+    "minimum_validated_reference": "0.28.2",
+    "typed_operation_allowlist": [
+      "SNAPSHOT",
+      "NAVIGATE",
+      "CLICK",
+      "TYPE_TEXT",
+      "SELECT",
+      "SCROLL",
+      "WAIT"
+    ]
+  },
+  "jev": {
+    "browser_harness": {
+      "version": "0.1.13",
+      "wheel_sha256": "2491459e4bfc0ee8aea22dc6c4680fc0f791b7ba553446323c50d2883449d769"
+    },
+    "commit": "1231850a0bf1a0c0341fe408ef1668dbbfdfac46",
+    "package": "jev-ultrafast",
+    "requires_python": ">=3.12",
+    "source_repository": "https://github.com/browser-use/jev-ultrafast.git",
+    "tree": "987b481ed8ef400911ca471bce38c7adfdabc45c",
+    "version": "0.1.0"
+  },
+  "schema_version": 1
+}

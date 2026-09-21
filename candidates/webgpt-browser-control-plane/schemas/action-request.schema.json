@@ -1,0 +1,35 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://example.invalid/wbcp/action-request.schema.json",
+  "title": "WBCP Action Request",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "session_id",
+    "idempotency_key",
+    "action_type",
+    "target_url",
+    "payload",
+    "expected",
+    "authority_source",
+    "reversible"
+  ],
+  "properties": {
+    "action_id": {"type": "string", "format": "uuid"},
+    "session_id": {"type": "string", "minLength": 1, "maxLength": 200},
+    "idempotency_key": {"type": "string", "minLength": 1, "maxLength": 200},
+    "action_type": {"type": "string", "pattern": "^[a-z][a-z0-9_]{0,63}$"},
+    "target_url": {"type": "string", "format": "uri", "maxLength": 4096},
+    "engine": {"enum": ["AUTO", "PLAYWRIGHT", "JEV", "CUA"]},
+    "payload": {"type": "object"},
+    "expected": {"type": "object"},
+    "authority_source": {
+      "enum": ["USER", "POLICY", "MODEL_PROPOSAL", "WEB_CONTENT"]
+    },
+    "page_revision": {"type": ["string", "null"], "maxLength": 200},
+    "estimated_cost": {"type": ["number", "null"], "minimum": 0},
+    "currency": {"type": ["string", "null"], "pattern": "^[A-Z]{3}$"},
+    "reversible": {"type": "boolean"},
+    "requested_at": {"type": "number"}
+  }
+}

@@ -1,0 +1,35 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://example.invalid/wbcp/receipt.schema.json",
+  "title": "WBCP Action Receipt",
+  "type": "object",
+  "additionalProperties": false,
+  "required": [
+    "job_id",
+    "state",
+    "risk",
+    "risk_name",
+    "action_digest",
+    "evidence_root",
+    "result"
+  ],
+  "properties": {
+    "job_id": {"type": "string", "format": "uuid"},
+    "state": {
+      "enum": [
+        "SUCCEEDED",
+        "FAILED",
+        "ROLLED_BACK",
+        "CANCELLED",
+        "BLOCKED",
+        "QUARANTINED"
+      ]
+    },
+    "risk": {"type": "integer", "minimum": 0, "maximum": 5},
+    "risk_name": {"type": "string"},
+    "action_digest": {"type": "string", "pattern": "^[a-f0-9]{64}$"},
+    "evidence_root": {"type": "string", "pattern": "^[a-f0-9]{64}$"},
+    "result": {"type": "object"},
+    "failure_code": {"type": ["string", "null"]}
+  }
+}

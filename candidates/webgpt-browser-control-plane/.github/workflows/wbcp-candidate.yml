@@ -1,0 +1,32 @@
+name: wbcp-candidate
+on:
+  pull_request:
+  workflow_dispatch:
+permissions:
+  contents: read
+jobs:
+  test:
+    strategy:
+      matrix:
+        python: ["3.12", "3.13"]
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: ${{ matrix.python }}
+          cache: pip
+      - run: python -m pip install --upgrade pip
+      - run: python -m pip install -e '.[http,test,playwright]'
+      # Jev is intentionally not installed in CI: its source pin is verified
+      # separately and it runs only in a dedicated WBCP-owned environment.
+      - run: python scripts/verify_engine_sources.py
+      - run: python -m playwright install --with-deps chromium
+      - run: python -m compileall -q src
+      - run: PYTHONPATH=src:tests python -m unittest discover -s tests -p 'test_*.py' -v
+      - run: python scripts/security_static_checks.py
+      - run: python scripts/generate_sbom.py
+      - uses: actions/upload-artifact@v4
+        with:
+          name: wbcp-evidence-py${{ matrix.python }}
+          path: artifacts/
