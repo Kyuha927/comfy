@@ -1,0 +1,200 @@
+name: wbcp-bootstrap-0.2.0a1
+
+on:
+  push:
+    branches:
+      - candidate/webgpt-browser-control-plane-0.2.0a1-20260921
+    paths:
+      - candidates/webgpt-browser-control-plane/_bootstrap/READY
+
+permissions:
+  contents: write
+
+jobs:
+  publish-and-fresh-clone-verify:
+    if: ${{ !contains(github.event.head_commit.message, '[wbcp-bootstrap-published]') }}
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.13"
+
+      - name: Reconstruct and verify exact source archive
+        shell: bash
+        run: |
+          set -euo pipefail
+          BOOT="candidates/webgpt-browser-control-plane/_bootstrap"
+          test -f "$BOOT/READY"
+          cat "$BOOT"/part-*.b64 | base64 --decode > "$RUNNER_TEMP/WBCP_0.2.0a1_SOURCE.tar.gz"
+          echo "f6e344ac2f95850189421934a40f1ca913e1735392ce7a8fceda79637018233e  $RUNNER_TEMP/WBCP_0.2.0a1_SOURCE.tar.gz" | sha256sum -c -
+
+          SRC_TAR="$RUNNER_TEMP/WBCP_0.2.0a1_SOURCE.tar.gz" OUT="$RUNNER_TEMP/wbcp-src" python - <<'PY'
+          import os, tarfile
+          from pathlib import Path
+
+          archive = Path(os.environ["SRC_TAR"])
+          out = Path(os.environ["OUT"])
+          out.mkdir(parents=True, exist_ok=True)
+          root = "WBCP_0.2.0a1"
+          executable = []
+          file_count = 0
+
+          with tarfile.open(archive, "r:gz") as tf:
+              members = tf.getmembers()
+              for m in members:
+                  p = Path(m.name)
+                  if p.is_absolute() or ".." in p.parts:
+                      raise SystemExit(f"unsafe path: {m.name}")
+                  if not m.name.startswith(root + "/") and m.name != root:
+                      raise SystemExit(f"unexpected root: {m.name}")
+                  if m.issym() or m.islnk():
+                      raise SystemExit(f"link rejected: {m.name}")
+                  if not (m.isfile() or m.isdir()):
+                      raise SystemExit(f"unsupported tar member: {m.name}")
+                  if m.isfile():
+                      file_count += 1
+                      if m.mode & 0o111:
+                          executable.append(m.name[len(root)+1:])
+              if file_count != 102:
+                  raise SystemExit(f"expected 102 files, got {file_count}")
+              tf.extractall(out, filter="data")
+
+          extracted = out / root
+          if not extracted.is_dir():
+              raise SystemExit("source root missing")
+          Path("/tmp/wbcp-executable-paths.txt").write_text(
+              "\n".join(executable) + "\n", encoding="utf-8"
+          )
+          print(f"SAFE_EXTRACT_PASS files={file_count} executable={len(executable)}")
+          PY
+
+      - name: Materialize candidate source with preserved modes
+        shell: bash
+        run: |
+          set -euo pipefail
+          TARGET="candidates/webgpt-browser-control-plane"
+          rm -rf "$TARGET"
+          mkdir -p "$(dirname "$TARGET")"
+          cp -a "$RUNNER_TEMP/wbcp-src/WBCP_0.2.0a1" "$TARGET"
+
+      - name: Verify manifests
+        working-directory: candidates/webgpt-browser-control-plane
+        run: |
+          set -euo pipefail
+          python scripts/verify_source_manifest.py --manifest SOURCE_MANIFEST.sha256
+          python scripts/verify_source_manifest.py --manifest PACKAGE_MANIFEST.sha256
+          python scripts/verify_source_manifest.py --manifest MANIFEST.sha256
+
+      - name: Install exact candidate dependencies
+        working-directory: candidates/webgpt-browser-control-plane
+        run: |
+          set -euo pipefail
+          python -m pip install --upgrade pip
+          python -m pip install -r requirements-candidate.lock
+          python -m pip install -e . --no-deps
+          python -m playwright install --with-deps chromium
+
+      - name: Run exact candidate regression and transport gates
+        working-directory: candidates/webgpt-browser-control-plane
+        run: |
+          set -euo pipefail
+          python -m compileall -q src tests scripts
+          PYTHONPATH=src:tests python -m unittest discover -s tests -p 'test_*.py' -v 2>&1 | tee "$RUNNER_TEMP/unit-tests.log"
+          grep -q "Ran 111 tests" "$RUNNER_TEMP/unit-tests.log"
+          grep -q "^OK$" "$RUNNER_TEMP/unit-tests.log"
+          python scripts/run_mcp_acceptance.py
+          PYTHONPATH=src python scripts/run_http_process_smoke.py
+          python scripts/security_static_checks.py
+          python scripts/scan_package_secrets.py
+
+          set +e
+          python scripts/run_release_gates.py > "$RUNNER_TEMP/release-gates.stdout.json"
+          rc=$?
+          set -e
+          cat "$RUNNER_TEMP/release-gates.stdout.json"
+          test "$rc" -eq 2
+
+      - name: Commit verified source and remove transport chunks
+        shell: bash
+        run: |
+          set -euo pipefail
+          git config user.name "wbcp-bootstrap"
+          git config user.email "wbcp-bootstrap@users.noreply.github.com"
+          git add -A candidates/webgpt-browser-control-plane
+          git diff --cached --quiet && { echo "no source diff"; exit 1; }
+          git commit -m "feat(wbcp): publish verified 0.2.0a1 source [wbcp-bootstrap-published]"
+          git push origin HEAD:candidate/webgpt-browser-control-plane-0.2.0a1-20260921
+          git rev-parse HEAD > "$RUNNER_TEMP/published-sha.txt"
+
+      - name: Fresh-clone exact remote branch
+        env:
+          GH_TOKEN: ${{ github.token }}
+        shell: bash
+        run: |
+          set -euo pipefail
+          FRESH="$RUNNER_TEMP/fresh"
+          git clone --single-branch --branch candidate/webgpt-browser-control-plane-0.2.0a1-20260921             "https://x-access-token:$GH_TOKEN@github.com/${GITHUB_REPOSITORY}.git" "$FRESH"
+          cd "$FRESH"
+          test "$(git rev-parse HEAD)" = "$(cat "$RUNNER_TEMP/published-sha.txt")"
+
+          cd candidates/webgpt-browser-control-plane
+          python scripts/verify_source_manifest.py --manifest SOURCE_MANIFEST.sha256
+          python scripts/verify_source_manifest.py --manifest PACKAGE_MANIFEST.sha256
+          python scripts/verify_source_manifest.py --manifest MANIFEST.sha256
+
+          while IFS= read -r p; do
+            test -z "$p" || test -x "$p"
+          done < /tmp/wbcp-executable-paths.txt
+
+          python -m pip install -r requirements-candidate.lock
+          python -m pip install -e . --no-deps
+          python -m playwright install --with-deps chromium
+          python -m compileall -q src tests scripts
+          PYTHONPATH=src:tests python -m unittest discover -s tests -p 'test_*.py' -v 2>&1 | tee "$RUNNER_TEMP/fresh-tests.log"
+          grep -q "Ran 111 tests" "$RUNNER_TEMP/fresh-tests.log"
+          grep -q "^OK$" "$RUNNER_TEMP/fresh-tests.log"
+
+      - name: Commit fresh-clone verification receipt
+        env:
+          GH_TOKEN: ${{ github.token }}
+        shell: bash
+        run: |
+          set -euo pipefail
+          FRESH="$RUNNER_TEMP/fresh"
+          cd "$FRESH"
+          SHA="$(git rev-parse HEAD)"
+          mkdir -p releases/work-handoffs/2026-09-21
+          SHA="$SHA" python - <<'PY'
+          import json, os
+          from pathlib import Path
+          receipt = {
+              "status": "GITHUB_CANDIDATE_PUBLISHED_AND_FRESH_CLONE_VERIFIED",
+              "candidate": "webgpt-browser-control-plane",
+              "version": "0.2.0a1",
+              "branch": "candidate/webgpt-browser-control-plane-0.2.0a1-20260921",
+              "published_commit": os.environ["SHA"],
+              "source_tar_sha256": "f6e344ac2f95850189421934a40f1ca913e1735392ce7a8fceda79637018233e",
+              "source_manifest_sha256": "733d0f8ce6b07415fa92f6777816ead0cd5e2c6a6cb31870d74ce8b4e3d0d9e4",
+              "local_candidate_commit": "4350b3ed3fd372f8094d11b43c58b7244a38e508",
+              "local_candidate_tree": "9ede3c3e3c3309c0df72b63671c61334094a2569",
+              "files": 102,
+              "fresh_clone_tests": {"passed": 111, "failed": 0, "status": "PASS"},
+              "executable_modes": "PASS",
+              "production_ready": False,
+              "production_promotion_granted": False,
+              "next_gate": "DRAFT_PR_AND_REAL_CHATGPT_TARGET_MAC_E2E"
+          }
+          Path("releases/work-handoffs/2026-09-21/WBCP_0.2.0a1_GITHUB_FRESH_CLONE_RECEIPT.json").write_text(
+              json.dumps(receipt, indent=2, sort_keys=True) + "\n", encoding="utf-8"
+          )
+          PY
+          git config user.name "wbcp-bootstrap"
+          git config user.email "wbcp-bootstrap@users.noreply.github.com"
+          git add releases/work-handoffs/2026-09-21/WBCP_0.2.0a1_GITHUB_FRESH_CLONE_RECEIPT.json
+          git commit -m "test(wbcp): record fresh-clone 0.2.0a1 verification"
+          git push origin HEAD:candidate/webgpt-browser-control-plane-0.2.0a1-20260921
