@@ -1,0 +1,41 @@
+{
+  "candidate": "webgpt-browser-control-plane",
+  "deterministic_double_build": "PASS_ALL_ARTIFACT_HASHES_IDENTICAL",
+  "manifests": {
+    "package_files": 119,
+    "source_files": 117,
+    "status": "PASS"
+  },
+  "production_promotion_granted": false,
+  "production_ready": false,
+  "real_offline_chromium_signup_provider_receipt": "PASS",
+  "reconstruction": {
+    "git_bundle": "172_TESTS_PASS",
+    "tar_gz": "172_TESTS_PASS",
+    "zip": "172_TESTS_PASS"
+  },
+  "release_gate_exit_code": 2,
+  "release_verdict": "CONDITIONAL_OFFLINE_AND_LOCAL_TRANSPORT_PASS_PRODUCTION_BLOCKED",
+  "repeated_short_soak": {
+    "evidence_chain_valid": true,
+    "iterations_per_run": 250,
+    "runs": 4,
+    "total_succeeded": 1000,
+    "workers_per_run": 8
+  },
+  "secret_scan": {
+    "findings": 0,
+    "status": "PASS"
+  },
+  "static_security_audit": {
+    "findings": 0,
+    "status": "PASS"
+  },
+  "status": "SAFE_SIGNUP_CANDIDATE_COMPLETE_PRODUCTION_BLOCKED",
+  "target_mac_signup_e2e": "NOT_RUN",
+  "tests": {
+    "failed": 0,
+    "passed": 172
+  },
+  "version": "0.4.0a1"
+}
