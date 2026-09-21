@@ -1,0 +1,84 @@
+name: WBCP signup candidate 0.4.0a1
+
+on:
+  pull_request:
+    branches:
+      - work-handoffs-v4-20260912
+    paths:
+      - candidates/webgpt-browser-control-plane/**
+      - .github/workflows/wbcp-signup-candidate-0.4.0a1.yml
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  verify-exact-source:
+    runs-on: ubuntu-latest
+    timeout-minutes: 35
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.12'
+      - name: Reconstruct exact source archive and extract safely
+        shell: bash
+        run: |
+          set -euo pipefail
+          ROOT='candidates/webgpt-browser-control-plane'
+          "$ROOT/RECONSTRUCT_SOURCE.sh" /tmp/WBCP_0.4.0a1_SOURCE.tar.gz
+          mkdir -p /tmp/wbcp
+          python3 - /tmp/WBCP_0.4.0a1_SOURCE.tar.gz /tmp/wbcp <<'PY'
+          import pathlib, sys, tarfile
+          archive = pathlib.Path(sys.argv[1])
+          out = pathlib.Path(sys.argv[2])
+          with tarfile.open(archive, 'r:gz') as tf:
+              for member in tf.getmembers():
+                  p = pathlib.PurePosixPath(member.name)
+                  if p.is_absolute() or '..' in p.parts or member.issym() or member.islnk():
+                      raise SystemExit(f'unsafe archive member: {member.name}')
+              tf.extractall(out, filter='data')
+          PY
+      - name: Install exact candidate dependencies
+        working-directory: /tmp/wbcp/WBCP_0.4.0a1
+        run: |
+          python -m pip install --upgrade pip
+          python -m pip install -r requirements-candidate.lock
+          python -m pip install -e . --no-deps
+          python -m playwright install --with-deps chromium
+      - name: Verify manifests and compile
+        working-directory: /tmp/wbcp/WBCP_0.4.0a1
+        run: |
+          python scripts/verify_source_manifest.py --manifest SOURCE_MANIFEST.sha256
+          python scripts/verify_source_manifest.py --manifest MANIFEST.sha256
+          python scripts/verify_source_manifest.py --manifest PACKAGE_MANIFEST.sha256
+          python -m compileall -q src tests scripts
+      - name: Run 172-test regression
+        working-directory: /tmp/wbcp/WBCP_0.4.0a1
+        env:
+          PYTHONPATH: src:tests
+        run: python -m unittest discover -s tests -p 'test_*.py' -v
+      - name: Run router and offline acceptance
+        working-directory: /tmp/wbcp/WBCP_0.4.0a1
+        env:
+          PYTHONPATH: src:tests
+        run: |
+          python scripts/run_worker_router_acceptance.py
+          python scripts/run_offline_acceptance.py
+      - name: Prove production remains blocked
+        working-directory: /tmp/wbcp/WBCP_0.4.0a1
+        env:
+          PYTHONPATH: src:tests
+        run: |
+          set +e
+          python scripts/run_release_gates.py
+          rc=$?
+          set -e
+          test "$rc" -eq 2
+          python - <<'PY'
+          import json
+          report = json.load(open('validation/RELEASE_GATES.json'))
+          assert report['release_ready'] is False
+          assert report['production_promotion_granted'] is False
+          assert report['verdict'] == 'CONDITIONAL_OFFLINE_AND_LOCAL_TRANSPORT_PASS_PRODUCTION_BLOCKED'
+          PY
