@@ -1,0 +1,71 @@
+{
+  "schema": "wbcp-verification-receipt-v1",
+  "generated_at": "2026-09-21",
+  "repository": "Kyuha927/comfy",
+  "base_branch": "work-handoffs-v4-20260912",
+  "candidate_branch": "candidate/webgpt-browser-control-plane-0.2.0a1-20260921",
+  "candidate": {
+    "name": "webgpt-browser-control-plane",
+    "version": "0.2.0a1",
+    "local_branch": "candidate/webgpt-browser-control-plane-0.2.0a1",
+    "local_commit": "4350b3ed3fd372f8094d11b43c58b7244a38e508",
+    "local_tree": "9ede3c3e3c3309c0df72b63671c61334094a2569",
+    "tracked_files": 102
+  },
+  "artifacts": {
+    "delivery_zip": {
+      "sha256": "ed6c83e0bdb9ea8bc2ca8a2b4ba88db763abdfc6090e0cd5fc036a1f3af8c467",
+      "size_bytes": 648093
+    },
+    "source_tar_gz": {
+      "sha256": "f6e344ac2f95850189421934a40f1ca913e1735392ce7a8fceda79637018233e",
+      "size_bytes": 131174,
+      "safe_members": 102
+    },
+    "build_receipt": {
+      "sha256": "bda6df9013d8bc5047a04f23f0fbb871577eadcf76d55aa45ab151e45fa6072b"
+    },
+    "source_manifest": {
+      "sha256": "733d0f8ce6b07415fa92f6777816ead0cd5e2c6a6cb31870d74ce8b4e3d0d9e4",
+      "verified_files": 88,
+      "status": "PASS"
+    },
+    "package_manifest": {
+      "sha256": "67a340fb19319aca36d93f3734e732402f5465fb22ca04423fe6e23dd379f80d",
+      "status": "PASS"
+    },
+    "git_bundle": {
+      "sha256": "620764cf36f09e8c5b52da5b511bf859e7e3f399271ae0a3b99a5b79a7309316",
+      "commit": "4350b3ed3fd372f8094d11b43c58b7244a38e508",
+      "tree": "9ede3c3e3c3309c0df72b63671c61334094a2569",
+      "status": "PASS"
+    }
+  },
+  "rerun_2026_09_21": {
+    "safe_extract": "PASS",
+    "source_manifest": "PASS",
+    "package_manifest": "PASS",
+    "unit_integration": {
+      "passed": 111,
+      "failed": 0,
+      "status": "PASS"
+    },
+    "python_compile": "PASS",
+    "git_bundle_verify": "PASS"
+  },
+  "excluded_evidence": {
+    "WBCP_0.2.0a1_REVERIFY_RECEIPT.json": {
+      "status": "ERROR",
+      "reason": "Historical reverify process referenced absent /mnt/data paths. It is not used as success evidence."
+    }
+  },
+  "github_publication": {
+    "branch_created": true,
+    "source_tree_expanded": false,
+    "draft_pr_created": false,
+    "production_ready": false,
+    "blocker": "BLOCKED_CURRENT_CHAT_GITHUB_TRANSPORT_CANNOT_BYTE_AND_MODE_PRESERVE_BULK_SOURCE",
+    "note": "The current GitHub connector can create UTF-8 files and Git objects but does not expose a binary-safe bulk source upload or the base tree SHA needed to graft an exact prebuilt subtree in one commit. A base64 transport probe was removed after truncation was detected; no incomplete payload remains in the branch diff."
+  },
+  "production_promotion_granted": false
+}
