@@ -4,29 +4,29 @@
   "candidate": "webgpt-browser-control-plane",
   "git_bundle": {
     "path": "WBCP_0.4.0a1.git.bundle",
-    "sha256": "054580fae09e28546c56361bb3b335b6472d4fa9c787a567fdf125d5ecd7beaf",
-    "size_bytes": 192970
+    "sha256": "f45e1736d35acc0554f9d5ecedee933c5d84f7bacd525a0f4412cf33e10213ff",
+    "size_bytes": 194488
   },
-  "git_commit": "65028e5b40f9b558bb49a6b090b5990dea4ef7db",
-  "git_tree": "eba44b1edf6b852135b4536e9976a6b28f36c7f8",
-  "legacy_manifest_file_sha256": "440793e5f7254908b50079a16203ba5ae423276489e0ebc2e24e6dd9d302cf49",
-  "package_manifest_file_sha256": "cf52c3506fc513527c852358f44b22ff924481e7a99a37a4d92ad61c2a51b781",
-  "package_tree_sha256": "1390e286d91fb8f958767d422b0fbb1eb5ecd43459e49000711ce269de0caf6d",
+  "git_commit": "2f6460760ef4ac8a10ae614aca425a4f113e485f",
+  "git_tree": "8bb7826c2282637374faf6c78c7e083058b05f2c",
+  "legacy_manifest_file_sha256": "6b7577ec97494f3d86ee8bf8e974a69aa33c8aa712acb632a5c3933453206292",
+  "package_manifest_file_sha256": "30b86f209c48d61c6ab15d4fc1599cbd52ac9f9828555ccd73ff2640ce12e747",
+  "package_tree_sha256": "cd0ae9b6789803e411ef9830156e98baa5cd7faf532f336f5e8febaf28a276e0",
   "production_promotion_granted": false,
   "production_ready": false,
-  "source_manifest_file_sha256": "440793e5f7254908b50079a16203ba5ae423276489e0ebc2e24e6dd9d302cf49",
+  "source_manifest_file_sha256": "6b7577ec97494f3d86ee8bf8e974a69aa33c8aa712acb632a5c3933453206292",
   "source_tar_gz": {
     "path": "WBCP_0.4.0a1_SOURCE.tar.gz",
-    "sha256": "2a56f8929f5850ea640deb562fac5c52525cade27a83bf7cc7d199c863039555",
-    "size_bytes": 145997
+    "sha256": "ec006c9080a87c9ef1c6a49b5559b5eb328b456ed2391d755c2b3cc7ef06282e",
+    "size_bytes": 151790
   },
-  "source_tree_sha256": "dddb3365272bdf7aa213e5c3b3e97d26b782708300b646a690b66926ea386372",
+  "source_tree_sha256": "2350cb43562a33852498f1ddd9ef17ad76c3e165437bb3fd10ab82a5e28d2c00",
   "source_zip": {
     "path": "WBCP_0.4.0a1_SOURCE.zip",
-    "sha256": "35a4fa38d6ef9596ee50f206c894cb19beb1408179b58f9b95c774082d4e07b4",
-    "size_bytes": 219297
+    "sha256": "64f81d147b292641f65b110f4142afb3f6a1d7d408a21f5d90e4da8680aaf015",
+    "size_bytes": 220698
   },
-  "status": "SAFE_SIGNUP_STATE_MACHINE_IMPLEMENTED_NOT_LOCALLY_PROMOTED",
+  "status": "SAFE_SIGNUP_CANDIDATE_COMPLETE_PRODUCTION_BLOCKED",
   "tests": {
     "failed": 0,
     "passed": 172
