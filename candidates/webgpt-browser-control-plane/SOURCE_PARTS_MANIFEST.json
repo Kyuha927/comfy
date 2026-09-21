@@ -1,0 +1,58 @@
+{
+  "candidate": "webgpt-browser-control-plane",
+  "decoded_filename": "WBCP_0.4.0a1_SOURCE.tar.gz",
+  "decoded_sha256": "2a56f8929f5850ea640deb562fac5c52525cade27a83bf7cc7d199c863039555",
+  "decoded_size_bytes": 145997,
+  "encoding": "base64",
+  "part_count": 9,
+  "parts": [
+    {
+      "chars": 24000,
+      "path": "releases/WBCP_0.4.0a1_SOURCE.tar.gz.b64.parts/part-000.b64",
+      "sha256_utf8": "aa97490c080af63f93c790600c9a03bdcc1ab07eed6ac8cbf3527f5a31251a6b"
+    },
+    {
+      "chars": 24000,
+      "path": "releases/WBCP_0.4.0a1_SOURCE.tar.gz.b64.parts/part-001.b64",
+      "sha256_utf8": "40fd7e8b0bff8cda93be20464540e7771f10dffa4f35438a229807e078a644a7"
+    },
+    {
+      "chars": 24000,
+      "path": "releases/WBCP_0.4.0a1_SOURCE.tar.gz.b64.parts/part-002.b64",
+      "sha256_utf8": "c7f94ef90aa748e93e8bbf514c7eefac0ccb7b0eec3f25b960ac443f3f237ac5"
+    },
+    {
+      "chars": 24000,
+      "path": "releases/WBCP_0.4.0a1_SOURCE.tar.gz.b64.parts/part-003.b64",
+      "sha256_utf8": "3420d291368e15e1890e509fe68a34207f915dd415f29675e101bee6cb68a238"
+    },
+    {
+      "chars": 24000,
+      "path": "releases/WBCP_0.4.0a1_SOURCE.tar.gz.b64.parts/part-004.b64",
+      "sha256_utf8": "5682c1bc29c351cdcc3642c73d8217aa11f10b8b21e3f6eb9b5cb6f012aadeba"
+    },
+    {
+      "chars": 24000,
+      "path": "releases/WBCP_0.4.0a1_SOURCE.tar.gz.b64.parts/part-005.b64",
+      "sha256_utf8": "c915dc0058141180127595f98867e8c4ec0747676ba84a7c13d571e17650c168"
+    },
+    {
+      "chars": 24000,
+      "path": "releases/WBCP_0.4.0a1_SOURCE.tar.gz.b64.parts/part-006.b64",
+      "sha256_utf8": "599907323f90b951bf4fad9ef722d3a37d7b0da2bd03e83a150af7ab1fe6eb50"
+    },
+    {
+      "chars": 24000,
+      "path": "releases/WBCP_0.4.0a1_SOURCE.tar.gz.b64.parts/part-007.b64",
+      "sha256_utf8": "d1c853f4f437f3a2027f8c32698a6f4dcc72d7a0194653b05013c7516da0e85f"
+    },
+    {
+      "chars": 2664,
+      "path": "releases/WBCP_0.4.0a1_SOURCE.tar.gz.b64.parts/part-008.b64",
+      "sha256_utf8": "d5f67742ee21922a716f4cd273805b7e1525bae0bafff4b47b235bd9289a7043"
+    }
+  ],
+  "production_promotion_granted": false,
+  "production_ready": false,
+  "version": "0.4.0a1"
+}
