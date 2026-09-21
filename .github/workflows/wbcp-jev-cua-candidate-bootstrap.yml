@@ -1,0 +1,218 @@
+name: WBCP Jev CUA candidate bootstrap
+
+on:
+  push:
+    branches:
+      - candidate/webgpt-browser-control-plane-jev-cua-20260921
+    paths:
+      - .wbcp-bootstrap/0.3.0a1/READY
+
+permissions:
+  contents: write
+
+jobs:
+  publish-verified-source:
+    if: ${{ !contains(github.event.head_commit.message, '[wbcp-published]') }}
+    runs-on: ubuntu-latest
+    timeout-minutes: 35
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.13"
+
+      - name: Reconstruct exact verified source archive
+        shell: bash
+        run: |
+          set -euo pipefail
+          BOOT=".wbcp-bootstrap/0.3.0a1"
+          test -f "$BOOT/READY"
+          cat "$BOOT"/part-*.b64 | base64 --decode > "$RUNNER_TEMP/WBCP_0.3.0a1_SOURCE.tar.gz"
+          echo "2f9e0049c1f1917ae20fe089a4876d3514b15934894201f99f55c93fda59dadb  $RUNNER_TEMP/WBCP_0.3.0a1_SOURCE.tar.gz" | sha256sum -c -
+
+      - name: Safe extract two independent copies
+        env:
+          SRC_TAR: ${{ runner.temp }}/WBCP_0.3.0a1_SOURCE.tar.gz
+          PUB_OUT: ${{ runner.temp }}/publish
+          TEST_OUT: ${{ runner.temp }}/test
+        shell: bash
+        run: |
+          set -euo pipefail
+          python - <<'PY'
+          import os, shutil, tarfile
+          from pathlib import Path
+
+          archive = Path(os.environ["SRC_TAR"])
+          pub_out = Path(os.environ["PUB_OUT"])
+          test_out = Path(os.environ["TEST_OUT"])
+          root_name = "WBCP_0.3.0a1"
+
+          def safe_extract(dest: Path):
+              dest.mkdir(parents=True, exist_ok=True)
+              with tarfile.open(archive, "r:gz") as tf:
+                  members = tf.getmembers()
+                  file_count = 0
+                  for m in members:
+                      p = Path(m.name)
+                      if p.is_absolute() or ".." in p.parts:
+                          raise SystemExit(f"unsafe path: {m.name}")
+                      if m.issym() or m.islnk():
+                          raise SystemExit(f"link rejected: {m.name}")
+                      if not (m.isfile() or m.isdir()):
+                          raise SystemExit(f"unsupported member: {m.name}")
+                      if not (m.name == root_name or m.name.startswith(root_name + "/")):
+                          raise SystemExit(f"unexpected root: {m.name}")
+                      if m.isfile():
+                          file_count += 1
+                  tf.extractall(dest, filter="data")
+              if file_count != 116:
+                  raise SystemExit(f"expected 116 files, got {file_count}")
+              return dest / root_name
+
+          pub = safe_extract(pub_out)
+          test = safe_extract(test_out)
+          if not pub.is_dir() or not test.is_dir():
+              raise SystemExit("extracted root missing")
+          print("SAFE_EXTRACT_PASS files=116")
+          PY
+
+      - name: Verify pristine publication copy manifests
+        working-directory: ${{ runner.temp }}/publish/WBCP_0.3.0a1
+        run: |
+          set -euo pipefail
+          python scripts/verify_source_manifest.py --manifest SOURCE_MANIFEST.sha256
+          python scripts/verify_source_manifest.py --manifest MANIFEST.sha256
+          python scripts/verify_source_manifest.py --manifest PACKAGE_MANIFEST.sha256
+          echo "b7bd290aece64ef26c487ffc1efbad9af2377cae866b798bd426f1c63d3a263e  SOURCE_MANIFEST.sha256" | sha256sum -c -
+          echo "b7bd290aece64ef26c487ffc1efbad9af2377cae866b798bd426f1c63d3a263e  MANIFEST.sha256" | sha256sum -c -
+          echo "ea564432b0ba73b769d66bd549cd9352ef5f65adb1177db0b8e7f7cdeae271e8  PACKAGE_MANIFEST.sha256" | sha256sum -c -
+
+      - name: Install candidate test dependencies
+        working-directory: ${{ runner.temp }}/test/WBCP_0.3.0a1
+        run: |
+          set -euo pipefail
+          python -m pip install --upgrade pip
+          python -m pip install -r requirements-candidate.lock
+          python -m pip install -e . --no-deps
+          python -m playwright install --with-deps chromium
+
+      - name: Run complete non-local regression
+        working-directory: ${{ runner.temp }}/test/WBCP_0.3.0a1
+        shell: bash
+        run: |
+          set -euo pipefail
+          python -m compileall -q src tests scripts
+          PYTHONPATH=src:tests python -m unittest discover -s tests -p 'test_*.py' -v 2>&1 | tee "$RUNNER_TEMP/unit.log"
+          grep -q "Ran 131 tests" "$RUNNER_TEMP/unit.log"
+          grep -q "^OK$" "$RUNNER_TEMP/unit.log"
+          python scripts/run_mcp_acceptance.py
+          PYTHONPATH=src python scripts/run_http_process_smoke.py
+          python scripts/security_static_checks.py
+          python scripts/scan_package_secrets.py
+          set +e
+          python scripts/run_release_gates.py > "$RUNNER_TEMP/release-gates.json"
+          rc=$?
+          set -e
+          test "$rc" -eq 2
+          python - <<'PY'
+          import json, os
+          p = os.path.join(os.environ["RUNNER_TEMP"], "release-gates.json")
+          d = json.load(open(p))
+          assert d["candidate_version"] == "0.3.0a1"
+          assert d["release_ready"] is False
+          assert d["verdict"] == "CONDITIONAL_OFFLINE_AND_LOCAL_TRANSPORT_PASS_PRODUCTION_BLOCKED"
+          print("EXPECTED_PRODUCTION_BLOCK_PASS")
+          PY
+
+      - name: Publish pristine exact source tree
+        shell: bash
+        run: |
+          set -euo pipefail
+          TARGET="candidates/webgpt-browser-control-plane"
+          rm -rf "$TARGET"
+          mkdir -p "$(dirname "$TARGET")"
+          cp -a "$RUNNER_TEMP/publish/WBCP_0.3.0a1" "$TARGET"
+          rm -rf .wbcp-bootstrap/0.3.0a1
+          git config user.name "wbcp-candidate-ci"
+          git config user.email "wbcp-candidate-ci@users.noreply.github.com"
+          git add -A "$TARGET" .wbcp-bootstrap
+          git diff --cached --check
+          git commit -m "feat(wbcp): publish verified Jev CUA 0.3.0a1 candidate [wbcp-published]"
+          git push origin HEAD:candidate/webgpt-browser-control-plane-jev-cua-20260921
+          git rev-parse HEAD > "$RUNNER_TEMP/published-sha"
+
+      - name: Fresh checkout exact remote candidate
+        env:
+          GH_TOKEN: ${{ github.token }}
+        shell: bash
+        run: |
+          set -euo pipefail
+          FRESH="$RUNNER_TEMP/fresh"
+          git clone --single-branch --branch candidate/webgpt-browser-control-plane-jev-cua-20260921             "https://x-access-token:$GH_TOKEN@github.com/${GITHUB_REPOSITORY}.git" "$FRESH"
+          cd "$FRESH"
+          test "$(git rev-parse HEAD)" = "$(cat "$RUNNER_TEMP/published-sha")"
+          cd candidates/webgpt-browser-control-plane
+          python scripts/verify_source_manifest.py --manifest SOURCE_MANIFEST.sha256
+          python scripts/verify_source_manifest.py --manifest MANIFEST.sha256
+          python scripts/verify_source_manifest.py --manifest PACKAGE_MANIFEST.sha256
+          python -m pip install -r requirements-candidate.lock
+          python -m pip install -e . --no-deps
+          python -m playwright install --with-deps chromium
+          python -m compileall -q src tests scripts
+          PYTHONPATH=src:tests python -m unittest discover -s tests -p 'test_*.py' -v 2>&1 | tee "$RUNNER_TEMP/fresh-unit.log"
+          grep -q "Ran 131 tests" "$RUNNER_TEMP/fresh-unit.log"
+          grep -q "^OK$" "$RUNNER_TEMP/fresh-unit.log"
+
+      - name: Record remote fresh-checkout receipt
+        env:
+          GH_TOKEN: ${{ github.token }}
+        shell: bash
+        run: |
+          set -euo pipefail
+          FRESH="$RUNNER_TEMP/fresh"
+          cd "$FRESH"
+          SOURCE_COMMIT="$(git rev-parse HEAD)"
+          mkdir -p releases/work-handoffs/2026-09-21
+          SOURCE_COMMIT="$SOURCE_COMMIT" python - <<'PY'
+          import json, os
+          from pathlib import Path
+          receipt = {
+            "status": "WBCP_JEV_CUA_IMPLEMENTED_NOT_LOCALLY_PROMOTED",
+            "candidate": "webgpt-browser-control-plane",
+            "version": "0.3.0a1",
+            "base_local_commit": "4350b3ed3fd372f8094d11b43c58b7244a38e508",
+            "remote_source_commit": os.environ["SOURCE_COMMIT"],
+            "source_tar_sha256": "2f9e0049c1f1917ae20fe089a4876d3514b15934894201f99f55c93fda59dadb",
+            "source_zip_sha256": "6a2ceec997a830b2b1934f3170d263b97d967c7c240f54bbb7a6b24f98c266eb",
+            "source_manifest_file_sha256": "b7bd290aece64ef26c487ffc1efbad9af2377cae866b798bd426f1c63d3a263e",
+            "package_manifest_file_sha256": "ea564432b0ba73b769d66bd549cd9352ef5f65adb1177db0b8e7f7cdeae271e8",
+            "tests": {"count": 131, "status": "PASS"},
+            "fresh_checkout": "PASS",
+            "playwright_primary_regression": "PASS",
+            "jev_route_contract": "PASS",
+            "cua_route_contract": "PASS",
+            "duplicate_side_effect_guard": "PASS",
+            "production_ready": False,
+            "production_promotion_granted": False,
+            "not_run": [
+              "target Mac installed runtime identity",
+              "live Jev Browser Harness attachment",
+              "paid Jev provider smoke",
+              "live CUA/TCC/native smoke",
+              "local plugin deployment and rollback",
+              "independent fresh-context security review",
+              "24-hour production soak"
+            ]
+          }
+          Path("releases/work-handoffs/2026-09-21/WBCP_JEV_CUA_REMOTE_IMPLEMENTATION_RECEIPT.json").write_text(
+            json.dumps(receipt, indent=2, sort_keys=True) + "\n", encoding="utf-8"
+          )
+          PY
+          git config user.name "wbcp-candidate-ci"
+          git config user.email "wbcp-candidate-ci@users.noreply.github.com"
+          git add releases/work-handoffs/2026-09-21/WBCP_JEV_CUA_REMOTE_IMPLEMENTATION_RECEIPT.json
+          git commit -m "test(wbcp): record Jev CUA fresh-checkout verification"
+          git push origin HEAD:candidate/webgpt-browser-control-plane-jev-cua-20260921
