@@ -28,8 +28,11 @@ The current local candidate was a newly materialized detached checkout of the ex
 | Compile | Python `compileall` | `0` | PASS |
 | Full candidate suite | Python unittest discovery | `0` | **125 tests**, PASS |
 | Jev/CUA boundary subset | `test_engine_boundaries.py` | `0` | **10 tests**, PASS |
+| Candidate-local MCP stdio probe | `initialize` → `tools/list` → `browser.health` with a disposable mock-browser runtime | `0` | **PASS**; 12 tools; version `0.3.0a1`; status `CANDIDATE_NOT_PRODUCTION` |
 
 The boundary subset executed and passed the following relevant contracts: Playwright remains the AUTO primary route; Jev authenticated/sensitive/personal-profile defaults fail closed; external-model egress defaults fail closed; Jev `DONE` requires the independent WBCP verifier; potential mutation requires reconciliation and blocks duplicate fallback; CUA exact binding and two independent existing-profile grants are enforced; and the public catalog exposes no shell, eval, unrestricted filesystem, or self-grant operation.
+
+The direct stdio probe used a newly created task-local data directory and mock browser only. Its response transcript SHA-256 was `a49afb41f11a8792a6c55ec4a7491f56ab73aa9911f40e3d67207748b6128f7b`; it reported `AUTO` primary `PLAYWRIGHT`, Jev egress default `DENY`, and CUA minimum `0.28.2`. This validates the isolated candidate transport only, not the installed active `wbcp_browser` runtime.
 
 ## 3. Isolated Jev environment
 
